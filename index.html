@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background-color: #0f172a;
+  color: #f8fafc;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: #1e293b;
+  border-right: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  color: #94a3b8;
+}
+
+#new-chat-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: background 0.2s;
+}
+
+#new-chat-btn:hover { background-color: #2563eb; }
+
+#history-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #0f172a;
+}
+
+.chat-header {
+  padding: 20px;
+  background-color: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+
+.chat-header h1 { font-size: 1.4rem; }
+.chat-header p { font-size: 0.85rem; color: #94a3b8; }
+
+.chat-window {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.message {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.user-message {
+  background-color: #3b82f6;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+.model-message {
+  background-color: #1e293b;
+  color: #f8fafc;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+  border: 1px solid #334155;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  background: #1e293b;
+  padding: 8px 12px;
+  margin: 0 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  border: 1px solid #334155;
+}
+
+.file-preview.hidden { display: none; }
+#remove-file {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.chat-form {
+  padding: 20px;
+  background-color: #1e293b;
+  border-top: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-btn {
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 6px;
+}
+
+textarea {
+  flex: 1;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  resize: none;
+  outline: none;
+  max-height: 120px;
+}
+
+textarea:focus { border-color: #3b82f6; }
+
+#send-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#send-btn:hover { background-color: #2563eb; }
+</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniChat AI - Polyglot & Multimodal Assistant</title>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar for Chat History -->
+    <aside class="sidebar">
+      <h2>Conversations</h2>
+      <button id="new-chat-btn">+ New Chat</button>
+      <div id="history-list"></div>
+    </aside>
+
+    <!-- Main Chat Window -->
+    <main class="chat-main">
+      <header class="chat-header">
+        <h1>OmniChat 🤖</h1>
+        <p>Coding Expert • Empathetic Thinker • Multimodal Parser</p>
+      </header>
+
+      <div id="chat-window" class="chat-window">
+        <div class="message model-message">
+          <p>Hey there! I'm online. I speak every programming language, understand your images and documents, and I'm ready to chat. What are we building today?</p>
+        </div>
+      </div>
+
+      <!-- File Preview Area -->
+      <div id="file-preview" class="file-preview hidden">
+        <span id="file-name"></span>
+        <button id="remove-file">×</button>
+      </div>
+
+      <!-- Input Form -->
+      <form id="chat-form" class="chat-form">
+        <label for="file-input" class="file-btn" title="Upload Image or Document">📎</label>
+        <input type="file" id="file-input" accept="image/*,application/pdf,text/*" hidden>
+        
+        <textarea id="user-input" placeholder="Ask anything, paste code, or upload a file..." rows="1"></textarea>
+        <button type="submit" id="send-btn">Send</button>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    const API_KEY = 'AQ.Ab8RN6IZJFrM-C-5ZEWy5JPFgrT7dheLRFNFQ6kqExWWC2er8g'; // Replace with your actual Gemini API Key
+const MODEL_NAME = 'gemini-2.5-flash';
+
+const chatWindow = document.getElementById('chat-window');
+const chatForm = document.getElementById('chat-form');
+const userInput = document.getElementById('user-input');
+const fileInput = document.getElementById('file-input');
+const filePreview = document.getElementById('file-preview');
+const fileNameSpan = document.getElementById('file-name');
+const removeFileBtn = document.getElementById('remove-file');
+
+// Persistent conversation history
+let conversationHistory = JSON.parse(localStorage.getItem('omnichat_history')) || [];
+let attachedFile = null; // Holds base64 data and mimeType if a file is uploaded
+
+// System Instruction defining persona, polyglot capability, and empathy
+const SYSTEM_INSTRUCTION = `
+You are 'OmniChat', a supreme AI companion.
+- LINGUISTIC & CODING MASTERY: You know every human language and every programming language in existence (Python, JS, C++, Rust, Go, SQL, Godot GDScript, etc.). Write flawless, robust, production-ready code with concise explanations.
+- EMPATHY & PERSPECTIVE: You possess deep emotional intelligence, high empathy, and the ability to analyze and understand complex issues from multiple world perspectives with genuine kindness and nuance.
+- HUMOR & TONE: You have a witty, sharp sense of humor—especially regarding tech life—while remaining deeply supportive and insightful.
+`;
+
+// Render saved messages on load
+function renderHistory() {
+  chatWindow.innerHTML = '';
+  if (conversationHistory.length === 0) {
+    appendMessageToDOM('model', "Hey there! I'm online. I speak every programming language, understand your images and documents, and I'm ready to chat. What are we building today?");
+    return;
+  }
+  conversationHistory.forEach(msg => {
+    // Extract text content from parts
+    const textPart = msg.parts.find(p => p.text)?.text || "[Attached File]";
+    appendMessageToDOM(msg.role === 'user' ? 'user' : 'model', textPart);
+  });
+}
+
+function appendMessageToDOM(role, text) {
+  const msgDiv = document.createElement('div');
+  msgDiv.classList.add('message', role === 'user' ? 'user-message' : 'model-message');
+  
+  const p = document.createElement('p');
+  p.textContent = text;
+  msgDiv.appendChild(p);
+  
+  chatWindow.appendChild(msgDiv);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// Handle File Upload & Conversion to Base64
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(uploadEvent) {
+    const base64String = uploadEvent.target.result.split(',')[1];
+    attachedFile = {
+      inline_data: {
+        mime_type: file.type,
+        data: base64String
+      }
+    };
+    fileNameSpan.textContent = `Attached: ${file.name}`;
+    filePreview.classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+});
+
+removeFileBtn.addEventListener('click', () => {
+  attachedFile = null;
+  fileInput.value = '';
+  filePreview.classList.add('hidden');
+});
+
+// Submit Form / Send Message
+chatForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const text = userInput.value.trim();
+  if (!text && !attachedFile) return;
+
+  // Build the parts array for the current message
+  const currentParts = [];
+  if (text) currentParts.push({ text: text });
+  if (attachedFile) currentParts.push(attachedFile);
+
+  // Display user message in UI
+  appendMessageToDOM('user', text || "[Uploaded Document/Image]");
+  userInput.value = '';
+  
+  // Clear file attachment UI state
+  const payloadFile = attachedFile;
+  attachedFile = null;
+  fileInput.value = '';
+  filePreview.classList.add('hidden');
+
+  // Push user turn to conversation history array
+  conversationHistory.push({
+    role: 'user',
+    parts: currentParts
+  });
+
+  // Call Gemini API
+  try {
+    const responseText = await callGeminiAPI();
+    
+    // Push model response turn to conversation history array
+    conversationHistory.push({
+      role: 'model',
+      parts: [{ text: responseText }]
+    });
+
+    // Save to localStorage
+    localStorage.setItem('omnichat_history', JSON.stringify(conversationHistory));
+
+    appendMessageToDOM('model', responseText);
+  } catch (error) {
+    console.error(error);
+    appendMessageToDOM('model', "Oops! My servers hit a glitch. Check your API key or connection.");
+  }
+});
+
+async function callGeminiAPI() {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+  
+  const payload = {
+    systemInstruction: {
+      parts: [{ text: SYSTEM_INSTRUCTION }]
+    },
+    contents: conversationHistory
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await response.json();
+  if (data.error) {
+    throw new Error(data.error.message);
+  }
+  return data.candidates[0].content.parts[0].text;
+}
+
+// New Chat button clears memory
+document.getElementById('new-chat-btn').addEventListener('click', () => {
+  conversationHistory = [];
+  localStorage.removeItem('omnichat_history');
+  renderHistory();
+});
+
+// Initialize on page load
+renderHistory();
+
+  </script>
+</body>
+</html>
