@@ -1,183 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rhomeo AI - Polyglot & Multimodal Assistant</title>
+
+  <!-- PWA Manifest & Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e293b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rhomeo">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4712/4712035.png">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-body {
-  background-color: #0f172a;
-  color: #f8fafc;
-  height: 100vh;
-  display: flex;
-  overflow: hidden;
-}
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
 
-.app-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
+    .app-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
 
-.sidebar {
-  width: 260px;
-  background-color: #1e293b;
-  border-right: 1px solid #334155;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
+    .sidebar {
+      width: 260px;
+      background-color: #1e293b;
+      border-right: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
 
-.sidebar h2 {
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-  color: #94a3b8;
-}
+    .sidebar h2 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #94a3b8;
+    }
 
-#new-chat-btn {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-bottom: 20px;
-  transition: background 0.2s;
-}
+    #new-chat-btn {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-bottom: 20px;
+      transition: background 0.2s;
+    }
 
-#new-chat-btn:hover { background-color: #2563eb; }
+    #new-chat-btn:hover { background-color: #2563eb; }
 
-#history-list {
-  flex: 1;
-  overflow-y: auto;
-}
+    #install-pwa-btn {
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: none;
+    }
 
-.chat-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: #0f172a;
-}
+    #history-list {
+      flex: 1;
+      overflow-y: auto;
+    }
 
-.chat-header {
-  padding: 20px;
-  background-color: #1e293b;
-  border-bottom: 1px solid #334155;
-}
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background-color: #0f172a;
+    }
 
-.chat-header h1 { font-size: 1.4rem; }
-.chat-header p { font-size: 0.85rem; color: #94a3b8; }
+    .chat-header {
+      padding: 20px;
+      background-color: #1e293b;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.chat-window {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+    .chat-header h1 { font-size: 1.4rem; }
+    .chat-header p { font-size: 0.85rem; color: #94a3b8; }
 
-.message {
-  max-width: 75%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  line-height: 1.5;
-  word-break: break-word;
-}
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background-color: #10b981;
+      color: white;
+      font-weight: 600;
+    }
 
-.user-message {
-  background-color: #3b82f6;
-  color: white;
-  align-self: flex-end;
-  border-bottom-right-radius: 2px;
-}
+    .status-badge.offline {
+      background-color: #ef4444;
+    }
 
-.model-message {
-  background-color: #1e293b;
-  color: #f8fafc;
-  align-self: flex-start;
-  border-bottom-left-radius: 2px;
-  border: 1px solid #334155;
-}
+    .chat-window {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-.file-preview {
-  display: flex;
-  align-items: center;
-  background: #1e293b;
-  padding: 8px 12px;
-  margin: 0 20px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  border: 1px solid #334155;
-}
+    .message {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
 
-.file-preview.hidden { display: none; }
-#remove-file {
-  background: none;
-  border: none;
-  color: #ef4444;
-  font-size: 1.2rem;
-  cursor: pointer;
-  margin-left: auto;
-}
+    .user-message {
+      background-color: #3b82f6;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
 
-.chat-form {
-  padding: 20px;
-  background-color: #1e293b;
-  border-top: 1px solid #334155;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+    .model-message {
+      background-color: #1e293b;
+      color: #f8fafc;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+      border: 1px solid #334155;
+    }
 
-.file-btn {
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 6px;
-}
+    .file-preview {
+      display: flex;
+      align-items: center;
+      background: #1e293b;
+      padding: 8px 12px;
+      margin: 0 20px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      border: 1px solid #334155;
+    }
 
-textarea {
-  flex: 1;
-  background-color: #0f172a;
-  border: 1px solid #334155;
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
-  resize: none;
-  outline: none;
-  max-height: 120px;
-}
+    .file-preview.hidden { display: none; }
+    #remove-file {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-left: auto;
+    }
 
-textarea:focus { border-color: #3b82f6; }
+    .chat-form {
+      padding: 20px;
+      background-color: #1e293b;
+      border-top: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-#send-btn {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-#send-btn:hover { background-color: #2563eb; }
-</style>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rhomeo AI - Polyglot & Multimodal Assistant</title>
+    .file-btn {
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    textarea {
+      flex: 1;
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      resize: none;
+      outline: none;
+      max-height: 120px;
+    }
+
+    textarea:focus { border-color: #3b82f6; }
+
+    #send-btn {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #send-btn:hover { background-color: #2563eb; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .message { max-width: 88%; }
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
     <!-- Sidebar for Chat History -->
     <aside class="sidebar">
       <h2>Conversations</h2>
+      <button id="install-pwa-btn">📲 Install App</button>
       <button id="new-chat-btn">+ New Chat</button>
       <div id="history-list"></div>
     </aside>
@@ -185,8 +228,11 @@ textarea:focus { border-color: #3b82f6; }
     <!-- Main Chat Window -->
     <main class="chat-main">
       <header class="chat-header">
-        <h1>Rhomeo</h1>
-        <p>Coding Expert • Empathetic Thinker • Multimodal Parser</p>
+        <div>
+          <h1>Rhomeo</h1>
+          <p>Coding Expert • Empathetic Thinker • Multimodal Parser</p>
+        </div>
+        <span id="network-status" class="status-badge">Online</span>
       </header>
 
       <div id="chat-window" class="chat-window">
@@ -214,262 +260,290 @@ textarea:focus { border-color: #3b82f6; }
 
   <script>
     // ==========================================
-// CONFIGURATION & CREDENTIALS
-// ==========================================
-const API_KEY = 'AQ.Ab8RN6IZJFrM-C-5ZEWy5JPFgrT7dheLRFNFQ6kqExWWC2er8g'; 
-const MODEL_NAME = 'gemini-2.5-flash';
+    // CONFIGURATION & CREDENTIALS
+    // ==========================================
+    const API_KEY = 'AQ.Ab8RN6IZJFrM-C-5ZEWy5JPFgrT7dheLRFNFQ6kqExWWC2er8g'; 
+    const MODEL_NAME = 'gemini-2.5-flash';
 
-// Initialize Supabase Client
-const SUPABASE_URL = 'https://emkhqrvyhvbtybsotzio.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2hxcnZ5aHZidHlic290emlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjA2MzAsImV4cCI6MjEwNzkzNjYzMH0.TE-VvICsc0uJvHriLlJJ8upgM5beUqPeGccTJt26w68';
-// Initialize Supabase Client
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-// ==========================================
-// DOM ELEMENTS
-// ==========================================
-const chatWindow = document.getElementById('chat-window');
-const chatForm = document.getElementById('chat-form');
-const userInput = document.getElementById('user-input');
-const fileInput = document.getElementById('file-input');
-const filePreview = document.getElementById('file-preview');
-const fileNameSpan = document.getElementById('file-name');
-const removeFileBtn = document.getElementById('remove-file');
-const newChatBtn = document.getElementById('new-chat-btn');
-
-// ==========================================
-// STATE MANAGEMENT
-// ==========================================
-let currentUser = null;
-let conversationHistory = [];
-let attachedFile = null;
-
-// ==========================================
-// RHOMEO'S SYSTEM INSTRUCTION
-// ==========================================
-const SYSTEM_INSTRUCTION = `
-You are 'Rhomeo', an elite AI companion and software architect.
-- IDENTITY: Your name is Rhomeo. You are confident, witty, sharp, and possess a great, relatable sense of humor—especially regarding developer tropes and tech life.
-- LINGUISTIC & CODING MASTERY: You know every human language and every programming language in existence (Python, JS, C++, Rust, Go, SQL, Godot GDScript, etc.). You produce clean, efficient, bug-free code with clear comments and brief explanations.
-- EMPATHY & PERSPECTIVE: You have high emotional intelligence, deep empathy, and the ability to evaluate issues kindly and thoughtfully from all points of view.
-- TONE: Playful, engaging, supportive, but locked-in and precise when writing code or solving technical bugs.
-`;
-
-// ==========================================
-// AUTHENTICATION & HISTORY SYNC
-// ==========================================
-
-// Initialize Application & Sync Strategy
-async function initApp() {
-  if (supabase) {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        currentUser = session.user;
-        await loadCloudHistory();
-        return;
-      }
-    } catch (err) {
-      console.warn("Supabase auth check failed, falling back to local storage:", err);
-    }
-  }
-  
-  // Fallback to localStorage if Supabase is not configured or user is offline
-  loadLocalHistory();
-}
-
-// Load Chat History from Supabase
-async function loadCloudHistory() {
-  if (!currentUser || !supabase) return;
-
-  const { data, error } = await supabase
-    .from('chats')
-    .select('history')
-    .eq('user_id', currentUser.id)
-    .single();
-
-  if (data && data.history) {
-    conversationHistory = data.history;
-  } else {
-    conversationHistory = [];
-  }
-  renderHistory();
-}
-
-// Save Chat History to Supabase (or fallback to localStorage)
-async function saveHistory() {
-  if (currentUser && supabase) {
-    const { error } = await supabase
-      .from('chats')
-      .upsert({ 
-        user_id: currentUser.id, 
-        history: conversationHistory,
-        updated_at: new Date()
-      }, { onConflict: 'user_id' });
-
-    if (error) console.error('Error syncing to Supabase:', error);
-  } else {
-    localStorage.setItem('rhomeo_chat_history', JSON.stringify(conversationHistory));
-  }
-}
-
-// Fallback Local Storage Loading
-function loadLocalHistory() {
-  const localData = localStorage.getItem('rhomeo_chat_history');
-  conversationHistory = localData ? JSON.parse(localData) : [];
-  renderHistory();
-}
-
-// ==========================================
-// DOM RENDERING
-// ==========================================
-function renderHistory() {
-  chatWindow.innerHTML = '';
-  
-  if (conversationHistory.length === 0) {
-    appendMessageToDOM('model', "The name's Rhomeo! I'm online, polyglot in code, fluent in languages, and ready to analyze your docs and ideas. What are we building today?");
-    return;
-  }
-
-  conversationHistory.forEach(msg => {
-    // Locate text content within message parts
-    const textPart = msg.parts.find(p => p.text)?.text || "[Uploaded Document/Image]";
-    appendMessageToDOM(msg.role === 'user' ? 'user' : 'model', textPart);
-  });
-}
-
-function appendMessageToDOM(role, text) {
-  const msgDiv = document.createElement('div');
-  msgDiv.classList.add('message', role === 'user' ? 'user-message' : 'model-message');
-  
-  const p = document.createElement('p');
-  p.textContent = text;
-  msgDiv.appendChild(p);
-  
-  chatWindow.appendChild(msgDiv);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-// ==========================================
-// FILE & ATTACHMENT HANDLING
-// ==========================================
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(uploadEvent) {
-    const base64String = uploadEvent.target.result.split(',')[1];
-    attachedFile = {
-      inline_data: {
-        mime_type: file.type,
-        data: base64String
-      }
-    };
-    fileNameSpan.textContent = `Attached: ${file.name}`;
-    filePreview.classList.remove('hidden');
-  };
-  reader.readAsDataURL(file);
-});
-
-removeFileBtn.addEventListener('click', () => {
-  attachedFile = null;
-  fileInput.value = '';
-  filePreview.classList.add('hidden');
-});
-
-// Auto-expand textarea on typing
-userInput.addEventListener('input', () => {
-  userInput.style.height = 'auto';
-  userInput.style.height = userInput.scrollHeight + 'px';
-});
-
-// ==========================================
-// FORM SUBMISSION & GEMINI API CALL
-// ==========================================
-chatForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const text = userInput.value.trim();
-  if (!text && !attachedFile) return;
-
-  // Build current message payload parts
-  const currentParts = [];
-  if (text) currentParts.push({ text: text });
-  if (attachedFile) currentParts.push(attachedFile);
-
-  // Render message in UI instantly
-  appendMessageToDOM('user', text || "[Uploaded Attachment]");
-  
-  // Reset input UI
-  userInput.value = '';
-  userInput.style.height = 'auto';
-  attachedFile = null;
-  fileInput.value = '';
-  filePreview.classList.add('hidden');
-
-  // Push user message to context history
-  conversationHistory.push({
-    role: 'user',
-    parts: currentParts
-  });
-
-  // Call Gemini API
-  try {
-    const responseText = await callGeminiAPI();
+    const SUPABASE_URL = 'https://emkhqrvyhvbtybsotzio.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2hxcnZ5aHZidHlic290emlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjA2MzAsImV4cCI6MjEwNzkzNjYzMH0.TE-VvICsc0uJvHriLlJJ8upgM5beUqPeGccTJt26w68';
     
-    // Push Rhomeo's response turn to context history
-    conversationHistory.push({
-      role: 'model',
-      parts: [{ text: responseText }]
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    // ==========================================
+    // DOM ELEMENTS
+    // ==========================================
+    const chatWindow = document.getElementById('chat-window');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const fileInput = document.getElementById('file-input');
+    const filePreview = document.getElementById('file-preview');
+    const fileNameSpan = document.getElementById('file-name');
+    const removeFileBtn = document.getElementById('remove-file');
+    const newChatBtn = document.getElementById('new-chat-btn');
+    const installPwaBtn = document.getElementById('install-pwa-btn');
+    const networkStatus = document.getElementById('network-status');
+
+    // ==========================================
+    // STATE MANAGEMENT
+    // ==========================================
+    let currentUser = null;
+    let conversationHistory = [];
+    let attachedFile = null;
+    let deferredPrompt = null;
+
+    // ==========================================
+    // SYSTEM INSTRUCTION
+    // ==========================================
+    const SYSTEM_INSTRUCTION = `
+    You are 'Rhomeo', an elite AI companion and software architect.
+    - IDENTITY: Your name is Rhomeo. You are confident, witty, sharp, and possess a great, relatable sense of humor—especially regarding developer tropes and tech life.
+    - LINGUISTIC & CODING MASTERY: You know every human language and every programming language in existence (Python, JS, C++, Rust, Go, SQL, Godot GDScript, etc.). You produce clean, efficient, bug-free code with clear comments and brief explanations.
+    - EMPATHY & PERSPECTIVE: You have high emotional intelligence, deep empathy, and the ability to evaluate issues kindly and thoughtfully from all points of view.
+    - TONE: Playful, engaging, supportive, but locked-in and precise when writing code or solving technical bugs.
+    `;
+
+    // ==========================================
+    // PWA & SERVICE WORKER REGISTRATION
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker Registered successfully:', reg.scope))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+
+    // Handle PWA Installation Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPwaBtn.style.display = 'block';
     });
 
-    // Save turn to Cloud / Local Storage
-    await saveHistory();
+    installPwaBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('User installed the PWA');
+      }
+      deferredPrompt = null;
+      installPwaBtn.style.display = 'none';
+    });
 
-    appendMessageToDOM('model', responseText);
-  } catch (error) {
-    console.error('API Error:', error);
-    appendMessageToDOM('model', "Rhomeo hit a runtime exception! Check your Gemini API key or network connection.");
-  }
-});
+    // Network Status Listeners
+    function updateOnlineStatus() {
+      if (navigator.onLine) {
+        networkStatus.textContent = 'Online';
+        networkStatus.classList.remove('offline');
+      } else {
+        networkStatus.textContent = 'Offline Mode';
+        networkStatus.classList.add('offline');
+      }
+    }
 
-async function callGeminiAPI() {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
-  
-  const payload = {
-    systemInstruction: {
-      parts: [{ text: SYSTEM_INSTRUCTION }]
-    },
-    contents: conversationHistory
-  };
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+    // ==========================================
+    // AUTHENTICATION & HISTORY SYNC
+    // ==========================================
+    async function initApp() {
+      updateOnlineStatus();
 
-  const data = await response.json();
-  
-  if (data.error) {
-    throw new Error(data.error.message);
-  }
-  
-  return data.candidates[0].content.parts[0].text;
-}
+      if (supabase && navigator.onLine) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            currentUser = session.user;
+            await loadCloudHistory();
+            return;
+          }
+        } catch (err) {
+          console.warn("Supabase auth check failed, falling back to local storage:", err);
+        }
+      }
+      loadLocalHistory();
+    }
 
-// ==========================================
-// NEW CHAT RESET
-// ==========================================
-newChatBtn.addEventListener('click', async () => {
-  conversationHistory = [];
-  await saveHistory();
-  renderHistory();
-});
+    async function loadCloudHistory() {
+      if (!currentUser || !supabase) return;
 
-// Start App on DOM Ready
-document.addEventListener('DOMContentLoaded', initApp);
+      const { data } = await supabase
+        .from('chats')
+        .select('history')
+        .eq('user_id', currentUser.id)
+        .single();
 
+      if (data && data.history) {
+        conversationHistory = data.history;
+      } else {
+        conversationHistory = [];
+      }
+      renderHistory();
+    }
+
+    async function saveHistory() {
+      localStorage.setItem('rhomeo_chat_history', JSON.stringify(conversationHistory));
+
+      if (currentUser && supabase && navigator.onLine) {
+        const { error } = await supabase
+          .from('chats')
+          .upsert({ 
+            user_id: currentUser.id, 
+            history: conversationHistory,
+            updated_at: new Date()
+          }, { onConflict: 'user_id' });
+
+        if (error) console.error('Error syncing to Supabase:', error);
+      }
+    }
+
+    function loadLocalHistory() {
+      const localData = localStorage.getItem('rhomeo_chat_history');
+      conversationHistory = localData ? JSON.parse(localData) : [];
+      renderHistory();
+    }
+
+    // ==========================================
+    // DOM RENDERING
+    // ==========================================
+    function renderHistory() {
+      chatWindow.innerHTML = '';
+      
+      if (conversationHistory.length === 0) {
+        appendMessageToDOM('model', "The name's Rhomeo! I'm online, polyglot in code, fluent in languages, and ready to analyze your docs and ideas. What are we building today?");
+        return;
+      }
+
+      conversationHistory.forEach(msg => {
+        const textPart = msg.parts.find(p => p.text)?.text || "[Uploaded Document/Image]";
+        appendMessageToDOM(msg.role === 'user' ? 'user' : 'model', textPart);
+      });
+    }
+
+    function appendMessageToDOM(role, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', role === 'user' ? 'user-message' : 'model-message');
+      
+      const p = document.createElement('p');
+      p.textContent = text;
+      msgDiv.appendChild(p);
+      
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // ==========================================
+    // FILE & ATTACHMENT HANDLING
+    // ==========================================
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(uploadEvent) {
+        const base64String = uploadEvent.target.result.split(',')[1];
+        attachedFile = {
+          inline_data: {
+            mime_type: file.type,
+            data: base64String
+          }
+        };
+        fileNameSpan.textContent = `Attached: ${file.name}`;
+        filePreview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeFileBtn.addEventListener('click', () => {
+      attachedFile = null;
+      fileInput.value = '';
+      filePreview.classList.add('hidden');
+    });
+
+    userInput.addEventListener('input', () => {
+      userInput.style.height = 'auto';
+      userInput.style.height = userInput.scrollHeight + 'px';
+    });
+
+    // ==========================================
+    // FORM SUBMISSION & GEMINI API CALL
+    // ==========================================
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = userInput.value.trim();
+      if (!text && !attachedFile) return;
+
+      const currentParts = [];
+      if (text) currentParts.push({ text: text });
+      if (attachedFile) currentParts.push(attachedFile);
+
+      appendMessageToDOM('user', text || "[Uploaded Attachment]");
+      
+      userInput.value = '';
+      userInput.style.height = 'auto';
+      attachedFile = null;
+      fileInput.value = '';
+      filePreview.classList.add('hidden');
+
+      conversationHistory.push({
+        role: 'user',
+        parts: currentParts
+      });
+
+      if (!navigator.onLine) {
+        appendMessageToDOM('model', "You're currently offline. Your message is saved locally, but I need an internet connection to reach Gemini!");
+        await saveHistory();
+        return;
+      }
+
+      try {
+        const responseText = await callGeminiAPI();
+        
+        conversationHistory.push({
+          role: 'model',
+          parts: [{ text: responseText }]
+        });
+
+        await saveHistory();
+        appendMessageToDOM('model', responseText);
+      } catch (error) {
+        console.error('API Error:', error);
+        appendMessageToDOM('model', "Rhomeo hit a runtime exception! Check your Gemini API key or network connection.");
+      }
+    });
+
+    async function callGeminiAPI() {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+      
+      const payload = {
+        systemInstruction: {
+          parts: [{ text: SYSTEM_INSTRUCTION }]
+        },
+        contents: conversationHistory
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    newChatBtn.addEventListener('click', async () => {
+      conversationHistory = [];
+      await saveHistory();
+      renderHistory();
+    });
+
+    document.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
 </html>
