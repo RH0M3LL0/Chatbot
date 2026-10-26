@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,10 +12,40 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4712/4712035.png">
 
-  <!-- Supabase Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    /* CSS Variables for Dynamic Dark & Light Theme */
+    :root {
+      --bg-primary: #0f172a;
+      --bg-surface: #1e293b;
+      --border-color: #334155;
+      --text-primary: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --user-msg-bg: #3b82f6;
+      --user-msg-text: #ffffff;
+      --model-msg-bg: #1e293b;
+      --input-bg: #0f172a;
+      --status-online: #10b981;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --user-msg-bg: #2563eb;
+      --user-msg-text: #ffffff;
+      --model-msg-bg: #f1f5f9;
+      --input-bg: #f8fafc;
+      --status-online: #059669;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -25,117 +54,84 @@
     }
 
     body {
-      background-color: #0f172a;
-      color: #f8fafc;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
       height: 100vh;
       display: flex;
       overflow: hidden;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Auth Modal Container */
+    /* Auth Overlay Modal */
     #auth-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(15, 23, 42, 0.98);
+      background-color: rgba(15, 23, 42, 0.96);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 2000;
-      padding: 20px;
+      z-index: 1000;
     }
 
     #auth-modal.hidden { display: none; }
 
     .auth-card {
-      background-color: #1e293b;
-      padding: 32px;
-      border-radius: 16px;
+      background-color: var(--bg-surface);
+      padding: 30px;
+      border-radius: 12px;
       width: 100%;
-      max-width: 420px;
-      border: 1px solid #334155;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      text-align: center;
+      max-width: 400px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
     .auth-card h2 {
-      margin-bottom: 8px;
-      font-size: 1.6rem;
-      color: #f8fafc;
-    }
-
-    .auth-subtitle {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
-
-    .auth-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
       margin-bottom: 20px;
+      font-size: 1.5rem;
+      text-align: center;
+      color: var(--text-primary);
     }
 
     .auth-input {
       width: 100%;
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      color: white;
-      padding: 12px 16px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 12px;
       border-radius: 8px;
-      font-size: 0.95rem;
+      margin-bottom: 15px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
-    .auth-input:focus { border-color: #3b82f6; }
+    .auth-input:focus { border-color: var(--accent); }
 
     .auth-btn {
       width: 100%;
-      background-color: #3b82f6;
+      background-color: var(--accent);
       color: white;
       border: none;
       padding: 12px;
       border-radius: 8px;
       font-weight: 600;
-      font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.2s;
+      margin-bottom: 10px;
     }
 
-    .auth-btn:hover { background-color: #2563eb; }
+    .auth-btn:hover { background-color: var(--accent-hover); }
 
     .auth-switch {
-      margin-top: 18px;
-      font-size: 0.88rem;
-      color: #94a3b8;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
       cursor: pointer;
-      user-select: none;
+      margin-top: 10px;
     }
 
-    .auth-switch span {
-      color: #3b82f6;
-      font-weight: 600;
-      text-decoration: underline;
-    }
-
-    #auth-error {
-      color: #ef4444;
-      font-size: 0.85rem;
-      margin-bottom: 14px;
-      min-height: 20px;
-      word-wrap: break-word;
-    }
-
-    #auth-success {
-      color: #10b981;
-      font-size: 0.85rem;
-      margin-bottom: 14px;
-      min-height: 20px;
-    }
+    .auth-switch:hover { color: var(--accent); text-decoration: underline; }
+    #auth-error { color: #ef4444; font-size: 0.85rem; margin-bottom: 15px; text-align: center; }
 
     /* Main App Layout */
     .app-container {
@@ -146,8 +142,8 @@
 
     .sidebar {
       width: 260px;
-      background-color: #1e293b;
-      border-right: 1px solid #334155;
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       padding: 20px;
@@ -156,22 +152,11 @@
     .sidebar h2 {
       font-size: 1.1rem;
       margin-bottom: 15px;
-      color: #94a3b8;
-    }
-
-    .user-info-badge {
-      font-size: 0.8rem;
-      color: #38bdf8;
-      background: #0f172a;
-      padding: 8px 12px;
-      border-radius: 6px;
-      margin-bottom: 15px;
-      word-break: break-all;
-      border: 1px solid #334155;
+      color: var(--text-muted);
     }
 
     #new-chat-btn {
-      background-color: #3b82f6;
+      background-color: var(--accent);
       color: white;
       border: none;
       padding: 10px;
@@ -182,8 +167,8 @@
     }
 
     #logout-btn {
-      background-color: #334155;
-      color: #f8fafc;
+      background-color: var(--border-color);
+      color: var(--text-muted);
       border: none;
       padding: 8px;
       border-radius: 6px;
@@ -191,10 +176,10 @@
       font-weight: 600;
       margin-bottom: 15px;
     }
-    #logout-btn:hover { background-color: #ef4444; }
+    #logout-btn:hover { background-color: #ef4444; color: white; }
 
     #install-pwa-btn {
-      background-color: #10b981;
+      background-color: var(--status-online);
       color: white;
       border: none;
       padding: 10px;
@@ -215,26 +200,49 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      background-color: #0f172a;
+      background-color: var(--bg-primary);
     }
 
     .chat-header {
       padding: 20px;
-      background-color: #1e293b;
-      border-bottom: 1px solid #334155;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .chat-header h1 { font-size: 1.4rem; }
-    .chat-header p { font-size: 0.85rem; color: #94a3b8; }
+    .chat-header p { font-size: 0.85rem; color: var(--text-muted); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle-btn:hover { border-color: var(--accent); }
 
     .status-badge {
       font-size: 0.75rem;
       padding: 4px 10px;
       border-radius: 12px;
-      background-color: #10b981;
+      background-color: var(--status-online);
       color: white;
       font-weight: 600;
     }
@@ -259,33 +267,32 @@
     }
 
     .user-message {
-      background-color: #3b82f6;
-      color: white;
+      background-color: var(--user-msg-bg);
+      color: var(--user-msg-text);
       align-self: flex-end;
       border-bottom-right-radius: 2px;
     }
 
     .model-message {
-      background-color: #1e293b;
-      color: #f8fafc;
+      background-color: var(--model-msg-bg);
+      color: var(--text-primary);
       align-self: flex-start;
       border-bottom-left-radius: 2px;
-      border: 1px solid #334155;
+      border: 1px solid var(--border-color);
     }
 
     .file-preview {
       display: flex;
       align-items: center;
-      background: #1e293b;
+      background: var(--bg-surface);
       padding: 8px 12px;
-      margin: 0 20px 10px 20px;
+      margin: 0 20px;
       border-radius: 6px;
       font-size: 0.9rem;
-      border: 1px solid #334155;
+      border: 1px solid var(--border-color);
     }
 
     .file-preview.hidden { display: none; }
-
     #remove-file {
       background: none;
       border: none;
@@ -295,10 +302,11 @@
       margin-left: auto;
     }
 
+    /* Fixed Input Bar */
     .chat-form {
       padding: 20px;
-      background-color: #1e293b;
-      border-top: 1px solid #334155;
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -311,10 +319,10 @@
       background: none;
       border: none;
       padding: 6px;
-      color: #94a3b8;
+      color: var(--text-muted);
       transition: color 0.2s;
     }
-    .tool-btn:hover { color: #f8fafc; }
+    .tool-btn:hover { color: var(--text-primary); }
     .tool-btn.recording { color: #ef4444; animation: pulse 1.5s infinite; }
 
     @keyframes pulse {
@@ -325,9 +333,9 @@
 
     textarea {
       flex: 1;
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      color: white;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
       padding: 12px;
       border-radius: 8px;
       resize: none;
@@ -335,10 +343,10 @@
       max-height: 120px;
     }
 
-    textarea:focus { border-color: #3b82f6; }
+    textarea:focus { border-color: var(--accent); }
 
     #send-btn {
-      background-color: #3b82f6;
+      background-color: var(--accent);
       color: white;
       border: none;
       padding: 12px 20px;
@@ -347,7 +355,7 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    #send-btn:hover { background-color: #2563eb; }
+    #send-btn:hover { background-color: var(--accent-hover); }
 
     @media (max-width: 768px) {
       .sidebar { display: none; }
@@ -357,64 +365,297 @@
 </head>
 <body>
 
-  <!-- Sign In & Sign Up Auth Overlay -->
-  <div id="auth-modal">
+  <!-- Authentication Modal -->
+  <div id="auth-modal" class="hidden">
     <div class="auth-card">
-      <h2 id="auth-title">Welcome Back</h2>
-      <p id="auth-subtitle" class="auth-subtitle">Sign in to your Rhomeo account</p>
-      
+      <h2 id="auth-title">Sign In to Rhomeo</h2>
       <div id="auth-error"></div>
-      <div id="auth-success"></div>
-
       <form id="auth-form">
-        <div class="auth-input-group">
-          <input type="email" id="auth-email" class="auth-input" placeholder="Email Address" required autocomplete="email">
-          <input type="password" id="auth-password" class="auth-input" placeholder="Password" required minlength="6" autocomplete="current-password">
-        </div>
+        <input type="email" id="auth-email" class="auth-input" placeholder="Email Address" required>
+        <input type="password" id="auth-password" class="auth-input" placeholder="Password" required>
         <button type="submit" id="auth-submit-btn" class="auth-btn">Sign In</button>
       </form>
-
-      <div id="auth-switch-mode" class="auth-switch">
-        Don't have an account? <span id="auth-switch-text">Sign Up</span>
-      </div>
+      <div id="auth-switch-mode" class="auth-switch">Need an account? Sign Up</div>
     </div>
   </div>
 
   <div class="app-container">
+    <!-- Sidebar -->
     <aside class="sidebar">
-      <h2>Account</h2>
-      <div id="user-display" class="user-info-badge">Not signed in</div>
+      <h2>Conversations</h2>
       <button id="install-pwa-btn">📲 Install App</button>
       <button id="new-chat-btn">+ New Chat</button>
       <button id="logout-btn">Sign Out</button>
       <div id="history-list"></div>
     </aside>
 
+    <!-- Main Chat Workspace -->
     <main class="chat-main">
       <header class="chat-header">
         <div>
           <h1>Rhomeo</h1>
           <p>Coding Expert • Empathetic Thinker • Multimodal Assistant</p>
         </div>
-        <span id="network-status" class="status-badge">Online</span>
+        <div class="header-actions">
+          <button id="theme-toggle-btn" class="theme-toggle-btn">
+            <span id="theme-icon">🌙</span> <span id="theme-label">Dark</span>
+          </button>
+          <span id="network-status" class="status-badge">Online</span>
+        </div>
       </header>
 
       <div id="chat-window" class="chat-window">
         <div class="message model-message">
-          <p>Hey there! I'm online and ready. I support live microphone voice recordings, audio files, images, videos, documents, and documents with embedded photos!</p>
+          <p>Hey there! I'm online. I support audio, voice notes, photos, videos, documents, and code. What are we building today?</p>
         </div>
       </div>
 
+      <!-- Attachment Preview -->
       <div id="file-preview" class="file-preview hidden">
         <span id="file-name"></span>
         <button id="remove-file">×</button>
       </div>
 
+      <!-- Input Bar -->
       <form id="chat-form" class="chat-form">
         <button type="button" id="mic-btn" class="tool-btn" title="Record Voice Note">🎙️</button>
-        
-        <label for="file-input" class="tool-btn" title="Attach Audio, Document, Image, or Video">📎</label>
+        <label for="file-input" class="tool-btn" title="Upload Image, Video, Audio, or Document">📎</label>
         <input type="file" id="file-input" accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/*" hidden>
+        
+        <textarea id="user-input" placeholder="Ask anything, paste code, or attach files..." rows="1"></textarea>
+        <button type="submit" id="send-btn">Send</button>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    const API_KEY = 'AQ.Ab8RN6IZJFrM-C-5ZEWy5JPFgrT7dheLRFNFQ6kqExWWC2er8g'; 
+    const MODEL_NAME = 'gemini-2.5-flash';
+
+    const SUPABASE_URL = 'https://emkhqrvyhvbtybsotzio.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2hxcnZ5aHZidHlic290emlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjA2MzAsImV4cCI6MjEwNzkzNjYzMH0.TE-VvICsc0uJvHriLlJJ8upgM5beUqPeGccTJt26w68';
+    
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    // DOM References
+    const chatWindow = document.getElementById('chat-window');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const fileInput = document.getElementById('file-input');
+    const filePreview = document.getElementById('file-preview');
+    const fileNameSpan = document.getElementById('file-name');
+    const removeFileBtn = document.getElementById('remove-file');
+    const newChatBtn = document.getElementById('new-chat-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const installPwaBtn = document.getElementById('install-pwa-btn');
+    const networkStatus = document.getElementById('network-status');
+    const micBtn = document.getElementById('mic-btn');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeLabel = document.getElementById('theme-label');
+
+    const authModal = document.getElementById('auth-modal');
+    const authForm = document.getElementById('auth-form');
+    const authEmail = document.getElementById('auth-email');
+    const authPassword = document.getElementById('auth-password');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authTitle = document.getElementById('auth-title');
+    const authError = document.getElementById('auth-error');
+    const authSwitchMode = document.getElementById('auth-switch-mode');
+
+    let currentUser = null;
+    let conversationHistory = [];
+    let attachedFile = null;
+    let deferredPrompt = null;
+    let isSignUpMode = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    const SYSTEM_INSTRUCTION = `
+    You are 'Rhomeo', an elite AI companion and software architect.
+    - IDENTITY: Your name is Rhomeo. You are confident, witty, sharp, and possess a great, relatable sense of humor.
+    - CAPABILITIES: You process all multimodal inputs, including images, videos, audio recordings, documents, PDFs, and code.
+    - TONE: Playful, engaging, supportive, but precise when writing code.
+    `;
+
+    // Dark / Light Theme Toggle Logic
+    function initTheme() {
+      const savedTheme = localStorage.getItem('rhomeo_theme') || 'dark';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('rhomeo_theme', theme);
+      if (theme === 'light') {
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'Light';
+      } else {
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'Dark';
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    });
+
+    // PWA & Service Worker Initialization
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPwaBtn.style.display = 'block';
+    });
+
+    installPwaBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt = null;
+      installPwaBtn.style.display = 'none';
+    });
+
+    function updateOnlineStatus() {
+      if (navigator.onLine) {
+        networkStatus.textContent = 'Online';
+        networkStatus.classList.remove('offline');
+      } else {
+        networkStatus.textContent = 'Offline Mode';
+        networkStatus.classList.add('offline');
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // Auth Event Listeners
+    authSwitchMode.addEventListener('click', () => {
+      isSignUpMode = !isSignUpMode;
+      authTitle.textContent = isSignUpMode ? 'Create Rhomeo Account' : 'Sign In to Rhomeo';
+      authSubmitBtn.textContent = isSignUpMode ? 'Sign Up' : 'Sign In';
+      authSwitchMode.textContent = isSignUpMode ? 'Already have an account? Sign In' : "Need an account? Sign Up";
+      authError.textContent = '';
+    });
+
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authError.textContent = '';
+      const email = authEmail.value.trim();
+      const password = authPassword.value.trim();
+
+      if (!supabase) {
+        authError.textContent = 'Supabase client failed to initialize.';
+        return;
+      }
+
+      if (isSignUpMode) {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          authError.textContent = error.message;
+        } else {
+          alert('Account created successfully! You can now sign in.');
+          isSignUpMode = false;
+          authTitle.textContent = 'Sign In to Rhomeo';
+          authSubmitBtn.textContent = 'Sign In';
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          authError.textContent = error.message;
+        } else {
+          currentUser = data.user;
+          authModal.classList.add('hidden');
+          await loadCloudHistory();
+        }
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      if (supabase) await supabase.auth.signOut();
+      currentUser = null;
+      conversationHistory = [];
+      authModal.classList.remove('hidden');
+      renderHistory();
+    });
+
+    async function initApp() {
+      initTheme();
+      updateOnlineStatus();
+      if (supabase) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            currentUser = session.user;
+            authModal.classList.add('hidden');
+            await loadCloudHistory();
+            return;
+          }
+        } catch (err) {
+          console.warn("Session retrieval error:", err);
+        }
+      }
+      authModal.classList.remove('hidden');
+    }
+
+    async function loadCloudHistory() {
+      if (!currentUser || !supabase) return;
+      const { data } = await supabase
+        .from('chats')
+        .select('history')
+        .eq('user_id', currentUser.id)
+        .single();
+
+      conversationHistory = (data && data.history) ? data.history : [];
+      renderHistory();
+    }
+
+    async function saveHistory() {
+      if (currentUser && supabase) {
+        await supabase.from('chats').upsert({ 
+          user_id: currentUser.id, 
+          history: conversationHistory,
+          updated_at: new Date()
+        }, { onConflict: 'user_id' });
+      }
+    }
+
+    function renderHistory() {
+      chatWindow.innerHTML = '';
+      if (conversationHistory.length === 0) {
+        appendMessageToDOM('model', "The name's Rhomeo! I'm online and ready. Send text, voice notes, documents, pictures, or videos!");
+        return;
+      }
+      conversationHistory.forEach(msg => {
+        const textPart = msg.parts.find(p => p.text)?.text || "[Multimodal Attachment Attached]";
+        appendMessageToDOM(msg.role === 'user' ? 'user' : 'model', textPart);
+      });
+    }
+
+    function appendMessageToDOM(role, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', role === 'user' ? 'user-message' : 'model-message');
+      const p = document.createElement('p');
+      p.textContent = text;
+      msgDiv.appendChild(p);
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // Voice Recording Logic
+    micBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataaut type="file" id="file-input" accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/*" hidden>
         
         <textarea id="user-input" placeholder="Ask anything, paste code, or attach media/docs..." rows="1"></textarea>
         <button type="submit" id="send-btn">Send</button>
