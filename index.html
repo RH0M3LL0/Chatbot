@@ -441,6 +441,12 @@ form#f.empty #send:not(.stop){display:none}
 .checks{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
 .checks .ok{color:#3fb97a}.checks .bad{color:var(--danger)}
 @keyframes fade{from{opacity:0}}
+/* v4: Rhomeo reply bubble (soft glass card, no tail) */
+.a{align-self:flex-start;width:fit-content;max-width:min(100%,720px);background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:14px 18px 16px;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.a::before{margin-bottom:6px}
+.a pre{max-width:100%;margin-bottom:.8em}
+.a>*:last-child{margin-bottom:0}
+.u{border-radius:22px;background:color-mix(in srgb,var(--accent) 22%,var(--s2));border:1px solid var(--line)}
 </style>
 </head>
 <body class="out">
