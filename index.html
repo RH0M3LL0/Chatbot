@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -359,10 +358,7 @@ html
 
       <!-- Input Form -->
       <form id="chat-form" class="chat-form">
-        <!-- Voice Record Button -->
         <button type="button" id="mic-btn" class="tool-btn" title="Record Voice Note">🎙️</button>
-        
-        <!-- File / Media / Document / Video Upload Button -->
         <label for="file-input" class="tool-btn" title="Upload Image, Video, Audio, or Document">📎</label>
         <input type="file" id="file-input" accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/*" hidden>
         
@@ -377,11 +373,8 @@ html
     const MODEL_NAME = 'gemini-2.5-flash';
 
     const SUPABASE_URL = 'https://emkhqrvyhvbtybsotzio.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2hxcnZ5aHZidHlic290emlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjA2MzAsImV4cCI6MjEwNzkzNjYzMH0.TE-VvICsc0uJvHriLlJJ8upgM5beUqPeGccTJt26w68';
-    
-    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-    // DOM Elements
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2hxcnZ5aHZidHlic290emlvIiwicm9sZ
+ // DOM Elements
     const chatWindow = document.getElementById('chat-window');
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
