@@ -1,10 +1,10 @@
-const CACHE = 'rhomeo-v9';
+const CACHE = 'rhomeo-v10';
 const CDN = [
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js',
   'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
   'https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js'
 ];
-const LOCAL = ['./', './index.html', './manifest.json', './favicon.svg', './logo.svg', './favicon-32.png', './apple-touch-icon.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
+const LOCAL = ['./', './index.html', './manifest.json', './icons/favicon.svg', './icons/favicon-32.png', './icons/apple-touch-icon.png', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.allSettled([...LOCAL, ...CDN].map(u => c.add(u)))));
