@@ -1,4 +1,4 @@
-const CACHE = 'rhomeo-v8';
+const CACHE = 'rhomeo-v9';
 const CDN = [
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js',
   'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
