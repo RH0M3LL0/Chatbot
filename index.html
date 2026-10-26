@@ -2,6 +2,7 @@
 <html lang="en" data-theme="dark" data-bg="aurora">
 <head>
 <meta charset="UTF-8">
+<script>window.__bip=null;addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__bip=e;});</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="color-scheme" content="dark light">
 <meta name="description" content="Rhomeo: an AI coding assistant. Write, debug and understand code, faster.">
@@ -645,7 +646,12 @@ let user = null, chats = [], cur = null, ctrl = null, busy = false, signup = fal
 
 /* ---------- small helpers ---------- */
 let noteT = 0;
-const note = t => { $('note').textContent = t || ''; clearTimeout(noteT); if (t) noteT = setTimeout(() => { $('note').textContent = ''; }, 9000); };
+const note = t => { $('note').textContent = t || ''; clearTimeout(noteT); if (t) noteT = setTimeout(() => { $('note').textContent = ''; }, /resets at/.test(t) ? 30000 : 9000); };
+function limitMsg() {
+  const t = new Date(); t.setUTCHours(24, 0, 0, 0); // the server counts days in UTC
+  const mins = Math.max(1, Math.round((t - Date.now()) / 60000)), h = Math.floor(mins / 60), m = mins % 60;
+  return 'You’ve used all your messages for today. Your limit resets at ' + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' (in ' + (h ? h + ' hr ' : '') + m + ' min).';
+}
 const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const ckey = k => 'rhomeo_' + (user ? user.id : 'x') + '_' + k;
@@ -1136,7 +1142,7 @@ $('f').onsubmit = async e => {
     if (!r.ok) {
       let code = ''; try { code = (await r.json()).error; } catch {}
       throw new Error(r.status === 429
-        ? (code === 'daily_limit' ? 'You’ve used all your messages for today. They reset at midnight UTC.' : code === 'slow_down' ? 'Easy there. Wait a few seconds, then try again.' : 'Rhomeo is busy right now. Try again in a moment.')
+        ? (code === 'daily_limit' ? limitMsg() : code === 'slow_down' ? 'Easy there. Wait a few seconds, then try again.' : 'Rhomeo is busy right now. Try again in a moment.')
         : 'Rhomeo couldn’t reply (error ' + r.status + ').');
     }
     const rd = r.body.getReader(), dec = new TextDecoder();
@@ -1243,7 +1249,7 @@ $('pf-pw-form').onsubmit = e => {
 
 /* ---------- install, offline, connection quality ---------- */
 addEventListener('load', () => { if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {}); });
-let installEvt = null;
+let installEvt = window.__bip || null;
 function isStandalone() { return matchMedia('(display-mode: standalone)').matches || navigator.standalone; }
 function hideInstall() { document.querySelectorAll('#install,.promo').forEach(x => x.classList.add('hidden')); }
 addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; });
@@ -1274,14 +1280,17 @@ async function openInstallHelp() { // the browser hasn't offered install: show h
   add(!!man, man ? 'manifest.json found' : 'manifest.json not found. The file must be named exactly manifest.json.');
   if (man) {
     for (const sz of ['192x192', '512x512']) {
-      const ic = (man.icons || []).find(i => i.sizes === sz && /png/.test(i.type || ''));
-      const ok = ic && await get(new URL(ic.src, location.href).href);
-      add(!!ok, ok ? sz + ' icon found' : sz + ' icon missing. Upload ' + (ic ? ic.src : 'a PNG icon') + '.');
+      const n = parseInt(sz), ic = (man.icons || []).find(i => i.sizes === sz && /png/.test(i.type || ''));
+      const u = ic && new URL(ic.src, location.href).href;
+      const w = u ? await new Promise(r => { const im = new Image(); im.onload = () => r(im.naturalWidth); im.onerror = () => r(0); im.src = u + '?c=' + Date.now(); }) : 0;
+      add(w >= n, w >= n ? sz + ' icon found' : !ic ? 'No ' + sz + ' PNG icon is listed in manifest.json.' : w ? sz + ' icon is only ' + w + 'px wide. Re-export it at ' + sz + '.' : sz + ' icon not found at ' + ic.src + '.');
     }
+    add(man.display === 'standalone' && !!man.start_url, 'App settings (name, start page, standalone) are set');
   }
   let reg = null; try { reg = await navigator.serviceWorker.getRegistration(); } catch {}
   add(!!reg, reg ? 'Offline support (service worker) is on' : 'Service worker not running. Reload the page once.');
-  const note2 = document.createElement('p'); note2.textContent = 'If everything is ✓ and nothing appears, Rhomeo may already be installed. Look for it on your home screen.';
+  add(!!installEvt, installEvt ? 'Your browser is ready to install Rhomeo' : 'Your browser hasn’t offered install yet');
+  const note2 = document.createElement('p'); note2.textContent = 'If every other line is ✓, Rhomeo may already be installed (check your app list) or the install offer was dismissed earlier. In Chrome, open ⋮: it shows “Install app” or “Open Rhomeo”.';
   box.insertBefore(note2, x);
 }
 $('install').onclick = doInstall;
