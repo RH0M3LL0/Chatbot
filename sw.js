@@ -1,66 +1,33 @@
-const CACHE_NAME = 'rhomeo-pwa-v1';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+const CACHE = 'rhomeo-v3';
+const CDN = [
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js',
+  'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
+  'https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js'
 ];
-
-// Install Event - Pre-cache core shell assets
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[PWA SW] Pre-caching app shell...');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => Promise.allSettled(['./', './index.html', './manifest.json', ...CDN].map(u => c.add(u)))));
   self.skipWaiting();
 });
-
-// Activate Event - Clean up stale caches
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('[PWA SW] Removing old cache:', cache);
-            return caches.delete(cache);
-          }
-        })
-      );
-    })
-  );
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== CACHE).map(x => caches.delete(x)))));
   self.clients.claim();
 });
-
-// Fetch Event - Network-first for API calls, Cache-first for local assets
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-
-  // Skip caching API calls (Gemini / Supabase REST endpoints)
-  if (url.hostname.includes('generativelanguage.googleapis.com') || url.hostname.includes('supabase.co')) {
+self.addEventListener('fetch', e => {
+  const r = e.request, u = new URL(r.url);
+  if (r.method !== 'GET' || u.hostname.endsWith('supabase.co') || u.hostname.includes('googleapis.com')) return;
+  if (r.mode === 'navigate') { // page: newest version when the network answers within 4s, saved copy otherwise
+    e.respondWith((async () => {
+      const c = await caches.open(CACHE);
+      try {
+        const res = await Promise.race([fetch(r), new Promise((_, j) => setTimeout(j, 4000))]);
+        const copy = res.clone(); c.put('./index.html', copy);
+        return res;
+      } catch { return (await c.match('./index.html')) || (await c.match('./')) || Response.error(); }
+    })());
     return;
   }
-
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch background updates silently
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
-          }
-        }).catch(() => {/* Offline fallback handling */});
-        return cachedResponse;
-      }
-
-      return fetch(event.request).catch(() => {
-        // Fallback response when completely offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
-  );
+  e.respondWith(caches.match(r).then(hit => { // libraries and files: instant from cache, refreshed in the background
+    const net = fetch(r).then(res => { if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(r, copy)); } return res; }).catch(() => hit);
+    return hit || net;
+  }));
 });
