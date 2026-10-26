@@ -461,6 +461,30 @@ aside{background:var(--sheet)}
 #chipmeta{color:var(--mute);font-size:.78rem}
 #unattach{width:30px;height:30px;border-radius:50%;background:var(--s2);color:var(--mute);display:grid;place-items:center;font-size:0;flex-shrink:0}
 #unattach::before{content:"✕";font-size:.85rem}
+/* v6: multi-file tray, WhatsApp-style voice notes, photo and PDF previews */
+#chip{display:flex;gap:12px;overflow-x:auto;width:calc(100% - 24px);max-width:var(--col);margin:0 auto 8px;padding:8px 6px 4px;border:0;background:none;border-radius:0;-webkit-backdrop-filter:none;backdrop-filter:none;animation:none}
+.ti{position:relative;flex-shrink:0}
+.ti .rm{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--text);color:var(--bg);font-size:.65rem;display:grid;place-items:center;z-index:2}
+.atts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.u.hasatt{padding:8px;max-width:min(88%,380px)}
+.atxt{padding:6px 10px 4px}
+.ph{width:150px;height:150px;border-radius:14px;overflow:hidden;background:var(--s2)}
+#chip .ph{width:68px;height:68px;border-radius:12px}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.pf{display:flex;align-items:center;gap:10px;min-width:210px;max-width:270px;padding:6px 12px 6px 6px;border-radius:14px;background:var(--s1);border:1px solid var(--line);cursor:pointer;text-align:left;color:var(--text)}
+.pft{width:46px;height:60px;border-radius:8px;overflow:hidden;background:#fff;display:grid;place-items:center;color:#d64545;font-weight:700;font-size:.72rem;flex-shrink:0;border:1px solid var(--line)}
+.pft img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.pfi{display:flex;flex-direction:column;min-width:0}
+.pfi b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.9rem}
+.pfi small{color:var(--mute);font-size:.75rem}
+.vn{display:flex;align-items:center;gap:10px;width:250px;max-width:100%;padding:4px 10px 4px 4px}
+#chip .vn{background:var(--s1);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 6px;width:230px}
+.vnp{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--accent);color:var(--onaccent);display:grid;place-items:center}
+.vnp svg{width:22px;height:22px}
+.vnw{flex:1;display:flex;align-items:center;gap:2px;height:34px;cursor:pointer}
+.vnw i{flex:1;min-width:2px;border-radius:2px;background:color-mix(in srgb,var(--text) 30%,transparent);transition:background .12s}
+.vnw i.on{background:var(--accent)}
+.vnt{font-size:.78rem;color:var(--mute);font-variant-numeric:tabular-nums;min-width:32px;text-align:right}
 </style>
 </head>
 <body class="out">
@@ -522,14 +546,14 @@ aside{background:var(--sheet)}
   <div id="msgs" aria-live="polite"></div>
   <div class="jumpwrap"><button id="jump" class="hidden" type="button" aria-label="Jump to latest message">↓</button></div>
   <div id="note" role="alert"></div>
-  <div id="chip" class="hidden"><button type="button" id="chipthumb" aria-label="Attachment preview"></button><div class="ci"><b id="chipname"></b><small id="chipmeta"></small></div><button id="unattach" type="button" aria-label="Remove attachment">Remove</button></div>
+  <div id="chip" class="hidden" aria-label="Attachments"></div>
   <form id="f" class="empty">
     <span id="wave" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 9v6M9 5v14M13 8v8M17 11v2"/><path d="M20 3v4M18 5h4" stroke-width="1.6"/></svg></span>
     <textarea id="input" rows="1" placeholder="Ask me anytime…"></textarea>
     <div class="tools">
       <button type="button" id="mic" aria-label="Record a voice note" title="Record a voice note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
       <button type="button" id="attach" aria-label="Attach image or PDF" title="Attach image or PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
-      <input type="file" id="file" accept="image/*,application/pdf" hidden>
+      <input type="file" id="file" accept="image/*,application/pdf" multiple hidden>
       <span class="tspace"></span>
       <button class="btn" id="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 4l7 8h-4.5v8h-5v-8H5z"/></svg></button>
     </div>
@@ -617,7 +641,7 @@ Promise.all(LIBS.map(([t, u]) => loadLib(t, u))).then(r => {
 
 function main() {
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
-let user = null, chats = [], cur = null, file = null, ctrl = null, busy = false, signup = false, openTok = 0;
+let user = null, chats = [], cur = null, ctrl = null, busy = false, signup = false, openTok = 0;
 
 /* ---------- small helpers ---------- */
 let noteT = 0;
@@ -677,10 +701,15 @@ function setMd(el, t, hl = true) {
     bar.append(lang, b); pre.prepend(bar);
   });
 }
-function addMsg(role, text, hl = true) {
+function addMsg(role, text, hl = true, att) {
   const d = document.createElement('div');
   d.className = 'm ' + (role === 'user' ? 'u' : 'a');
-  if (role === 'user') d.textContent = text; else setMd(d, text, hl);
+  if (role === 'user' && att && att.length) {
+    d.classList.add('hasatt');
+    const w = document.createElement('div'); w.className = 'atts'; att.forEach(a => w.appendChild(mediaEl(a))); d.appendChild(w);
+    const t = (text || '').split('\n').filter(l => !/^\[(Voice note|Attached: .*)\]$/.test(l)).join('\n');
+    if (t) { const p = document.createElement('div'); p.className = 'atxt'; p.textContent = t; d.appendChild(p); }
+  } else if (role === 'user') d.textContent = text; else setMd(d, text, hl);
   const box = $('msgs'); box.appendChild(d); box.scrollTop = box.scrollHeight;
   return d;
 }
@@ -741,7 +770,7 @@ function renderChat() {
   $('title').textContent = cur.title;
   $('msgs').innerHTML = '';
   if (!cur.history.length) return showEmpty();
-  cur.history.forEach(m => addMsg(m.role, m.parts.map(p => p.text || '').join('\n'), false));
+  cur.history.forEach(m => addMsg(m.role, m.parts.map(p => p.text || '').join('\n'), false, m.att));
   (window.requestIdleCallback || (f => setTimeout(f, 60)))(hlAll);
 }
 
@@ -877,52 +906,120 @@ async function saveChat() {
 }
 
 /* ---------- attachments ---------- */
-$('attach').onclick = () => $('file').click();
-$('file').onchange = e => {
-  const f = e.target.files[0]; if (!f) return;
-  if (f.size > MAX_FILE) { note('That file is over 5 MB. Choose a smaller image or PDF.'); e.target.value = ''; return; }
-  const done = (mime, data) => { file = { name: f.name, mime, data }; $('chipname').textContent = 'Attached: ' + f.name; $('chip').classList.remove('hidden'); syncSend(); note(''); syncSend(); };
-  const r = new FileReader();
-  r.onload = () => {
-    if (!f.type.startsWith('image/') || f.type === 'image/gif') return done(f.type, r.result.split(',')[1]);
-    const img = new Image();
-    img.onload = () => { // shrink big photos: faster upload on weak networks and less quota used
-      const k = Math.min(1, (lite ? 1024 : 1280) / Math.max(img.width, img.height));
-      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
-      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
-      done('image/jpeg', c.toDataURL('image/jpeg', 0.8).split(',')[1]);
-    };
-    img.onerror = () => done(f.type, r.result.split(',')[1]);
-    img.src = r.result;
-  };
-  r.readAsDataURL(f);
-};
-function clearFile() { file = null; $('file').value = ''; $('chip').classList.add('hidden'); syncSend(); }
+const MAX_FILES = 5, MAX_TOTAL = 10 * 1024 * 1024; // all files together stay under the server's request limit
+const PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/';
 const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>', PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
-let chipAudio = null;
-function renderChip() { // small preview of what's attached: photo thumbnail, PDF tile, or a playable voice note
-  if (chipAudio) { chipAudio.pause(); chipAudio = null; }
-  const th = $('chipthumb'); th.onclick = null; th.replaceChildren();
-  if (!file) { $('chip').classList.add('hidden'); return; }
-  const kb = Math.round(file.data.length * 0.75 / 1024), size = kb > 900 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB';
-  if (file.mime.startsWith('image/')) {
-    const im = document.createElement('img'); im.alt = ''; im.src = 'data:' + file.mime + ';base64,' + file.data; th.appendChild(im);
-    $('chipname').textContent = file.name; $('chipmeta').textContent = 'Image · ' + size;
-  } else if (file.mime.startsWith('audio/')) {
-    th.innerHTML = PLAY; const d = file.dur || 0;
-    $('chipname').textContent = 'Voice note'; $('chipmeta').textContent = Math.floor(d / 60) + ':' + String(d % 60).padStart(2, '0') + ' · tap to play';
-    th.onclick = () => {
-      if (chipAudio && !chipAudio.paused) { chipAudio.pause(); th.innerHTML = PLAY; return; }
-      if (!chipAudio) { chipAudio = new Audio('data:' + file.mime + ';base64,' + file.data); chipAudio.onended = () => { th.innerHTML = PLAY; }; }
-      chipAudio.play(); th.innerHTML = PAUSE;
-    };
-  } else {
-    th.textContent = 'PDF'; $('chipname').textContent = file.name; $('chipmeta').textContent = 'PDF · ' + size;
-  }
-  $('chip').classList.remove('hidden');
+let files = [];
+const dataUrl = b => new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(b); });
+const fmtDur = d => Math.floor(d / 60) + ':' + String(Math.round(d % 60)).padStart(2, '0');
+const fmtSize = n => n > 921600 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+async function shrink(blob) { // photos: 1280px JPEG, so uploads are quick on weak networks and use less quota
+  const url = URL.createObjectURL(blob);
+  try {
+    const img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url; });
+    const k = Math.min(1, 1280 / Math.max(img.width, img.height));
+    const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+    return await new Promise(r => c.toBlob(r, 'image/jpeg', 0.82));
+  } catch { return blob; } finally { URL.revokeObjectURL(url); }
 }
-function syncSend() { $('f').classList.toggle('empty', !$('input').value.trim() && !file); renderChip(); }
-$('unattach').onclick = clearFile;
+async function pdfInfo(blob) { // first-page thumbnail and page count; pdf.js is only downloaded when someone attaches a PDF
+  try {
+    if (!window.pdfjsLib) await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = PDFJS + 'pdf.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+    pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
+    const doc = await pdfjsLib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;
+    const pg = await doc.getPage(1), v = pg.getViewport({ scale: 150 / pg.getViewport({ scale: 1 }).width });
+    const c = document.createElement('canvas'); c.width = Math.round(v.width); c.height = Math.round(v.height);
+    await pg.render({ canvasContext: c.getContext('2d'), viewport: v }).promise;
+    return { pages: doc.numPages, thumb: c.toDataURL('image/jpeg', 0.6) };
+  } catch { return {}; }
+}
+async function addFile(blob, name, extra = {}) {
+  if (files.length >= MAX_FILES) return note('You can attach up to ' + MAX_FILES + ' files per message.');
+  let b = blob; if (b.type.startsWith('image/') && b.type !== 'image/gif') b = await shrink(b);
+  if (b.size > MAX_FILE) return note(name + ' is over 5 MB. Choose a smaller file.');
+  const data = (await dataUrl(b)).split(',')[1];
+  if (files.reduce((n, f) => n + f.data.length, data.length) > MAX_TOTAL) return note('Those files are too big to send together. Remove one first.');
+  const fo = { name, mime: b.type, data, size: b.size, ...extra };
+  files.push(fo); note(''); syncSend();
+  if (b.type === 'application/pdf') pdfInfo(b).then(i => { Object.assign(fo, i); renderTray(); });
+}
+$('attach').onclick = () => $('file').click();
+$('file').onchange = async e => { const list = [...e.target.files]; e.target.value = ''; for (const f of list) await addFile(f, f.name); };
+function clearFile() { files = []; $('file').value = ''; syncSend(); }
+const toAtt = f => ({ n: f.name, m: f.mime, s: f.size, d: f.dur, w: f.w, t: f.thumb, g: f.pages, url: 'data:' + f.mime + ';base64,' + f.data });
+async function attUrl(a) { // the local copy while this page is open; a signed link from storage after a reload
+  if (a.url) return a.url;
+  if (!a.p) return '';
+  const { data } = await sb.storage.from('attachments').createSignedUrl(a.p, 3600);
+  return (a.url = data ? data.signedUrl : '');
+}
+function mediaEl(a) { // one attachment: photo, PDF card, or a WhatsApp-style voice note
+  const m = a.m || '', el = document.createElement('div');
+  if (m.startsWith('audio/')) {
+    el.className = 'vn';
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'vnp'; btn.innerHTML = PLAY; btn.setAttribute('aria-label', 'Play voice note');
+    const wave = document.createElement('div'); wave.className = 'vnw';
+    const bars = a.w && a.w.length ? a.w : Array.from({ length: 36 }, (_, i) => 3 + (i * 7 + Math.round(a.d || 5)) % 6);
+    bars.forEach(v => { const i = document.createElement('i'); i.style.height = (18 + v * 9) + '%'; wave.appendChild(i); });
+    const time = document.createElement('span'); time.className = 'vnt'; time.textContent = fmtDur(a.d || 0);
+    el.append(btn, wave, time);
+    let au = null;
+    const paint = () => {
+      const n = au && au.duration ? Math.round(au.currentTime / au.duration * bars.length) : 0;
+      [...wave.children].forEach((c, i) => c.classList.toggle('on', i < n));
+      time.textContent = fmtDur(au && au.currentTime ? au.currentTime : (a.d || 0));
+    };
+    btn.onclick = async () => {
+      if (au && !au.paused) { au.pause(); btn.innerHTML = PLAY; return; }
+      if (!au) {
+        const u = await attUrl(a); if (!u) return note('This voice note is no longer available.');
+        au = new Audio(u); au.ontimeupdate = paint;
+        au.onended = () => { btn.innerHTML = PLAY; au.currentTime = 0; paint(); };
+      }
+      au.play(); btn.innerHTML = PAUSE;
+    };
+    wave.onclick = e => { if (au && au.duration) { const r = wave.getBoundingClientRect(); au.currentTime = au.duration * (e.clientX - r.left) / r.width; paint(); } };
+    return el;
+  }
+  if (m.startsWith('image/')) {
+    el.className = 'ph'; const im = document.createElement('img'); im.alt = a.n || 'Photo'; im.loading = 'lazy';
+    attUrl(a).then(u => { if (u) im.src = u; }); el.appendChild(im); return el;
+  }
+  el.className = 'pf';
+  const th = document.createElement('div'); th.className = 'pft';
+  if (a.t) { const im = document.createElement('img'); im.alt = ''; im.src = a.t; th.appendChild(im); } else th.textContent = 'PDF';
+  const info = document.createElement('div'); info.className = 'pfi';
+  const nm = document.createElement('b'); nm.textContent = a.n || 'Document';
+  const mt = document.createElement('small'); mt.textContent = 'PDF' + (a.g ? ' · ' + a.g + (a.g > 1 ? ' pages' : ' page') : '') + (a.s ? ' · ' + fmtSize(a.s) : '');
+  info.append(nm, mt); el.append(th, info);
+  el.onclick = async () => { const u = await attUrl(a); if (u && !u.startsWith('data:')) open(u, '_blank'); };
+  return el;
+}
+function renderTray() { // small previews of everything about to be sent, each with its own remove button
+  const c = $('chip'); c.replaceChildren();
+  files.forEach((f, i) => {
+    const w = document.createElement('div'); w.className = 'ti'; w.appendChild(mediaEl(toAtt(f)));
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'rm'; x.textContent = '✕'; x.setAttribute('aria-label', 'Remove ' + f.name);
+    x.onclick = () => { files.splice(i, 1); syncSend(); };
+    w.appendChild(x); c.appendChild(w);
+  });
+  c.classList.toggle('hidden', !files.length);
+}
+function syncSend() { $('f').classList.toggle('empty', !$('input').value.trim() && !files.length); renderTray(); }
+async function uploadAll(list, atts) { // keep the files so the previews still work after a reload
+  return Promise.all(list.map(async (f, i) => {
+    const a = atts[i], meta = { n: a.n, m: a.m, s: a.s, d: a.d, w: a.w, t: a.t, g: a.g };
+    try {
+      const ext = (f.mime.split('/')[1] || 'bin').split('+')[0].replace('mpeg', 'mp3');
+      const path = user.id + '/' + crypto.randomUUID() + '.' + ext;
+      const bin = Uint8Array.from(atob(f.data), c => c.charCodeAt(0));
+      const { error } = await sb.storage.from('attachments').upload(path, new Blob([bin], { type: f.mime }), { contentType: f.mime });
+      if (!error) meta.p = path;
+    } catch {}
+    return meta;
+  }));
+}
 
 /* ---------- drafts survive reloads and dropped connections ---------- */
 const DRAFT = 'rhomeo_draft';
@@ -950,7 +1047,11 @@ async function toWav(blob) { // 16 kHz mono WAV: the format Gemini reads most re
   w(0, 'RIFF'); out.setUint32(4, 36 + n * 2, true); w(8, 'WAVEfmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 1, true);
   out.setUint32(24, 16000, true); out.setUint32(28, 32000, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true); w(36, 'data'); out.setUint32(40, n * 2, true);
   for (let i = 0; i < n; i++) out.setInt16(44 + i * 2, Math.max(-1, Math.min(1, pcm[i])) * 0x7fff, true);
-  return new Blob([out], { type: 'audio/wav' });
+  const pk = []; const st = Math.max(1, Math.floor(n / 40));
+  for (let b = 0; b < 40; b++) { let mx = 0; for (let i = b * st; i < Math.min(n, (b + 1) * st); i++) mx = Math.max(mx, Math.abs(pcm[i])); pk.push(mx); }
+  const top = Math.max(...pk, 0.02);
+  const wav = new Blob([out], { type: 'audio/wav' }); wav.peaks = pk.map(v => Math.round(v / top * 9));
+  return wav;
 }
 async function startRec() {
   if (!navigator.mediaDevices || !window.MediaRecorder) return note('Voice notes aren’t supported in this browser.');
@@ -967,9 +1068,7 @@ async function startRec() {
       if (!raw.size) return;
       let blob = raw; try { blob = await toWav(raw); } catch {}
       if (blob.size > MAX_FILE) return note('That voice note is too long. Keep it under about 90 seconds.');
-      const r = new FileReader();
-      r.onload = () => { file = { name: 'Voice note', mime: blob.type, data: r.result.split(',')[1], dur }; $('chipname').textContent = 'Voice note ready'; $('chip').classList.remove('hidden'); syncSend(); note(''); syncSend(); };
-      r.readAsDataURL(blob);
+      addFile(blob, 'Voice note', { dur, w: blob.peaks });
     };
     rec.start(); recT = Date.now(); $('mic').classList.add('rec');
     recTick = setInterval(() => {
@@ -991,21 +1090,20 @@ $('f').onsubmit = async e => {
   e.preventDefault();
   if (busy) return;
   const text = $('input').value.trim();
-  if (!text && !file) return;
+  if (!text && !files.length) return;
   if (!navigator.onLine) { note('You’re offline. Reconnect to send messages. Your draft is kept.'); return; }
   note('');
-  const sent = file;
+  const sent = files.slice(); const atts = sent.map(toAtt); const upP = uploadAll(sent, atts);
   const live = [];                    // what Gemini receives this turn
   const kept = [];                    // what we save (no raw file data yet)
   if (text) { live.push({ text }); kept.push({ text }); }
-  if (sent) {
-    const voice = sent.mime.startsWith('audio/');
-    live.push({ inline_data: { mime_type: sent.mime, data: sent.data } });
-    if (voice && !text) live.push({ text: 'This is a voice note. First write a one-line transcript in italics, then reply to what I said.' });
-    kept.push({ text: voice ? '[Voice note]' : '[Attached: ' + sent.name + ']' });
-  }
-  if (!cur.history.length) { $('msgs').innerHTML = ''; cur.title = (text || sent.name).slice(0, 40); $('title').textContent = cur.title; }
-  addMsg('user', kept.map(p => p.text).join('\n'));
+  sent.forEach(f => {
+    live.push({ inline_data: { mime_type: f.mime, data: f.data } });
+    kept.push({ text: f.mime.startsWith('audio/') ? '[Voice note]' : '[Attached: ' + f.name + ']' });
+  });
+  if (!text && sent.some(f => f.mime.startsWith('audio/'))) live.push({ text: 'This includes a voice note. First write a one-line transcript in italics, then reply to what I said.' });
+  if (!cur.history.length) { $('msgs').innerHTML = ''; cur.title = (text || (sent[0] && sent[0].name) || 'Attachment').slice(0, 40); $('title').textContent = cur.title; }
+  addMsg('user', kept.map(p => p.text).join('\n'), true, atts);
   $('input').value = ''; $('input').style.height = 'auto'; clearFile();
 
   const box = addMsg('model', ''); const th = thinking(box);
@@ -1024,7 +1122,7 @@ $('f').onsubmit = async e => {
   const sched = () => { if (!timer) timer = setTimeout(() => paint(false), Math.max(0, gap - (performance.now() - lastPaint))); };
   try {
     const { data: { session } } = await sb.auth.getSession();
-    const body = JSON.stringify({ mode, contents: cur.history.concat({ role: 'user', parts: live }) });
+    const body = JSON.stringify({ mode, contents: cur.history.map(({ role, parts }) => ({ role, parts })).concat({ role: 'user', parts: live }) });
     let r;
     for (let a = 0; ; a++) { // one automatic retry if the connection fails before any reply arrives
       try {
@@ -1055,7 +1153,7 @@ $('f').onsubmit = async e => {
     if (!out) { // nothing came back: undo the message so you can resend it
       if (box.previousElementSibling) box.previousElementSibling.remove();
       box.remove(); $('input').value = text; autosize();
-      if (sent) { file = sent; $('chipname').textContent = 'Attached: ' + sent.name; $('chip').classList.remove('hidden'); syncSend(); }
+      if (sent.length) { files = sent; syncSend(); }
       syncSend();
     }
   }
@@ -1064,7 +1162,7 @@ $('f').onsubmit = async e => {
   setBusy(false); ctrl = null;
   if (out) {
     paint(true); clearDraft();
-    cur.history.push({ role: 'user', parts: kept }, { role: 'model', parts: [{ text: out }] });
+    cur.history.push({ role: 'user', parts: kept, ...(sent.length ? { att: await upP } : {}) }, { role: 'model', parts: [{ text: out }] });
     await saveChat();
   } else if (!cur.history.length) { showEmpty(); }
 };
