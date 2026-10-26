@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rhomeo</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rhomeo">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#131314">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://emkhqrvyhvbtybsotzio.supabase.co" crossorigin>
@@ -48,6 +54,7 @@ body.collapsed aside{margin-left:-280px}
 .foot .who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .foot div{display:flex;gap:16px}
 .foot button:hover{color:var(--text)}
+.foot>button{text-align:left;color:var(--accent)}
 #scrim{display:none}
 main{flex:1;display:flex;flex-direction:column;min-width:0;height:100dvh}
 #offline{background:var(--s2);text-align:center;font-size:.85rem;padding:6px;color:var(--mute)}
@@ -119,6 +126,7 @@ aside.open+#scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45
   <div id="list"></div>
   <div class="foot">
     <span class="who" id="who"></span>
+    <button id="install" class="hidden">Install app</button>
     <div><button id="theme">Switch theme</button><button id="out">Sign out</button></div>
   </div>
 </aside>
@@ -378,10 +386,18 @@ $('input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftK
 $('new').onclick = newChat;
 $('menu').onclick = () => matchMedia('(max-width:760px)').matches ? $('side').classList.toggle('open') : document.body.classList.toggle('collapsed');
 $('scrim').onclick = () => $('side').classList.remove('open');
-function theme(t) { document.documentElement.dataset.theme = t; try { localStorage.setItem('rhomeo_theme', t); } catch {} }
+function theme(t) { document.documentElement.dataset.theme = t; document.querySelector('meta[name=theme-color]').content = t === 'light' ? '#ffffff' : '#131314'; try { localStorage.setItem('rhomeo_theme', t); } catch {} }
 $('theme').onclick = () => theme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
 try { const t = localStorage.getItem('rhomeo_theme'); theme(t || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')); } catch {}
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+let installEvt = null;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('install').classList.remove('hidden'); });
+addEventListener('appinstalled', () => { installEvt = null; $('install').classList.add('hidden'); });
+if (!(matchMedia('(display-mode: standalone)').matches || navigator.standalone) && /iphone|ipad|ipod/i.test(navigator.userAgent)) $('install').classList.remove('hidden');
+$('install').onclick = async () => {
+  if (installEvt) { installEvt.prompt(); await installEvt.userChoice; installEvt = null; $('install').classList.add('hidden'); }
+  else note('To install on iPhone or iPad: tap Share, then Add to Home Screen.');
+};
 const off = () => $('offline').classList.toggle('hidden', navigator.onLine);
 addEventListener('online', off); addEventListener('offline', off); off();
 sb.auth.getSession(); // triggers onAuthStateChange for returning users

@@ -1,11 +1,11 @@
-const CACHE = 'rhomeo-v3';
+const CACHE = 'rhomeo-v4';
 const CDN = [
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js',
   'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
   'https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js'
 ];
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => Promise.allSettled(['./', './index.html', './manifest.json', ...CDN].map(u => c.add(u)))));
+  e.waitUntil(caches.open(CACHE).then(c => Promise.allSettled(['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', ...CDN].map(u => c.add(u)))));
   self.skipWaiting();
 });
 self.addEventListener('activate', e => {
