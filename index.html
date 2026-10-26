@@ -447,6 +447,20 @@ form#f.empty #send:not(.stop){display:none}
 .a pre{max-width:100%;margin-bottom:.8em}
 .a>*:last-child{margin-bottom:0}
 .u{border-radius:22px;background:color-mix(in srgb,var(--accent) 22%,var(--s2));border:1px solid var(--line)}
+/* v5: glitch fixes + file preview card */
+header{z-index:40}
+.menu{background:var(--sheet);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 14px 40px rgba(0,0,0,.28)}
+aside{background:var(--sheet)}
+.orb{--lg:#3d5bff}
+#chip{display:flex;align-items:center;gap:12px;width:fit-content;max-width:calc(100% - 24px);margin:0 auto 8px;padding:8px 10px 8px 8px;border-radius:18px;background:var(--s1);border:1px solid var(--line);font-family:var(--sans);font-size:.92rem;color:var(--text);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);animation:up .2s ease-out}
+#chipthumb{width:52px;height:52px;border-radius:12px;overflow:hidden;flex-shrink:0;display:grid;place-items:center;background:var(--s2);color:var(--accent);font-weight:700;font-size:.78rem;border:0}
+#chipthumb img{width:100%;height:100%;object-fit:cover;display:block}
+#chipthumb svg{width:24px;height:24px}
+.ci{display:flex;flex-direction:column;min-width:0}
+#chipname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+#chipmeta{color:var(--mute);font-size:.78rem}
+#unattach{width:30px;height:30px;border-radius:50%;background:var(--s2);color:var(--mute);display:grid;place-items:center;font-size:0;flex-shrink:0}
+#unattach::before{content:"✕";font-size:.85rem}
 </style>
 </head>
 <body class="out">
@@ -508,7 +522,7 @@ form#f.empty #send:not(.stop){display:none}
   <div id="msgs" aria-live="polite"></div>
   <div class="jumpwrap"><button id="jump" class="hidden" type="button" aria-label="Jump to latest message">↓</button></div>
   <div id="note" role="alert"></div>
-  <div id="chip" class="hidden"><span id="chipname"></span><button id="unattach" type="button" aria-label="Remove attachment">Remove</button></div>
+  <div id="chip" class="hidden"><button type="button" id="chipthumb" aria-label="Attachment preview"></button><div class="ci"><b id="chipname"></b><small id="chipmeta"></small></div><button id="unattach" type="button" aria-label="Remove attachment">Remove</button></div>
   <form id="f" class="empty">
     <span id="wave" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 9v6M9 5v14M13 8v8M17 11v2"/><path d="M20 3v4M18 5h4" stroke-width="1.6"/></svg></span>
     <textarea id="input" rows="1" placeholder="Ask me anytime…"></textarea>
@@ -606,7 +620,8 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY);
 let user = null, chats = [], cur = null, file = null, ctrl = null, busy = false, signup = false, openTok = 0;
 
 /* ---------- small helpers ---------- */
-const note = t => { $('note').textContent = t || ''; };
+let noteT = 0;
+const note = t => { $('note').textContent = t || ''; clearTimeout(noteT); if (t) noteT = setTimeout(() => { $('note').textContent = ''; }, 9000); };
 const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const ckey = k => 'rhomeo_' + (user ? user.id : 'x') + '_' + k;
@@ -694,7 +709,7 @@ function thinking(box) { // animated "Rhomeo is working" pill with changing stat
 }
 
 function showEmpty() {
-  const ORB = '<svg class="orb" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ee0ff"/><stop offset=".55" stop-color="#6a9bff"/><stop offset="1" stop-color="#c06bff"/></linearGradient><radialGradient id="ob" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dde2ee"/></radialGradient></defs><circle cx="48" cy="48" r="48" fill="url(#ob)"/><path d="M48 27 70 62H26Z" fill="url(#og)" stroke="url(#og)" stroke-width="13" stroke-linejoin="round"/><path d="M48 38 60 57H36Z" fill="#fff" fill-opacity=".38" stroke="#fff" stroke-opacity=".38" stroke-width="6" stroke-linejoin="round"/></svg>';
+  const ORB = '<svg class="orb" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ee0ff"/><stop offset=".55" stop-color="#6a9bff"/><stop offset="1" stop-color="#c06bff"/></linearGradient><radialGradient id="ob" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dde2ee"/></radialGradient></defs><circle cx="48" cy="48" r="48" fill="url(#ob)"/><use href="#rm" x="21" y="30" width="54" height="42"/></svg>';
   const ICONS = {
     bug: '<path d="M8 8a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z"/><path d="M12 8v12M4 12h4M16 12h4M5 6l3 2M19 6l-3 2M5 19l3-2M19 19l-3-2"/>',
     code: '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
@@ -806,6 +821,7 @@ function renderList() {
   });
 }
 function newChat() {
+  note('');
   if (busy) return;
   openTok++;
   cur = { id: null, title: 'New chat', history: [] };
@@ -865,7 +881,7 @@ $('attach').onclick = () => $('file').click();
 $('file').onchange = e => {
   const f = e.target.files[0]; if (!f) return;
   if (f.size > MAX_FILE) { note('That file is over 5 MB. Choose a smaller image or PDF.'); e.target.value = ''; return; }
-  const done = (mime, data) => { file = { name: f.name, mime, data }; $('chipname').textContent = 'Attached: ' + f.name; $('chip').classList.remove('hidden'); note(''); syncSend(); };
+  const done = (mime, data) => { file = { name: f.name, mime, data }; $('chipname').textContent = 'Attached: ' + f.name; $('chip').classList.remove('hidden'); syncSend(); note(''); syncSend(); };
   const r = new FileReader();
   r.onload = () => {
     if (!f.type.startsWith('image/') || f.type === 'image/gif') return done(f.type, r.result.split(',')[1]);
@@ -882,7 +898,30 @@ $('file').onchange = e => {
   r.readAsDataURL(f);
 };
 function clearFile() { file = null; $('file').value = ''; $('chip').classList.add('hidden'); syncSend(); }
-function syncSend() { $('f').classList.toggle('empty', !$('input').value.trim() && !file); }
+const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>', PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+let chipAudio = null;
+function renderChip() { // small preview of what's attached: photo thumbnail, PDF tile, or a playable voice note
+  if (chipAudio) { chipAudio.pause(); chipAudio = null; }
+  const th = $('chipthumb'); th.onclick = null; th.replaceChildren();
+  if (!file) { $('chip').classList.add('hidden'); return; }
+  const kb = Math.round(file.data.length * 0.75 / 1024), size = kb > 900 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB';
+  if (file.mime.startsWith('image/')) {
+    const im = document.createElement('img'); im.alt = ''; im.src = 'data:' + file.mime + ';base64,' + file.data; th.appendChild(im);
+    $('chipname').textContent = file.name; $('chipmeta').textContent = 'Image · ' + size;
+  } else if (file.mime.startsWith('audio/')) {
+    th.innerHTML = PLAY; const d = file.dur || 0;
+    $('chipname').textContent = 'Voice note'; $('chipmeta').textContent = Math.floor(d / 60) + ':' + String(d % 60).padStart(2, '0') + ' · tap to play';
+    th.onclick = () => {
+      if (chipAudio && !chipAudio.paused) { chipAudio.pause(); th.innerHTML = PLAY; return; }
+      if (!chipAudio) { chipAudio = new Audio('data:' + file.mime + ';base64,' + file.data); chipAudio.onended = () => { th.innerHTML = PLAY; }; }
+      chipAudio.play(); th.innerHTML = PAUSE;
+    };
+  } else {
+    th.textContent = 'PDF'; $('chipname').textContent = file.name; $('chipmeta').textContent = 'PDF · ' + size;
+  }
+  $('chip').classList.remove('hidden');
+}
+function syncSend() { $('f').classList.toggle('empty', !$('input').value.trim() && !file); renderChip(); }
 $('unattach').onclick = clearFile;
 
 /* ---------- drafts survive reloads and dropped connections ---------- */
@@ -921,6 +960,7 @@ async function startRec() {
     rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined); recChunks = [];
     rec.ondataavailable = e => { if (e.data.size) recChunks.push(e.data); };
     rec.onstop = async () => {
+      const dur = Math.round((Date.now() - recT) / 1000);
       stream.getTracks().forEach(t => t.stop()); clearInterval(recTick);
       $('mic').classList.remove('rec'); $('input').placeholder = PH;
       const raw = new Blob(recChunks, { type: (rec.mimeType || mime || 'audio/webm').split(';')[0] }); rec = null;
@@ -928,7 +968,7 @@ async function startRec() {
       let blob = raw; try { blob = await toWav(raw); } catch {}
       if (blob.size > MAX_FILE) return note('That voice note is too long. Keep it under about 90 seconds.');
       const r = new FileReader();
-      r.onload = () => { file = { name: 'Voice note', mime: blob.type, data: r.result.split(',')[1] }; $('chipname').textContent = 'Voice note ready'; $('chip').classList.remove('hidden'); note(''); syncSend(); };
+      r.onload = () => { file = { name: 'Voice note', mime: blob.type, data: r.result.split(',')[1], dur }; $('chipname').textContent = 'Voice note ready'; $('chip').classList.remove('hidden'); syncSend(); note(''); syncSend(); };
       r.readAsDataURL(blob);
     };
     rec.start(); recT = Date.now(); $('mic').classList.add('rec');
@@ -995,7 +1035,12 @@ $('f').onsubmit = async e => {
         th.set('Connection hiccup, retrying…'); await sleep(1500);
       }
     }
-    if (!r.ok) throw new Error(r.status === 429 ? 'Rhomeo is busy or you’ve hit today’s message limit. Try again in a bit.' : 'Rhomeo couldn’t reply (error ' + r.status + ').');
+    if (!r.ok) {
+      let code = ''; try { code = (await r.json()).error; } catch {}
+      throw new Error(r.status === 429
+        ? (code === 'daily_limit' ? 'You’ve used all your messages for today. They reset at midnight UTC.' : code === 'slow_down' ? 'Easy there. Wait a few seconds, then try again.' : 'Rhomeo is busy right now. Try again in a moment.')
+        : 'Rhomeo couldn’t reply (error ' + r.status + ').');
+    }
     const rd = r.body.getReader(), dec = new TextDecoder();
     let first = true;
     for (;;) {
@@ -1010,7 +1055,7 @@ $('f').onsubmit = async e => {
     if (!out) { // nothing came back: undo the message so you can resend it
       if (box.previousElementSibling) box.previousElementSibling.remove();
       box.remove(); $('input').value = text; autosize();
-      if (sent) { file = sent; $('chipname').textContent = 'Attached: ' + sent.name; $('chip').classList.remove('hidden'); }
+      if (sent) { file = sent; $('chipname').textContent = 'Attached: ' + sent.name; $('chip').classList.remove('hidden'); syncSend(); }
       syncSend();
     }
   }
