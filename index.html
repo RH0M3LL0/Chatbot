@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4712/4712035.png">
 
+  <!-- Supabase Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -30,37 +32,51 @@
       overflow: hidden;
     }
 
-    /* Auth Overlay Modal */
+    /* Auth Modal Container */
     #auth-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(15, 23, 42, 0.96);
+      background-color: rgba(15, 23, 42, 0.98);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 2000;
+      padding: 20px;
     }
 
     #auth-modal.hidden { display: none; }
 
     .auth-card {
       background-color: #1e293b;
-      padding: 30px;
-      border-radius: 12px;
+      padding: 32px;
+      border-radius: 16px;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       border: 1px solid #334155;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      text-align: center;
     }
 
     .auth-card h2 {
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-      text-align: center;
+      margin-bottom: 8px;
+      font-size: 1.6rem;
       color: #f8fafc;
+    }
+
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+
+    .auth-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
     }
 
     .auth-input {
@@ -68,10 +84,11 @@
       background-color: #0f172a;
       border: 1px solid #334155;
       color: white;
-      padding: 12px;
+      padding: 12px 16px;
       border-radius: 8px;
-      margin-bottom: 15px;
+      font-size: 0.95rem;
       outline: none;
+      transition: border-color 0.2s;
     }
 
     .auth-input:focus { border-color: #3b82f6; }
@@ -84,24 +101,43 @@
       padding: 12px;
       border-radius: 8px;
       font-weight: 600;
+      font-size: 1rem;
       cursor: pointer;
-      margin-bottom: 10px;
+      transition: background-color 0.2s;
     }
 
     .auth-btn:hover { background-color: #2563eb; }
 
     .auth-switch {
-      text-align: center;
-      font-size: 0.85rem;
+      margin-top: 18px;
+      font-size: 0.88rem;
       color: #94a3b8;
       cursor: pointer;
-      margin-top: 10px;
+      user-select: none;
     }
 
-    .auth-switch:hover { color: #3b82f6; text-decoration: underline; }
-    #auth-error { color: #ef4444; font-size: 0.85rem; margin-bottom: 15px; text-align: center; }
+    .auth-switch span {
+      color: #3b82f6;
+      font-weight: 600;
+      text-decoration: underline;
+    }
 
-    /* App Layout */
+    #auth-error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      min-height: 20px;
+      word-wrap: break-word;
+    }
+
+    #auth-success {
+      color: #10b981;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      min-height: 20px;
+    }
+
+    /* Main App Layout */
     .app-container {
       display: flex;
       width: 100%;
@@ -123,6 +159,17 @@
       color: #94a3b8;
     }
 
+    .user-info-badge {
+      font-size: 0.8rem;
+      color: #38bdf8;
+      background: #0f172a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      word-break: break-all;
+      border: 1px solid #334155;
+    }
+
     #new-chat-btn {
       background-color: #3b82f6;
       color: white;
@@ -136,7 +183,7 @@
 
     #logout-btn {
       background-color: #334155;
-      color: #94a3b8;
+      color: #f8fafc;
       border: none;
       padding: 8px;
       border-radius: 6px;
@@ -144,7 +191,7 @@
       font-weight: 600;
       margin-bottom: 15px;
     }
-    #logout-btn:hover { background-color: #ef4444; color: white; }
+    #logout-btn:hover { background-color: #ef4444; }
 
     #install-pwa-btn {
       background-color: #10b981;
@@ -231,13 +278,14 @@
       align-items: center;
       background: #1e293b;
       padding: 8px 12px;
-      margin: 0 20px;
+      margin: 0 20px 10px 20px;
       border-radius: 6px;
       font-size: 0.9rem;
       border: 1px solid #334155;
     }
 
     .file-preview.hidden { display: none; }
+
     #remove-file {
       background: none;
       border: none;
@@ -247,7 +295,6 @@
       margin-left: auto;
     }
 
-    /* Fixed Input Form & Controls */
     .chat-form {
       padding: 20px;
       background-color: #1e293b;
@@ -310,31 +357,39 @@
 </head>
 <body>
 
-  <!-- Authentication Modal -->
-  <div id="auth-modal" class="hidden">
+  <!-- Sign In & Sign Up Auth Overlay -->
+  <div id="auth-modal">
     <div class="auth-card">
-      <h2 id="auth-title">Sign In to Rhomeo</h2>
+      <h2 id="auth-title">Welcome Back</h2>
+      <p id="auth-subtitle" class="auth-subtitle">Sign in to your Rhomeo account</p>
+      
       <div id="auth-error"></div>
+      <div id="auth-success"></div>
+
       <form id="auth-form">
-        <input type="email" id="auth-email" class="auth-input" placeholder="Email Address" required>
-        <input type="password" id="auth-password" class="auth-input" placeholder="Password" required>
+        <div class="auth-input-group">
+          <input type="email" id="auth-email" class="auth-input" placeholder="Email Address" required autocomplete="email">
+          <input type="password" id="auth-password" class="auth-input" placeholder="Password" required minlength="6" autocomplete="current-password">
+        </div>
         <button type="submit" id="auth-submit-btn" class="auth-btn">Sign In</button>
       </form>
-      <div id="auth-switch-mode" class="auth-switch">Need an account? Sign Up</div>
+
+      <div id="auth-switch-mode" class="auth-switch">
+        Don't have an account? <span id="auth-switch-text">Sign Up</span>
+      </div>
     </div>
   </div>
 
   <div class="app-container">
-    <!-- Sidebar for Chat History -->
     <aside class="sidebar">
-      <h2>Conversations</h2>
+      <h2>Account</h2>
+      <div id="user-display" class="user-info-badge">Not signed in</div>
       <button id="install-pwa-btn">📲 Install App</button>
       <button id="new-chat-btn">+ New Chat</button>
       <button id="logout-btn">Sign Out</button>
       <div id="history-list"></div>
     </aside>
 
-    <!-- Main Chat Window -->
     <main class="chat-main">
       <header class="chat-header">
         <div>
@@ -346,23 +401,22 @@
 
       <div id="chat-window" class="chat-window">
         <div class="message model-message">
-          <p>Hey there! I'm online. I support audio, voice memos, images, videos, documents, and code. What are we building today?</p>
+          <p>Hey there! I'm online and ready. I support live microphone voice recordings, audio files, images, videos, documents, and documents with embedded photos!</p>
         </div>
       </div>
 
-      <!-- File Preview Area -->
       <div id="file-preview" class="file-preview hidden">
         <span id="file-name"></span>
         <button id="remove-file">×</button>
       </div>
 
-      <!-- Input Form -->
       <form id="chat-form" class="chat-form">
         <button type="button" id="mic-btn" class="tool-btn" title="Record Voice Note">🎙️</button>
-        <label for="file-input" class="tool-btn" title="Upload Image, Video, Audio, or Document">📎</label>
+        
+        <label for="file-input" class="tool-btn" title="Attach Audio, Document, Image, or Video">📎</label>
         <input type="file" id="file-input" accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/*" hidden>
         
-        <textarea id="user-input" placeholder="Ask anything, paste code, or attach files..." rows="1"></textarea>
+        <textarea id="user-input" placeholder="Ask anything, paste code, or attach media/docs..." rows="1"></textarea>
         <button type="submit" id="send-btn">Send</button>
       </form>
     </main>
@@ -373,14 +427,248 @@
     const MODEL_NAME = 'gemini-2.5-flash';
 
     const SUPABASE_URL = 'https://emkhqrvyhvbtybsotzio.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2hxcnZ5aHZidHlic290emlvIiwicm9sZ
- // DOM Elements
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVta2hxcnZ5aHZidHlic290emlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjA2MzAsImV4cCI6MjEwNzkzNjYzMH0.TE-VvICsc0uJvHriLlJJ8upgM5beUqPeGccTJt26w68';
+    
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    // DOM Elements
     const chatWindow = document.getElementById('chat-window');
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
     const fileInput = document.getElementById('file-input');
     const filePreview = document.getElementById('file-preview');
     const fileNameSpan = document.getElementById('file-name');
+    const removeFileBtn = document.getElementById('remove-file');
+    const newChatBtn = document.getElementById('new-chat-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const installPwaBtn = document.getElementById('install-pwa-btn');
+    const networkStatus = document.getElementById('network-status');
+    const micBtn = document.getElementById('mic-btn');
+    const userDisplay = document.getElementById('user-display');
+    
+    // Auth Elements
+    const authModal = document.getElementById('auth-modal');
+    const authForm = document.getElementById('auth-form');
+    const authEmail = document.getElementById('auth-email');
+    const authPassword = document.getElementById('auth-password');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authTitle = document.getElementById('auth-title');
+    const authSubtitle = document.getElementById('auth-subtitle');
+    const authError = document.getElementById('auth-error');
+    const authSuccess = document.getElementById('auth-success');
+    const authSwitchMode = document.getElementById('auth-switch-mode');
+    const authSwitchText = document.getElementById('auth-switch-text');
+
+    let currentUser = null;
+    let conversationHistory = [];
+    let attachedFile = null;
+    let deferredPrompt = null;
+    let isSignUpMode = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    const SYSTEM_INSTRUCTION = `
+    You are 'Rhomeo', an elite AI companion and software architect.
+    - IDENTITY: Your name is Rhomeo. You are confident, witty, sharp, and possess a great, relatable sense of humor.
+    - CAPABILITIES: You process all multimodal inputs, including images, videos, audio recordings, documents, PDFs, rich charts, and text.
+    - TONE: Playful, engaging, supportive, but precise when analyzing technical data or code.
+    `;
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW failed', err));
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPwaBtn.style.display = 'block';
+    });
+
+    installPwaBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt = null;
+      installPwaBtn.style.display = 'none';
+    });
+
+    // Network Status Tracker
+    function updateOnlineStatus() {
+      if (navigator.onLine) {
+        networkStatus.textContent = 'Online';
+        networkStatus.classList.remove('offline');
+      } else {
+        networkStatus.textContent = 'Offline Mode';
+        networkStatus.classList.add('offline');
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // Toggle Between Sign In and Sign Up Forms
+    authSwitchMode.addEventListener('click', () => {
+      isSignUpMode = !isSignUpMode;
+      authError.textContent = '';
+      authSuccess.textContent = '';
+
+      if (isSignUpMode) {
+        authTitle.textContent = 'Create Account';
+        authSubtitle.textContent = 'Sign up to start using Rhomeo AI';
+        authSubmitBtn.textContent = 'Sign Up';
+        authSwitchMode.childNodes[0].textContent = 'Already have an account? ';
+        authSwitchText.textContent = 'Sign In';
+      } else {
+        authTitle.textContent = 'Welcome Back';
+        authSubtitle.textContent = 'Sign in to your Rhomeo account';
+        authSubmitBtn.textContent = 'Sign In';
+        authSwitchMode.childNodes[0].textContent = "Don't have an account? ";
+        authSwitchText.textContent = 'Sign Up';
+      }
+    });
+
+    // Authentication Form Handler
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authError.textContent = '';
+      authSuccess.textContent = '';
+      
+      const email = authEmail.value.trim();
+      const password = authPassword.value.trim();
+
+      if (!supabase) {
+        authError.textContent = 'Supabase backend failed to initialize.';
+        return;
+      }
+
+      authSubmitBtn.disabled = true;
+      authSubmitBtn.textContent = isSignUpMode ? 'Signing Up...' : 'Signing In...';
+
+      try {
+        if (isSignUpMode) {
+          const { data, error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
+
+          if (data.user && data.session) {
+            currentUser = data.user;
+            userDisplay.textContent = currentUser.email;
+            authModal.classList.add('hidden');
+            await loadCloudHistory();
+          } else {
+            authSuccess.textContent = 'Account created! Please sign in with your credentials.';
+            isSignUpMode = false;
+            authTitle.textContent = 'Welcome Back';
+            authSubtitle.textContent = 'Sign in to your Rhomeo account';
+            authSubmitBtn.textContent = 'Sign In';
+            authSwitchMode.childNodes[0].textContent = "Don't have an account? ";
+            authSwitchText.textContent = 'Sign Up';
+          }
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+
+          currentUser = data.user;
+          userDisplay.textContent = currentUser.email;
+          authModal.classList.add('hidden');
+          await loadCloudHistory();
+        }
+      } catch (error) {
+        authError.textContent = error.message || 'Authentication error occurred.';
+      } finally {
+        authSubmitBtn.disabled = false;
+        authSubmitBtn.textContent = isSignUpMode ? 'Sign Up' : 'Sign In';
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      if (supabase) await supabase.auth.signOut();
+      currentUser = null;
+      conversationHistory = [];
+      userDisplay.textContent = 'Not signed in';
+      authModal.classList.remove('hidden');
+      renderHistory();
+    });
+
+    // App Session Initialization
+    async function initApp() {
+      updateOnlineStatus();
+      if (supabase) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            currentUser = session.user;
+            userDisplay.textContent = currentUser.email;
+            authModal.classList.add('hidden');
+            await loadCloudHistory();
+            return;
+          }
+        } catch (err) {
+          console.warn("Session check error:", err);
+        }
+      }
+      authModal.classList.remove('hidden');
+    }
+
+    async function loadCloudHistory() {
+      if (!currentUser || !supabase) return;
+      try {
+        const { data } = await supabase
+          .from('chats')
+          .select('history')
+          .eq('user_id', currentUser.id)
+          .single();
+
+        conversationHistory = (data && data.history) ? data.history : [];
+      } catch (err) {
+        conversationHistory = [];
+      }
+      renderHistory();
+    }
+
+    async function saveHistory() {
+      if (currentUser && supabase) {
+        await supabase.from('chats').upsert({ 
+          user_id: currentUser.id, 
+          history: conversationHistory,
+          updated_at: new Date()
+        }, { onConflict: 'user_id' });
+      }
+    }
+
+    function renderHistory() {
+      chatWindow.innerHTML = '';
+      if (conversationHistory.length === 0) {
+        appendMessageToDOM('model', "The name's Rhomeo! I'm online and ready. Send text, voice notes, documents, pictures, or videos!");
+        return;
+      }
+      conversationHistory.forEach(msg => {
+        const textPart = msg.parts.find(p => p.text)?.text || "[Multimodal Attachment Attached]";
+        appendMessageToDOM(msg.role === 'user' ? 'user' : 'model', textPart);
+      });
+    }
+
+    function appendMessageToDOM(role, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', role === 'user' ? 'user-message' : 'model-message');
+      const p = document.createElement('p');
+      p.textContent = text;
+      msgDiv.appendChild(p);
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // Voice Recording Support
+    micBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) audioChunks.push(efileNameSpan = document.getElementById('file-name');
     const removeFileBtn = document.getElementById('remove-file');
     const newChatBtn = document.getElementById('new-chat-btn');
     const logoutBtn = document.getElementById('logout-btn');
