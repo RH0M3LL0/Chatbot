@@ -29,9 +29,9 @@
   var rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(weak||slow||rm) d.classList.add('lite');
   if(rm) d.classList.add('rm');
-  var bg='aurora';
+  var bg='none';
   try{bg=localStorage.getItem('rhomeo_bg')||bg;}catch(e){}
-  if(['aurora','grid','code','waves','stars','pulse'].indexOf(bg)<0) bg='aurora';
+  if(['none','aurora','grid','code','waves','stars','pulse'].indexOf(bg)<0) bg='none';
   d.dataset.bg=bg;
 })();
 </script>
@@ -389,6 +389,58 @@ form#f.empty #send{background:var(--s2);color:var(--mute)}
 .foot{font-size:.9rem}
 header h2{font-size:.95rem}
 @media(max-width:760px){:root{--fs:1rem}.u{max-width:90%}}
+
+/* ===== v3: home-screen design (round header buttons, centered orb, install card, pill composer) ===== */
+:root[data-theme=dark]{--bg:#000;--s1:rgba(46,46,50,.78);--s2:rgba(62,62,67,.88);--line:rgba(255,255,255,.07);--text:#f4f4f6;--mute:#8e8e95;--sheet:#1c1c1f;--shadow:none}
+:root[data-theme=light]{--bg:#e9ecf2;--s1:rgba(255,255,255,.72);--s2:rgba(255,255,255,.95);--line:rgba(0,0,0,.05);--text:#111318;--mute:#7b818c;--sheet:#fff;--shadow:0 6px 22px rgba(30,40,80,.10)}
+body{background:radial-gradient(70% 38% at 90% 102%,rgba(96,72,200,.20),transparent 70%),radial-gradient(60% 34% at 6% 98%,rgba(190,60,90,.14),transparent 70%),var(--bg)}
+:root[data-theme=light] body{background:radial-gradient(70% 40% at 8% 100%,rgba(255,196,220,.7),transparent 70%),radial-gradient(60% 42% at 96% 88%,rgba(176,208,255,.75),transparent 70%),radial-gradient(50% 30% at 50% 0,rgba(255,255,255,.8),transparent 70%),var(--bg)}
+header{position:relative;justify-content:space-between;padding:12px 16px 4px;min-height:64px}
+#menu,#newtop{width:44px;height:44px;border-radius:50%;background:var(--s1);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--text);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+#menu svg,#newtop svg{width:22px;height:22px}
+.hdrlogo,header h2{display:none!important}
+.hright{gap:0;margin-left:0}
+.modewrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+button.modebtn{font-size:1.2rem;font-weight:600;padding:8px 12px}
+.modebtn .ml{display:none}
+.menu{left:50%;margin-left:-135px}
+.home{flex:1;display:flex;flex-direction:column;min-height:0;animation:up .5s ease-out}
+.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 0 16px}
+.orb{width:96px;height:96px;margin-bottom:22px;filter:drop-shadow(0 10px 28px rgba(110,130,255,.35));animation:float 4.5s ease-in-out infinite}
+.mid h1{font-size:1.65rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;background:linear-gradient(90deg,#4f7bff,#9a6bff 55%,#ff7b8c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mid p{color:var(--mute);margin-top:8px;font-size:1.02rem}
+.promo{display:flex;align-items:center;gap:8px;width:calc(100% - 8px);max-width:520px;margin-top:30px;padding:14px 14px 14px 12px;border-radius:30px;background:linear-gradient(110deg,color-mix(in srgb,var(--text) 14%,transparent),var(--s1));border:1px solid var(--line);cursor:pointer;text-align:left}
+.promo .bub{width:58px;height:58px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 35% 30%,#fff,#a7b7ff 45%,#8e7bff 80%);box-shadow:0 6px 18px rgba(120,120,255,.4)}
+.promo b{flex:1;text-align:center;font-weight:500;font-size:1rem}
+.promo .x{width:38px;height:38px;border-radius:50%;background:var(--s2);color:var(--mute);display:grid;place-items:center;flex-shrink:0}
+.home .chips{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin:0 0 14px}
+.home .chips button{display:flex;flex-direction:row;align-items:center;gap:14px;width:fit-content;max-width:100%;padding:13px 22px 13px 18px;border-radius:999px;background:var(--s1);border:1px solid var(--line);font-size:1.02rem;font-weight:500;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.home .chips button:hover{transform:none;border-color:var(--line);background:var(--s2)}
+.home .chips button span{font:inherit;color:var(--text)}
+.home .chips svg{width:26px;height:26px;flex-shrink:0}
+form#f{flex-direction:row;align-items:center;gap:2px;border-radius:999px;padding:6px 8px 6px 14px;min-height:58px;background:var(--s1);border:1px solid var(--line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+form#f:focus-within{border-color:var(--line);box-shadow:var(--shadow),0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent)}
+.tools{display:contents}
+.tspace{display:none}
+#wave{order:1;display:grid;place-items:center;width:34px;flex-shrink:0;color:var(--text)}
+#wave svg{width:26px;height:26px}
+#input{order:2;flex:1;min-width:0;padding:12px 6px;font-size:1.06rem}
+#input::placeholder{color:var(--mute)}
+#mic,#attach{order:3;width:44px;height:44px;border-radius:50%;border:0;background:none;color:var(--text);display:grid;place-items:center;flex-shrink:0}
+#attach{order:4}
+#mic svg,#attach svg{width:26px;height:26px}
+#mic:hover,#attach:hover{background:var(--s2);border:0}
+#mic.rec{color:#fff;background:#e5484d;animation:recpulse 1.2s ease-in-out infinite}
+@keyframes recpulse{50%{box-shadow:0 0 0 9px rgba(229,72,77,.22)}}
+form#f:not(.empty) #mic{display:none}
+#send{order:5;width:44px;height:44px;margin-left:2px}
+form#f.empty #send:not(.stop){display:none}
+.sheetbg{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet{width:100%;max-width:440px;background:var(--sheet);color:var(--text);border-radius:28px 28px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;animation:up .25s ease-out}
+.sheet h3{font-size:1.2rem}.sheet p{color:var(--mute);font-size:.95rem}
+.checks{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.checks .ok{color:#3fb97a}.checks .bad{color:var(--danger)}
+@keyframes fade{from{opacity:0}}
 </style>
 </head>
 <body class="out">
@@ -442,7 +494,7 @@ header h2{font-size:.95rem}
       </div>
     </div>
     <h2 id="title">New chat</h2>
-    <div class="hright">
+    <div class="hright"><button id="newtop" class="ibtn" type="button" aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12.5V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h3l3 3 1-3"/><path d="M18 14v6M15 17h6"/></svg></button>
       <button id="settingsbtn" class="ibtn" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
       <button id="profilebtn" class="profile" type="button" aria-label="Your profile"><span id="avatar" class="avatar">R</span><span id="pname" class="pname"></span></button>
     </div>
@@ -452,8 +504,10 @@ header h2{font-size:.95rem}
   <div id="note" role="alert"></div>
   <div id="chip" class="hidden"><span id="chipname"></span><button id="unattach" type="button" aria-label="Remove attachment">Remove</button></div>
   <form id="f" class="empty">
-    <textarea id="input" rows="1" placeholder="Ask Rhomeo about your code…"></textarea>
+    <span id="wave" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 9v6M9 5v14M13 8v8M17 11v2"/><path d="M20 3v4M18 5h4" stroke-width="1.6"/></svg></span>
+    <textarea id="input" rows="1" placeholder="Ask me anytime…"></textarea>
     <div class="tools">
+      <button type="button" id="mic" aria-label="Record a voice note" title="Record a voice note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
       <button type="button" id="attach" aria-label="Attach image or PDF" title="Attach image or PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <input type="file" id="file" accept="image/*,application/pdf" hidden>
       <span class="tspace"></span>
@@ -634,28 +688,33 @@ function thinking(box) { // animated "Rhomeo is working" pill with changing stat
 }
 
 function showEmpty() {
-  const name = user ? displayName() : '';
-  const h = document.createElement('div'); h.className = 'hero';
-  const lg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); lg.setAttribute('class', 'logo');
-  const us = document.createElementNS('http://www.w3.org/2000/svg', 'use'); us.setAttribute('href', '#rm'); lg.appendChild(us);
-  const s = document.createElement('small'); s.textContent = name ? '> hello, ' + name : '> hello';
-  const t = document.createElement('h1'); t.textContent = 'What are we building today?';
-  const p = document.createElement('p'); p.textContent = 'Write, debug and understand code, faster.';
+  const ORB = '<svg class="orb" viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ee0ff"/><stop offset=".55" stop-color="#6a9bff"/><stop offset="1" stop-color="#c06bff"/></linearGradient><radialGradient id="ob" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dde2ee"/></radialGradient></defs><circle cx="48" cy="48" r="48" fill="url(#ob)"/><path d="M48 27 70 62H26Z" fill="url(#og)" stroke="url(#og)" stroke-width="13" stroke-linejoin="round"/><path d="M48 38 60 57H36Z" fill="#fff" fill-opacity=".38" stroke="#fff" stroke-opacity=".38" stroke-width="6" stroke-linejoin="round"/></svg>';
+  const ICONS = {
+    bug: '<path d="M8 8a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z"/><path d="M12 8v12M4 12h4M16 12h4M5 6l3 2M19 6l-3 2M5 19l3-2M19 19l-3-2"/>',
+    code: '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+    book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19a2 2 0 0 1 2-2h13"/>'
+  };
+  const home = document.createElement('div'); home.className = 'home';
+  const mid = document.createElement('div'); mid.className = 'mid';
+  mid.innerHTML = ORB + '<h1>Hi! I’m Rhomeo</h1><p>Code smarter. Ship faster.</p>';
+  let hidePromo = false; try { hidePromo = localStorage.getItem('rhomeo_promo') === '1'; } catch {}
+  if (!hidePromo && !isStandalone()) {
+    const pr = document.createElement('div'); pr.className = 'promo'; pr.tabIndex = 0; pr.setAttribute('role', 'button');
+    pr.innerHTML = '<i class="bub"></i><b>Tap to install Rhomeo</b>';
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.setAttribute('aria-label', 'Dismiss'); x.textContent = '✕';
+    x.onclick = ev => { ev.stopPropagation(); pr.remove(); try { localStorage.setItem('rhomeo_promo', '1'); } catch {} };
+    pr.onclick = () => doInstall(); pr.onkeydown = ev => { if (ev.key === 'Enter') doInstall(); };
+    pr.appendChild(x); mid.appendChild(pr);
+  }
   const row = document.createElement('div'); row.className = 'chips';
-  [
-    ['Debug this error', 'paste a stack trace', 'Help me debug this error'],
-    ['Write a function', 'any language', 'Write a function that'],
-    ['Explain this code', 'line by line', 'Explain this code'],
-    ['Review and refactor', 'cleaner, faster', 'Review and refactor this code']
-  ].forEach(([title, sub, fill]) => {
+  [['bug', '#8b7bff', 'Debug this error', 'Help me debug this error'], ['code', '#ff7d6e', 'Write a function', 'Write a function that'], ['book', '#5b9bff', 'Explain this code', 'Explain this code']].forEach(([ic, col, label, fill]) => {
     const b = document.createElement('button'); b.type = 'button';
-    const bt = document.createElement('b'); bt.textContent = title;
-    const sp = document.createElement('span'); sp.textContent = sub;
-    b.append(bt, sp);
-    b.onclick = () => { $('input').value = fill + ': '; $('input').focus(); };
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="' + col + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[ic] + '</svg>';
+    const sp = document.createElement('span'); sp.textContent = label; b.appendChild(sp);
+    b.onclick = () => { $('input').value = fill + ': '; $('input').dispatchEvent(new Event('input')); $('input').focus(); };
     row.appendChild(b);
   });
-  h.append(lg, s, t, p, row); $('msgs').replaceChildren(h);
+  home.append(mid, row); $('msgs').replaceChildren(home);
 }
 function renderChat() {
   $('title').textContent = cur.title;
@@ -829,6 +888,54 @@ let draftT;
 $('input').addEventListener('input', e => { autosize(); syncSend(); clearTimeout(draftT); draftT = setTimeout(() => { try { localStorage.setItem(DRAFT, e.target.value); } catch {} }, 400); });
 const clearDraft = () => { try { localStorage.removeItem(DRAFT); } catch {} };
 
+/* ---------- header, footer and voice notes ---------- */
+$('menu').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5M12 7.5V12l3 2"/></svg>';
+$('newtop').onclick = () => $('new').click();
+{ const ft = document.querySelector('.foot'); ft.append($('settingsbtn'), $('profilebtn')); }
+const PH = $('input').placeholder;
+let rec = null, recChunks = [], recT = 0, recTick = 0;
+async function toWav(blob) { // 16 kHz mono WAV: the format Gemini reads most reliably, and small enough for weak networks
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  const buf = await ac.decodeAudioData(await blob.arrayBuffer()); ac.close();
+  const n = Math.max(1, Math.ceil(buf.duration * 16000));
+  const off = new OfflineAudioContext(1, n, 16000);
+  const src = off.createBufferSource(); src.buffer = buf; src.connect(off.destination); src.start();
+  const pcm = (await off.startRendering()).getChannelData(0);
+  const out = new DataView(new ArrayBuffer(44 + n * 2)); const w = (o, t) => [...t].forEach((c, i) => out.setUint8(o + i, c.charCodeAt(0)));
+  w(0, 'RIFF'); out.setUint32(4, 36 + n * 2, true); w(8, 'WAVEfmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 1, true);
+  out.setUint32(24, 16000, true); out.setUint32(28, 32000, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true); w(36, 'data'); out.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) out.setInt16(44 + i * 2, Math.max(-1, Math.min(1, pcm[i])) * 0x7fff, true);
+  return new Blob([out], { type: 'audio/wav' });
+}
+async function startRec() {
+  if (!navigator.mediaDevices || !window.MediaRecorder) return note('Voice notes aren’t supported in this browser.');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find(t => MediaRecorder.isTypeSupported(t)) || '';
+    rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined); recChunks = [];
+    rec.ondataavailable = e => { if (e.data.size) recChunks.push(e.data); };
+    rec.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop()); clearInterval(recTick);
+      $('mic').classList.remove('rec'); $('input').placeholder = PH;
+      const raw = new Blob(recChunks, { type: (rec.mimeType || mime || 'audio/webm').split(';')[0] }); rec = null;
+      if (!raw.size) return;
+      let blob = raw; try { blob = await toWav(raw); } catch {}
+      if (blob.size > MAX_FILE) return note('That voice note is too long. Keep it under about 90 seconds.');
+      const r = new FileReader();
+      r.onload = () => { file = { name: 'Voice note', mime: blob.type, data: r.result.split(',')[1] }; $('chipname').textContent = 'Voice note ready'; $('chip').classList.remove('hidden'); note(''); syncSend(); };
+      r.readAsDataURL(blob);
+    };
+    rec.start(); recT = Date.now(); $('mic').classList.add('rec');
+    recTick = setInterval(() => {
+      const t = Math.floor((Date.now() - recT) / 1000);
+      $('input').placeholder = 'Recording ' + Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0') + ' · tap the mic to stop';
+      if (t >= 90) stopRec();
+    }, 500);
+  } catch { rec = null; note('Microphone blocked. Allow microphone access for this site, then try again.'); }
+}
+function stopRec() { if (rec && rec.state !== 'inactive') rec.stop(); }
+$('mic').onclick = () => rec ? stopRec() : startRec();
+
 /* ---------- send ---------- */
 function setBusy(b) {
   busy = b; $('send').classList.toggle('stop', b); $('send').setAttribute('aria-label', b ? 'Stop' : 'Send'); $('send').type = b ? 'button' : 'submit';
@@ -845,7 +952,12 @@ $('f').onsubmit = async e => {
   const live = [];                    // what Gemini receives this turn
   const kept = [];                    // what we save (no raw file data yet)
   if (text) { live.push({ text }); kept.push({ text }); }
-  if (sent) { live.push({ inline_data: { mime_type: sent.mime, data: sent.data } }); kept.push({ text: '[Attached: ' + sent.name + ']' }); }
+  if (sent) {
+    const voice = sent.mime.startsWith('audio/');
+    live.push({ inline_data: { mime_type: sent.mime, data: sent.data } });
+    if (voice && !text) live.push({ text: 'This is a voice note. First write a one-line transcript in italics, then reply to what I said.' });
+    kept.push({ text: voice ? '[Voice note]' : '[Attached: ' + sent.name + ']' });
+  }
   if (!cur.history.length) { $('msgs').innerHTML = ''; cur.title = (text || sent.name).slice(0, 40); $('title').textContent = cur.title; }
   addMsg('user', kept.map(p => p.text).join('\n'));
   $('input').value = ''; $('input').style.height = 'auto'; clearFile();
@@ -983,13 +1095,47 @@ $('pf-pw-form').onsubmit = e => {
 /* ---------- install, offline, connection quality ---------- */
 addEventListener('load', () => { if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {}); });
 let installEvt = null;
-addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('install').classList.remove('hidden'); });
-addEventListener('appinstalled', () => { installEvt = null; $('install').classList.add('hidden'); });
-if (!(matchMedia('(display-mode: standalone)').matches || navigator.standalone) && /iphone|ipad|ipod/i.test(navigator.userAgent)) $('install').classList.remove('hidden');
-$('install').onclick = async () => {
-  if (installEvt) { installEvt.prompt(); await installEvt.userChoice; installEvt = null; $('install').classList.add('hidden'); }
-  else note('To install on iPhone or iPad: tap Share, then Add to Home Screen.');
-};
+function isStandalone() { return matchMedia('(display-mode: standalone)').matches || navigator.standalone; }
+function hideInstall() { document.querySelectorAll('#install,.promo').forEach(x => x.classList.add('hidden')); }
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; });
+addEventListener('appinstalled', () => { installEvt = null; hideInstall(); });
+if (isStandalone()) hideInstall(); else $('install').classList.remove('hidden');
+async function doInstall() {
+  if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice; installEvt = null; if (r.outcome === 'accepted') hideInstall(); return; }
+  openInstallHelp();
+}
+async function openInstallHelp() { // the browser hasn't offered install: show how, and check what's blocking it
+  const ov = document.createElement('div'); ov.className = 'sheetbg';
+  const box = document.createElement('div'); box.className = 'sheet'; ov.appendChild(box); document.body.appendChild(ov);
+  const close = () => ov.remove(); ov.onclick = e => { if (e.target === ov) close(); };
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const h = document.createElement('h3'); h.textContent = 'Install Rhomeo';
+  const how = document.createElement('p');
+  how.textContent = ios ? 'In Safari, tap the Share button, then “Add to Home Screen”.' : 'Open your browser menu (⋮), then tap “Install app” or “Add to Home screen”.';
+  const list = document.createElement('ul'); list.className = 'checks';
+  const x = document.createElement('button'); x.className = 'btn'; x.type = 'button'; x.textContent = 'Close'; x.onclick = close;
+  box.append(h, how, list, x);
+  const add = (ok, t) => { const li = document.createElement('li'); li.className = ok ? 'ok' : 'bad'; li.textContent = (ok ? '✓ ' : '✗ ') + t; list.appendChild(li); };
+  const get = async u => { try { const r = await fetch(u, { cache: 'no-store' }); return r.ok ? r : null; } catch { return null; } };
+  add(isSecureContext, isSecureContext ? 'Secure connection (https)' : 'Not on https');
+  const inApp = /FBAN|FBAV|Instagram|Snapchat|TikTok|Line\/|Telegram|; wv\)/i.test(navigator.userAgent);
+  add(!inApp, inApp ? 'You’re inside another app’s browser. Open this site in Chrome or Safari.' : 'Opened in a normal browser');
+  const mr = await get('manifest.json'); let man = null;
+  if (mr) { try { man = await mr.json(); } catch {} }
+  add(!!man, man ? 'manifest.json found' : 'manifest.json not found. The file must be named exactly manifest.json.');
+  if (man) {
+    for (const sz of ['192x192', '512x512']) {
+      const ic = (man.icons || []).find(i => i.sizes === sz && /png/.test(i.type || ''));
+      const ok = ic && await get(new URL(ic.src, location.href).href);
+      add(!!ok, ok ? sz + ' icon found' : sz + ' icon missing. Upload ' + (ic ? ic.src : 'a PNG icon') + '.');
+    }
+  }
+  let reg = null; try { reg = await navigator.serviceWorker.getRegistration(); } catch {}
+  add(!!reg, reg ? 'Offline support (service worker) is on' : 'Service worker not running. Reload the page once.');
+  const note2 = document.createElement('p'); note2.textContent = 'If everything is ✓ and nothing appears, Rhomeo may already be installed. Look for it on your home screen.';
+  box.insertBefore(note2, x);
+}
+$('install').onclick = doInstall;
 function netStatus() {
   const off = !navigator.onLine, slow = !!(cn && (cn.saveData || /(^|-)2g$/.test(cn.effectiveType || '')));
   const el = $('offline'); el.classList.toggle('hidden', !off && !slow);
