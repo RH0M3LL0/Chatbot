@@ -373,6 +373,22 @@ form#f.empty #send{background:var(--s2);color:var(--mute)}
 }
 @media(pointer:coarse){.row .x{padding:12px}.cp{padding:7px 12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.u,.m,.hero,.row,.chips button,#auth form{animation:none!important}}
+/* v2: flat, readable chat (no bubble tails, bigger text, clearer hierarchy) */
+:root{--fs:1.0625rem}
+#msgs{gap:30px}
+.u{align-self:flex-end;max-width:min(86%,600px);background:var(--s2);border:0;border-radius:20px;padding:10px 18px;font-size:var(--fs);line-height:1.6}
+.a{background:none;border:0;border-radius:0;padding:0;font-size:var(--fs);line-height:1.75;color:var(--text)}
+.a p{margin-bottom:1em}
+.a li{margin:.35em 0}
+.a h1{font-size:1.45em;margin:1.3em 0 .5em}.a h2{font-size:1.25em;margin:1.2em 0 .45em}.a h3{font-size:1.1em;margin:1.1em 0 .4em}
+.a h1:first-of-type,.a h2:first-of-type,.a h3:first-of-type{margin-top:.2em}
+.a code{font-size:.88em}
+.a pre code{font-size:.9rem}
+#input{font-size:1.0625rem}
+.row .t{font-size:.98rem}
+.foot{font-size:.9rem}
+header h2{font-size:.95rem}
+@media(max-width:760px){:root{--fs:1rem}.u{max-width:90%}}
 </style>
 </head>
 <body class="out">
