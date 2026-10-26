@@ -3,17 +3,17 @@
   "name": "Rhomeo",
   "short_name": "Rhomeo",
   "description": "Rhomeo: an AI coding assistant. Write, debug and understand code, faster.",
-  "start_url": "./",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./?source=pwa",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#0D1117",
   "theme_color": "#0D1117",
-  "categories": [
-    "developer tools",
-    "productivity",
-    "utilities"
-  ],
+  "prefer_related_applications": false,
+  "categories": ["developer tools", "productivity", "utilities"],
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -38,6 +38,20 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New chat",
+      "short_name": "New chat",
+      "url": "./?source=shortcut",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
