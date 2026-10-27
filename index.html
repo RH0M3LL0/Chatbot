@@ -477,18 +477,20 @@ html.rm #send[data-s=rec]::before{animation:none}
 
 .chips button i.ci{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
 .chips button i.ci svg{width:19px;height:19px}
-.rec small{text-align:center;margin-bottom:4px}
-.rec{margin-top:20px;display:flex;flex-direction:column;gap:7px}
-.rec button{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:16px;text-align:left;background:color-mix(in srgb,var(--s1) 72%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line);animation:up .45s ease-out .25s backwards}
-.rec button:hover{border-color:var(--accent);background:var(--s2)}
-.rec .rt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.92rem;font-weight:500}
-.rec .rd{font-family:var(--mono);font-size:.72rem;color:var(--mute);flex-shrink:0}
-html.lite .chips button,html.lite .rec button,html.lite form#f{-webkit-backdrop-filter:none;backdrop-filter:none}
+html.lite .chips button,html.lite form#f{-webkit-backdrop-filter:none;backdrop-filter:none}
 /* calmer background in the default mix: slower stars and waves */
 html[data-bg=mix] .w1{animation-duration:48s}html[data-bg=mix] .w2{animation-duration:34s}
 html[data-bg=mix] .st{animation:twinkle 7s ease-in-out infinite alternate,stardrift1 140s linear infinite}
 html[data-bg=mix] .st::after{animation:twinkle 9s ease-in-out -2s infinite alternate,stardrift2 200s linear infinite}
 html[data-bg=mix] #bg{opacity:.85}
+
+/* ---------- voice settings ---------- */
+.vl{display:flex;justify-content:space-between;align-items:center;font-size:.84rem;color:var(--mute);margin:14px 0 6px}
+.vl:first-of-type{margin-top:0}.vl b{font-family:var(--mono);font-weight:500;color:var(--text)}
+select.sel{background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;width:100%}
+select.sel:focus{border-color:var(--accent);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+input[type=range]{padding:0;border:0;background:none;height:28px;accent-color:var(--accent);box-shadow:none}
+.vbtns{display:flex;align-items:center;gap:16px;margin-top:16px}.vbtns .btn{flex:1}
 
 /* ---------- every screen size ---------- */
 @media(min-width:1600px){:root{--col:880px}body{font-size:16px}}
@@ -509,8 +511,7 @@ html[data-bg=mix] #bg{opacity:.85}
 }
 @media(max-width:360px){body{font-size:15px}header{padding:8px 10px}.modebtn{padding:5px 10px}.chips button{padding:12px 14px}}
 @media(max-height:520px){
-  .hero{padding-bottom:0}.hero .logo,.hero small,.rec{display:none}.hero p{margin-bottom:12px}
-  header{padding:4px 10px}#msgs{padding-top:8px}.hint{display:none}
+  .hero{padding-bottom:0}.hero .logo,.hero small,  header{padding:4px 10px}#msgs{padding-top:8px}.hint{display:none}
 }
 @media(pointer:coarse){.row .x{padding:12px}.cp{padding:7px 12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.m,.hero,.row,.chips button,#auth form,#note{animation:none!important}}
@@ -614,6 +615,17 @@ html[data-bg=mix] #bg{opacity:.85}
       <h4>Install app</h4>
       <p id="inst-text" class="instp"></p>
       <button id="inst-btn" class="btn hidden" type="button">Install Rhomeo</button>
+    </section>
+    <section id="st-voice">
+      <h4>Voice (read aloud)</h4>
+      <label class="vl" for="vsel">Voice</label>
+      <select id="vsel" class="sel"></select>
+      <label class="vl" for="vrate">Speed <b id="vratev">1.0×</b></label>
+      <input id="vrate" type="range" min="0.5" max="2" step="0.1" value="1">
+      <label class="vl" for="vpitch">Pitch <b id="vpitchv">1.0</b></label>
+      <input id="vpitch" type="range" min="0.5" max="2" step="0.1" value="1">
+      <div class="vbtns"><button id="vtest" class="btn" type="button">Preview voice</button><button id="vreset" class="link" type="button">Reset</button></div>
+      <p id="vnote" class="msg" role="status"></p>
     </section>
     <section>
       <h4>Account</h4>
@@ -779,6 +791,71 @@ function setMd(el, t, hl = true) {
     bar.append(lang, b); pre.prepend(bar);
   });
 }
+/*VOICE-START*/
+/* ---------- read aloud: voice, speed and pitch (saved on this device) ---------- */
+const VK = 'rhomeo_voice';
+const vs = Object.assign({ uri: '', rate: 1, pitch: 1 }, lsGet(VK) || {});
+vs.rate = Math.min(2, Math.max(0.5, +vs.rate || 1)); vs.pitch = Math.min(2, Math.max(0.5, +vs.pitch || 1));
+let voices = [], ttsStop = null, ttsBtn = null;
+const hasTTS = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+function speakText(raw, done) { // reads long text in short pieces, because some browsers cut off long utterances
+  const ss = window.speechSynthesis;
+  const clean = raw.replace(/```[\s\S]*?```/g, ' code block. ').replace(/`([^`]*)`/g, '$1').replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[#*_>~|]/g, '').replace(/\s+/g, ' ').trim();
+  const parts = clean.match(/[^.!?\n]+[.!?]*\s*/g) || [clean], chunks = []; let cur = '';
+  parts.forEach(p => { if (cur && (cur + p).length > 200) { chunks.push(cur); cur = p; } else cur += p; });
+  if (cur) chunks.push(cur);
+  const v = voices.find(x => x.voiceURI === vs.uri);
+  let i = 0, dead = false;
+  const next = () => {
+    if (dead) return; if (i >= chunks.length) { if (done) done(); return; }
+    const u = new SpeechSynthesisUtterance(chunks[i++]);
+    if (v) { u.voice = v; u.lang = v.lang; } else u.lang = navigator.language || 'en-US';
+    u.rate = vs.rate; u.pitch = vs.pitch; u.onend = next;
+    u.onerror = e => { if (e.error === 'canceled' || e.error === 'interrupted') dead = true; else next(); };
+    ss.speak(u);
+  };
+  ss.cancel(); setTimeout(next, 60);
+  return () => { dead = true; ss.cancel(); };
+}
+function stopSpeech() {
+  if (ttsStop) { ttsStop(); ttsStop = null; }
+  if (ttsBtn) { ttsBtn.classList.remove('on'); ttsBtn = null; }
+  const t = $('vtest'); if (t) t.textContent = 'Preview voice';
+}
+function readAloud(text, btn) {
+  if (!hasTTS) return note('Read aloud isn’t supported in this browser.');
+  if (ttsBtn === btn) return stopSpeech();
+  stopSpeech(); ttsBtn = btn; btn.classList.add('on');
+  ttsStop = speakText(text, () => { if (ttsBtn === btn) stopSpeech(); });
+}
+function fillVoices() {
+  if (!hasTTS) return;
+  voices = speechSynthesis.getVoices().slice();
+  const lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  voices.sort((a, b) => (b.lang.toLowerCase().startsWith(lang) - a.lang.toLowerCase().startsWith(lang)) || a.name.localeCompare(b.name));
+  const sel = $('vsel'); sel.replaceChildren(new Option('Device default', ''));
+  voices.forEach(v => sel.add(new Option(v.name + ' · ' + v.lang + (v.localService ? '' : ' (online)'), v.voiceURI)));
+  sel.value = voices.some(v => v.voiceURI === vs.uri) ? vs.uri : '';
+  $('vnote').textContent = voices.length ? '' : 'No voices found yet. Your device may need a text-to-speech engine installed.';
+}
+function syncVoiceUI() { $('vrate').value = vs.rate; $('vpitch').value = vs.pitch; $('vratev').textContent = vs.rate.toFixed(1) + '×'; $('vpitchv').textContent = vs.pitch.toFixed(1); }
+function previewVoice() {
+  stopSpeech(); $('vtest').textContent = 'Stop';
+  ttsStop = speakText('Hi, I’m Rhomeo. This is how I sound when I read answers aloud.', () => stopSpeech());
+}
+if (!hasTTS) { $('st-voice').classList.add('hidden'); }
+else {
+  fillVoices(); syncVoiceUI();
+  if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', fillVoices);
+  setTimeout(fillVoices, 800); // some browsers load voices late
+  $('vsel').onchange = e => { vs.uri = e.target.value; lsSet(VK, vs); previewVoice(); };
+  $('vrate').oninput = e => { vs.rate = +e.target.value; $('vratev').textContent = vs.rate.toFixed(1) + '×'; };
+  $('vpitch').oninput = e => { vs.pitch = +e.target.value; $('vpitchv').textContent = vs.pitch.toFixed(1); };
+  $('vrate').onchange = $('vpitch').onchange = () => lsSet(VK, vs);
+  $('vtest').onclick = () => { if (ttsStop) stopSpeech(); else previewVoice(); };
+  $('vreset').onclick = () => { vs.uri = ''; vs.rate = 1; vs.pitch = 1; lsSet(VK, vs); fillVoices(); syncVoiceUI(); stopSpeech(); };
+}
+/*VOICE-END*/
 const IC = {
   up: '<path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3zM7 11l4-8a2.2 2.2 0 0 1 2.2 2.4L12.7 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7"/>',
   down: '<path d="M17 13V4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3zM17 13l-4 8a2.2 2.2 0 0 1-2.2-2.4l.5-3.6H5a2 2 0 0 1-2-2.3l1.2-7A2 2 0 0 1 6.2 4H17"/>',
@@ -799,12 +876,7 @@ function addActs(d, text) {
     try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); flash(b, 'share'); } } catch {}
   });
   mk('copy', 'Copy', async b => { try { await navigator.clipboard.writeText(text); flash(b, 'copy'); } catch { note('Couldn’t copy. Press and hold the text to copy it.'); } });
-  const sp = mk('spk', 'Read aloud', b => {
-    const ss = window.speechSynthesis; if (!ss) return note('Read aloud isn’t supported in this browser.');
-    if (ss.speaking) { ss.cancel(); b.classList.remove('on'); return; }
-    const u = new SpeechSynthesisUtterance(text.replace(/```[\s\S]*?```/g, ' code block ').replace(/[#*`_>]/g, '')); u.onend = u.onerror = () => b.classList.remove('on');
-    b.classList.add('on'); ss.speak(u);
-  });
+  const sp = mk('spk', 'Read aloud', b => readAloud(text, b));
   sp.classList.add('spk'); d.appendChild(w);
 }
 function addMsg(role, text, hl = true) {
@@ -849,7 +921,6 @@ function thinking(box) { // "Rhomeo is working": wave dots and a shimmering stat
   return { set: t => { clearInterval(iv); iv = 0; swap(t); }, stop: () => clearInterval(iv) };
 }
 
-const ago = iso => { const m = Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000)); return m < 1 ? 'now' : m < 60 ? m + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : Math.round(m / 1440) + 'd'; };
 function showEmpty() {
   const name = user ? displayName() : '';
   const h = document.createElement('div'); h.className = 'hero';
@@ -875,20 +946,10 @@ function showEmpty() {
     row.appendChild(b);
   });
   h.append(lg, s, t, p, row);
-  if (chats.length) { // quick way back into your latest chats
-    const rec = document.createElement('div'); rec.className = 'rec';
-    const rs = document.createElement('small'); rs.textContent = '> recent'; rec.appendChild(rs);
-    chats.slice(0, 2).forEach(c => {
-      const b = document.createElement('button'); b.type = 'button';
-      const rt = document.createElement('span'); rt.className = 'rt'; rt.textContent = c.title;
-      const rd = document.createElement('span'); rd.className = 'rd'; rd.textContent = c.updated_at ? ago(c.updated_at) : '';
-      b.append(rt, rd); b.onclick = () => openChat(c.id); rec.appendChild(b);
-    });
-    h.appendChild(rec);
-  }
   $('msgs').replaceChildren(h);
 }
 function renderChat() {
+  stopSpeech();
   $('title').textContent = cur.title;
   $('msgs').innerHTML = '';
   if (!cur.history.length) return showEmpty();
@@ -936,7 +997,7 @@ $('auth-form').onsubmit = async e => {
   if (error) { $('auth-err').textContent = isNetErr(error) ? 'Can’t reach the server. Check your connection and try again.' : error.message; return; }
   if (!data.session) $('auth-err').textContent = 'Account created. Confirm your email, then sign in.';
 };
-$('logout').onclick = () => { closeModals(); sb.auth.signOut(); };
+$('logout').onclick = () => { stopSpeech(); closeModals(); sb.auth.signOut(); };
 sb.auth.onAuthStateChange((_e, session) => {
   const u = session ? session.user : null;
   hideBoot();
