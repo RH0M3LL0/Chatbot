@@ -486,10 +486,17 @@ html[data-bg=mix] #bg{opacity:.85}
 
 /* ---------- voice settings ---------- */
 .vl{display:flex;justify-content:space-between;align-items:center;font-size:.84rem;color:var(--mute);margin:14px 0 6px}
-.vl:first-of-type{margin-top:0}.vl b{font-family:var(--mono);font-weight:500;color:var(--text)}
+.vl b{font-family:var(--mono);font-weight:500;color:var(--text)}
 select.sel{background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;width:100%}
 select.sel:focus{border-color:var(--accent);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
 input[type=range]{padding:0;border:0;background:none;height:28px;accent-color:var(--accent);box-shadow:none}
+.chars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.chr{display:flex;flex-direction:column;gap:2px;text-align:left;padding:11px 13px;border:1px solid var(--line);border-radius:16px;background:var(--bg)}
+.chr b{font-family:var(--disp);font-size:.92rem;font-weight:600}
+.chr span{font-family:var(--mono);font-size:.72rem;color:var(--mute)}
+.chr:hover{border-color:var(--accent)}
+.chr[aria-pressed=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.chr.wide{grid-column:1/-1}
 .vbtns{display:flex;align-items:center;gap:16px;margin-top:16px}.vbtns .btn{flex:1}
 
 /* ---------- every screen size ---------- */
@@ -618,12 +625,13 @@ input[type=range]{padding:0;border:0;background:none;height:28px;accent-color:va
     </section>
     <section id="st-voice">
       <h4>Voice (read aloud)</h4>
-      <label class="vl" for="vsel">Voice</label>
-      <select id="vsel" class="sel"></select>
+      <div class="seg" id="vgender"><button type="button" data-g="male" aria-pressed="true">Male</button><button type="button" data-g="female" aria-pressed="false">Female</button></div>
+      <div class="chars" id="vchars"></div>
+      <p class="instp" style="margin:10px 0 0;font-size:.8rem">Characters are style presets built from your device’s voices. Gender matching is best effort.</p>
       <label class="vl" for="vrate">Speed <b id="vratev">1.0×</b></label>
       <input id="vrate" type="range" min="0.5" max="2" step="0.1" value="1">
-      <label class="vl" for="vpitch">Pitch <b id="vpitchv">1.0</b></label>
-      <input id="vpitch" type="range" min="0.5" max="2" step="0.1" value="1">
+      <label class="vl" for="vsel">Device voice (optional)</label>
+      <select id="vsel" class="sel"></select>
       <div class="vbtns"><button id="vtest" class="btn" type="button">Preview voice</button><button id="vreset" class="link" type="button">Reset</button></div>
       <p id="vnote" class="msg" role="status"></p>
     </section>
@@ -792,25 +800,53 @@ function setMd(el, t, hl = true) {
   });
 }
 /*VOICE-START*/
-/* ---------- read aloud: voice, speed and pitch (saved on this device) ---------- */
+/* ---------- read aloud: characters, speed and device voice (saved on this device) ---------- */
 const VK = 'rhomeo_voice';
-const vs = Object.assign({ uri: '', rate: 1, pitch: 1 }, lsGet(VK) || {});
-vs.rate = Math.min(2, Math.max(0.5, +vs.rate || 1)); vs.pitch = Math.min(2, Math.max(0.5, +vs.pitch || 1));
+const CHARS = {
+  male: [
+    { id: 'natural', name: 'Natural', tag: 'clear, everyday voice', rate: 1, pitch: 1, wide: true },
+    { id: 'warrior', name: 'Warrior', tag: 'vibrant · fierce', rate: 1.12, pitch: 0.8 },
+    { id: 'warlord', name: 'Warlord', tag: 'deep · calm', rate: 0.85, pitch: 0.6 },
+    { id: 'hero', name: 'Hero', tag: 'bright · confident', rate: 1.05, pitch: 1 },
+    { id: 'sage', name: 'Sage', tag: 'warm · slow', rate: 0.9, pitch: 0.75 }
+  ],
+  female: [
+    { id: 'natural', name: 'Natural', tag: 'clear, everyday voice', rate: 1, pitch: 1, wide: true },
+    { id: 'valkyrie', name: 'Valkyrie', tag: 'vibrant · strong', rate: 1.1, pitch: 1.1 },
+    { id: 'queen', name: 'Queen', tag: 'calm · commanding', rate: 0.88, pitch: 0.85 },
+    { id: 'guide', name: 'Guide', tag: 'friendly · clear', rate: 1, pitch: 1.25 },
+    { id: 'sorceress', name: 'Sorceress', tag: 'smooth · mysterious', rate: 0.92, pitch: 1 }
+  ]
+};
+const vs = Object.assign({ gender: 'male', char: 'natural', uri: '', rate: 1 }, lsGet(VK) || {});
+if (vs.gender !== 'female') vs.gender = 'male';
+if (!CHARS[vs.gender].some(c => c.id === vs.char)) vs.char = 'natural';
+vs.rate = Math.min(2, Math.max(0.5, +vs.rate || 1));
+const curChar = () => CHARS[vs.gender].find(c => c.id === vs.char) || CHARS[vs.gender][0];
+const MALE = /(\bmale\b|david|mark\b|james|george|daniel|alex\b|fred\b|ralph|guy\b|ryan|matthew|thomas|oliver|arthur|rishi|aaron|eric\b|brian|liam|x-(iol|iom|tpd)\b)/i;
+const FEMALE = /(female|woman|zira|samantha|victoria|karen|moira|tessa|fiona|susan|hazel|aria\b|jenny|sara\b|emma|joanna|salli|kimberly|ivy\b|amy\b|nicole|olivia|libby|sonia|natasha|x-(sfg|tpf|tpc|iob)\b)/i;
 let voices = [], ttsStop = null, ttsBtn = null;
 const hasTTS = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+function pickVoice() { // a specific device voice wins; otherwise the best male or female match in your language
+  if (vs.uri) { const v = voices.find(x => x.voiceURI === vs.uri); if (v) return v; }
+  const lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  const want = vs.gender === 'male' ? MALE : FEMALE, not = vs.gender === 'male' ? FEMALE : MALE;
+  const m = voices.filter(v => v.lang.toLowerCase().startsWith(lang) && want.test(v.name + ' ' + v.voiceURI) && !not.test(v.name + ' ' + v.voiceURI));
+  return m.find(v => v.localService) || m[0] || null;
+}
 function speakText(raw, done) { // reads long text in short pieces, because some browsers cut off long utterances
   const ss = window.speechSynthesis;
   const clean = raw.replace(/```[\s\S]*?```/g, ' code block. ').replace(/`([^`]*)`/g, '$1').replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[#*_>~|]/g, '').replace(/\s+/g, ' ').trim();
   const parts = clean.match(/[^.!?\n]+[.!?]*\s*/g) || [clean], chunks = []; let cur = '';
   parts.forEach(p => { if (cur && (cur + p).length > 200) { chunks.push(cur); cur = p; } else cur += p; });
   if (cur) chunks.push(cur);
-  const v = voices.find(x => x.voiceURI === vs.uri);
+  const v = pickVoice(), c = curChar(), rate = Math.min(2, Math.max(0.3, c.rate * vs.rate));
   let i = 0, dead = false;
   const next = () => {
     if (dead) return; if (i >= chunks.length) { if (done) done(); return; }
     const u = new SpeechSynthesisUtterance(chunks[i++]);
     if (v) { u.voice = v; u.lang = v.lang; } else u.lang = navigator.language || 'en-US';
-    u.rate = vs.rate; u.pitch = vs.pitch; u.onend = next;
+    u.rate = rate; u.pitch = c.pitch; u.onend = next;
     u.onerror = e => { if (e.error === 'canceled' || e.error === 'interrupted') dead = true; else next(); };
     ss.speak(u);
   };
@@ -833,12 +869,22 @@ function fillVoices() {
   voices = speechSynthesis.getVoices().slice();
   const lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
   voices.sort((a, b) => (b.lang.toLowerCase().startsWith(lang) - a.lang.toLowerCase().startsWith(lang)) || a.name.localeCompare(b.name));
-  const sel = $('vsel'); sel.replaceChildren(new Option('Device default', ''));
+  const sel = $('vsel'); sel.replaceChildren(new Option('Auto (best match)', ''));
   voices.forEach(v => sel.add(new Option(v.name + ' · ' + v.lang + (v.localService ? '' : ' (online)'), v.voiceURI)));
   sel.value = voices.some(v => v.voiceURI === vs.uri) ? vs.uri : '';
   $('vnote').textContent = voices.length ? '' : 'No voices found yet. Your device may need a text-to-speech engine installed.';
 }
-function syncVoiceUI() { $('vrate').value = vs.rate; $('vpitch').value = vs.pitch; $('vratev').textContent = vs.rate.toFixed(1) + '×'; $('vpitchv').textContent = vs.pitch.toFixed(1); }
+function renderChars() {
+  const box = $('vchars'); box.replaceChildren();
+  CHARS[vs.gender].forEach(c => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chr' + (c.wide ? ' wide' : ''); b.setAttribute('aria-pressed', String(c.id === vs.char));
+    const n = document.createElement('b'); n.textContent = c.name; const t = document.createElement('span'); t.textContent = c.tag; b.append(n, t);
+    b.onclick = () => { vs.char = c.id; lsSet(VK, vs); renderChars(); previewVoice(); };
+    box.appendChild(b);
+  });
+  document.querySelectorAll('#vgender [data-g]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.g === vs.gender)));
+}
+function syncVoiceUI() { $('vrate').value = vs.rate; $('vratev').textContent = vs.rate.toFixed(1) + '×'; renderChars(); }
 function previewVoice() {
   stopSpeech(); $('vtest').textContent = 'Stop';
   ttsStop = speakText('Hi, I’m Rhomeo. This is how I sound when I read answers aloud.', () => stopSpeech());
@@ -848,12 +894,15 @@ else {
   fillVoices(); syncVoiceUI();
   if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', fillVoices);
   setTimeout(fillVoices, 800); // some browsers load voices late
+  document.querySelectorAll('#vgender [data-g]').forEach(b => b.onclick = () => { // keep the same slot, so Warlord becomes Queen (both calm)
+    const idx = Math.max(0, CHARS[vs.gender].findIndex(c => c.id === vs.char));
+    vs.gender = b.dataset.g; vs.char = CHARS[vs.gender][idx].id; vs.uri = ''; $('vsel').value = ''; lsSet(VK, vs); renderChars(); previewVoice();
+  });
   $('vsel').onchange = e => { vs.uri = e.target.value; lsSet(VK, vs); previewVoice(); };
   $('vrate').oninput = e => { vs.rate = +e.target.value; $('vratev').textContent = vs.rate.toFixed(1) + '×'; };
-  $('vpitch').oninput = e => { vs.pitch = +e.target.value; $('vpitchv').textContent = vs.pitch.toFixed(1); };
-  $('vrate').onchange = $('vpitch').onchange = () => lsSet(VK, vs);
+  $('vrate').onchange = () => lsSet(VK, vs);
   $('vtest').onclick = () => { if (ttsStop) stopSpeech(); else previewVoice(); };
-  $('vreset').onclick = () => { vs.uri = ''; vs.rate = 1; vs.pitch = 1; lsSet(VK, vs); fillVoices(); syncVoiceUI(); stopSpeech(); };
+  $('vreset').onclick = () => { vs.gender = 'male'; vs.char = 'natural'; vs.uri = ''; vs.rate = 1; lsSet(VK, vs); fillVoices(); syncVoiceUI(); stopSpeech(); };
 }
 /*VOICE-END*/
 const IC = {
