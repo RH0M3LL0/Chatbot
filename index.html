@@ -61,7 +61,7 @@ if('serviceWorker' in navigator){var regSW=function(){navigator.serviceWorker.re
   --text:#E6EDF3;--mute:#8B949E;
   --accent:#4F6BFF;--link:#8197FF;--onaccent:#fff;--ok:#2DD4A7;--danger:#F85149;
   --code:#0A0E14;--shadow:0 8px 30px rgba(0,0,0,.35);
-  --comp:#1E1E1E;--sendbg:#203C9B;--sendfg:#E9EEFF;--tile:#2C2C2E;--tile2:#3B3B3E;--tilehi:#3A3A3D;--sheet:#222224;
+  --comp:#1E1E1E;--ubub:#262A31;--sendbg:#203C9B;--sendfg:#E9EEFF;--tile:#2C2C2E;--tile2:#3B3B3E;--tilehi:#3A3A3D;--sheet:#222224;
   --glow:radial-gradient(60% 50% at 50% 0%,rgba(79,107,255,.14),transparent 70%);
   --orb1:rgba(79,107,255,.24);--orb2:rgba(45,212,167,.13);--orb3:rgba(139,92,246,.17);
   --gridc:rgba(139,148,158,.10);--sweep:rgba(79,107,255,.16);--star:rgba(200,215,255,.85);--ring:rgba(79,107,255,.42);
@@ -77,7 +77,7 @@ if('serviceWorker' in navigator){var regSW=function(){navigator.serviceWorker.re
   --text:#1F2328;--mute:#59636E;
   --accent:#3F58E8;--link:#3F58E8;--onaccent:#fff;--ok:#0F9F7A;--danger:#CF222E;
   --code:#F6F8FA;--shadow:0 8px 30px rgba(31,35,40,.10);
-  --comp:#FFFFFF;--sendbg:#A9D3FF;--sendfg:#0B1330;--tile:#EDEDEC;--tile2:#E0E0DF;--tilehi:#FFFFFF;--sheet:#F9F8F6;
+  --comp:#FFFFFF;--ubub:#F1EFF0;--sendbg:#A9D3FF;--sendfg:#0B1330;--tile:#EDEDEC;--tile2:#E0E0DF;--tilehi:#FFFFFF;--sheet:#F9F8F6;
   --glow:radial-gradient(60% 50% at 50% 0%,rgba(63,88,232,.09),transparent 70%);
   --orb1:rgba(63,88,232,.17);--orb2:rgba(15,159,122,.12);--orb3:rgba(130,80,223,.13);
   --gridc:rgba(31,35,40,.07);--sweep:rgba(63,88,232,.12);--star:rgba(63,88,232,.55);--ring:rgba(63,88,232,.32);
@@ -293,16 +293,22 @@ button.modebtn{margin:0;display:flex;align-items:center;gap:8px;background:none;
 .wl{width:28px;height:22px;flex-shrink:0}
 .u .who{color:var(--mute)}
 .u{align-self:stretch}
-.a+.u{margin-top:10px;padding-top:26px;border-top:1px solid color-mix(in srgb,var(--line) 75%,transparent)}
-.u .who{flex-direction:row-reverse}
-.u .body{width:fit-content;max-width:88%;margin-left:auto;text-align:left;white-space:pre-wrap;font-size:var(--msg);line-height:1.6;font-weight:500;padding-right:13px;border-right:3px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:2px}
+.a+.u{margin-top:14px}
+.u+.a{margin-top:6px}
+.u .body{width:fit-content;max-width:84%;margin-left:auto;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--msg);line-height:1.55;font-weight:500;background:var(--ubub);padding:16px 22px;border-radius:30px}
 .a{align-self:stretch;position:relative;min-height:30px}
-.a .body{font-size:var(--msg);line-height:1.78}
+.a .body{font-size:var(--msg);line-height:1.78;font-weight:500}
+.a .who{display:none}
+.a.wait .who{display:flex}
+.a.wait .who b{display:none}
 .a .body>:first-child{margin-top:0}
-.acts{display:flex;gap:6px;margin-top:12px}
-.act{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--mute);padding:6px 12px;border-radius:999px;border:1px solid var(--line)}
-.act:hover{color:var(--text);border-color:var(--accent)}
-.act svg{width:14px;height:14px}
+.acts{display:flex;align-items:center;gap:4px;margin-top:14px}
+.act{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:var(--text)}
+.act:hover{background:color-mix(in srgb,var(--text) 8%,transparent)}
+.act svg{width:22px;height:22px}
+.act.on{color:var(--accent)}
+.act.on svg path:first-child{fill:currentColor;fill-opacity:.2}
+.act.spk{margin-left:auto}
 
 .a.wait .wl{animation:pulse 1.4s ease-in-out infinite}
 
@@ -746,30 +752,45 @@ function setMd(el, t, hl = true) {
     bar.append(lang, b); pre.prepend(bar);
   });
 }
-const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A1.5 1.5 0 0 1 6.5 5H15"/></svg>';
+const IC = {
+  up: '<path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3zM7 11l4-8a2.2 2.2 0 0 1 2.2 2.4L12.7 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7"/>',
+  down: '<path d="M17 13V4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3zM17 13l-4 8a2.2 2.2 0 0 1-2.2-2.4l.5-3.6H5a2 2 0 0 1-2-2.3l1.2-7A2 2 0 0 1 6.2 4H17"/>',
+  share: '<path d="M12 15V3M7.5 7.5L12 3l4.5 4.5M5 12v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-7"/>',
+  copy: '<rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A1.5 1.5 0 0 1 6.5 5H15"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  spk: '<path d="M4 9.5v5h3.5l5 4v-13l-5 4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>'
+};
+const icon = k => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC[k] + '</svg>';
 function addActs(d, text) {
   if (!text || d.querySelector('.acts')) return;
   const w = document.createElement('div'); w.className = 'acts';
-  const b = document.createElement('button'); b.type = 'button'; b.className = 'act'; b.insertAdjacentHTML('afterbegin', COPY_ICON);
-  const l = document.createElement('span'); l.textContent = 'Copy'; b.appendChild(l);
-  b.onclick = async () => {
-    try { await navigator.clipboard.writeText(text); l.textContent = 'Copied ✓'; } catch { l.textContent = 'Couldn’t copy'; }
-    setTimeout(() => l.textContent = 'Copy', 1600);
-  };
-  w.appendChild(b); d.appendChild(w);
+  const mk = (k, label, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'act'; b.setAttribute('aria-label', label); b.title = label; b.innerHTML = icon(k); b.onclick = () => fn(b); w.appendChild(b); return b; };
+  const flash = (b, k) => { b.innerHTML = icon('check'); setTimeout(() => b.innerHTML = icon(k), 1500); };
+  const up = mk('up', 'Good response', b => { const on = !b.classList.contains('on'); b.classList.toggle('on', on); if (on) dn.classList.remove('on'); });
+  const dn = mk('down', 'Bad response', b => { const on = !b.classList.contains('on'); b.classList.toggle('on', on); if (on) up.classList.remove('on'); });
+  mk('share', 'Share', async b => {
+    try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); flash(b, 'share'); } } catch {}
+  });
+  mk('copy', 'Copy', async b => { try { await navigator.clipboard.writeText(text); flash(b, 'copy'); } catch { note('Couldn’t copy. Press and hold the text to copy it.'); } });
+  const sp = mk('spk', 'Read aloud', b => {
+    const ss = window.speechSynthesis; if (!ss) return note('Read aloud isn’t supported in this browser.');
+    if (ss.speaking) { ss.cancel(); b.classList.remove('on'); return; }
+    const u = new SpeechSynthesisUtterance(text.replace(/```[\s\S]*?```/g, ' code block ').replace(/[#*`_>]/g, '')); u.onend = u.onerror = () => b.classList.remove('on');
+    b.classList.add('on'); ss.speak(u);
+  });
+  sp.classList.add('spk'); d.appendChild(w);
 }
 function addMsg(role, text, hl = true) {
   const user = role === 'user';
   const d = document.createElement('div'); d.className = 'm ' + (user ? 'u' : 'a');
   const who = document.createElement('div'); who.className = 'who';
-  if (user) { const av = document.createElement('span'); av.className = 'avatar'; av.textContent = (displayName()[0] || 'Y').toUpperCase(); who.appendChild(av); }
-  else {
+  if (!user) {
     const lg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); lg.setAttribute('class', 'wl');
     const us = document.createElementNS('http://www.w3.org/2000/svg', 'use'); us.setAttribute('href', '#rm'); lg.appendChild(us); who.appendChild(lg);
   }
   const nm = document.createElement('b'); nm.textContent = user ? 'You' : 'Rhomeo'; who.appendChild(nm);
   const body = document.createElement('div'); body.className = 'body'; d.body = body;
-  d.append(who, body);
+  if (user) d.append(body); else d.append(who, body);
   if (user) body.textContent = text; else { setMd(body, text, hl); addActs(d, text); }
   const box = $('msgs'); box.appendChild(d); box.scrollTop = box.scrollHeight;
   return d;
