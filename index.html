@@ -499,6 +499,41 @@ input[type=range]{padding:0;border:0;background:none;height:28px;accent-color:va
 .chr.wide{grid-column:1/-1}
 .vbtns{display:flex;align-items:center;gap:16px;margin-top:16px}.vbtns .btn{flex:1}
 
+
+/* ---------- header, menus, notifications, attachments ---------- */
+@keyframes pop{from{opacity:0;transform:scale(.82)}}
+header{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:6px}
+header .modewrap:not(.hright .modewrap){justify-self:center;min-width:0;max-width:100%}
+.hright .modewrap{position:relative}
+.tcol{display:flex;flex-direction:column;align-items:center;min-width:0;line-height:1.2}
+#title{max-width:min(48vw,300px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--disp);font-size:1rem;font-weight:600}
+button.modebtn{max-width:100%}
+#modemenu{width:270px;min-width:0;left:50%;margin-left:-135px;transform-origin:top center;animation:pop .18s ease-out}
+.mm{position:absolute;top:calc(100% + 8px);right:0;width:252px;background:var(--s1);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:8px;z-index:30;transform-origin:top right;animation:pop .18s ease-out}
+.mm hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+.mm .profile{width:100%;max-width:none;border:0;background:none;border-radius:12px;padding:6px}
+.mm .profile:hover{background:var(--s2)}.mm .pname{display:block;font-size:.9rem}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px}.mrow>span{font-size:.86rem;color:var(--mute)}
+.tseg{display:flex;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px}
+.tseg button{padding:5px 10px;border-radius:999px;font-size:.78rem;color:var(--mute)}
+.tseg button[aria-pressed=true]{background:var(--accent);color:var(--onaccent)}
+.mm .mi{display:flex;align-items:center;gap:10px;width:100%;padding:10px 6px;border-radius:12px;font-size:.92rem;text-align:left}
+.mm .mi:hover{background:var(--s2)}.mm .mi svg{width:18px;height:18px;color:var(--mute)}
+#note{position:fixed;top:calc(62px + env(safe-area-inset-top,0px));left:50%;margin:0;z-index:60;transform:translateX(-50%) scale(.55);opacity:0;pointer-events:none;transition:transform .3s cubic-bezier(.2,.9,.3,1.15),opacity .22s}
+#note.show{transform:translateX(-50%) scale(1);opacity:1;pointer-events:auto}
+#note:empty{display:flex}
+html.rm #note{transition:opacity .2s}
+#chip{display:flex;padding:0 14px 8px;max-width:var(--col);margin:0 auto;width:100%}
+#chip.hidden{display:none}
+.att{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;width:84px;height:84px;padding:8px 6px 6px;border:1px solid var(--line);border-radius:16px;background:var(--s1);animation:pop .22s ease-out;overflow:hidden}
+.athumb{flex:1;width:100%;display:grid;place-items:center;border-radius:10px;position:relative;overflow:hidden}
+.athumb i{font-style:normal;font-family:var(--mono);font-weight:700;font-size:.8rem;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:8px;padding:5px 8px}
+.athumb.img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.athumb.img i{position:absolute;left:4px;bottom:4px;font-size:.62rem;padding:2px 5px;background:rgba(0,0,0,.55);color:#fff}
+.aname{font-family:var(--mono);font-size:.68rem;color:var(--mute);max-width:100%;white-space:nowrap}
+.ax{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;display:grid;place-items:center;z-index:2}
+.att.sent{width:78px;height:78px;margin-bottom:8px;animation:none}
+
 /* ---------- every screen size ---------- */
 @media(min-width:1600px){:root{--col:880px}body{font-size:16px}}
 @media(min-width:761px) and (max-width:1024px){aside{width:260px}body.collapsed aside{margin-left:-260px}}
@@ -518,7 +553,7 @@ input[type=range]{padding:0;border:0;background:none;height:28px;accent-color:va
 }
 @media(max-width:360px){body{font-size:15px}header{padding:8px 10px}.modebtn{padding:5px 10px}.chips button{padding:12px 14px}}
 @media(max-height:520px){
-  .hero{padding-bottom:0}.hero .logo,.hero small,  header{padding:4px 10px}#msgs{padding-top:8px}.hint{display:none}
+  .hero{padding-bottom:0}.hero .logo,.hero small{display:none}header{padding:4px 10px}#msgs{padding-top:8px}.hint{display:none}
 }
 @media(pointer:coarse){.row .x{padding:12px}.cp{padding:7px 12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.m,.hero,.row,.chips button,#auth form,#note{animation:none!important}}
@@ -564,28 +599,33 @@ input[type=range]{padding:0;border:0;background:none;height:28px;accent-color:va
 <div id="scrim"></div>
 <div id="tt" class="tt" role="status" aria-live="polite"></div>
 <main>
-  <div id="offline" class="hidden" role="status"></div>
   <header>
     <button id="menu" aria-label="Toggle chats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
-    <svg class="logo hdrlogo" aria-hidden="true"><use href="#rm"/></svg>
     <div class="modewrap">
-      <button id="mode" class="modebtn" type="button" aria-haspopup="menu" aria-expanded="false"><span class="wm">Rhomeo</span><span id="modelabel" class="ml">Fast</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button id="mode" class="modebtn" type="button" aria-haspopup="menu" aria-expanded="false"><span class="tcol"><span id="title">Rhomeo</span><span id="modelabel" class="ml">Fast</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
       <div id="modemenu" class="menu hidden" role="menu">
-        <button type="button" role="menuitemradio" data-mode="fast" aria-checked="true"><b>Fast</b><span>Quick answers for everyday coding</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></button>
-        <button type="button" role="menuitemradio" data-mode="smart" aria-checked="false"><b>Smart</b><span>Deeper reasoning for hard problems</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></button>
+        <button type="button" role="menuitemradio" data-mode="fast" aria-checked="true"><b>Fast response</b><span>Quick answers for everyday coding</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></button>
+        <button type="button" role="menuitemradio" data-mode="smart" aria-checked="false"><b>Deep thinking</b><span>Deeper reasoning for hard problems</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></button>
       </div>
     </div>
-    <h2 id="title">New chat</h2>
     <div class="hright">
-      <button id="themebtn" class="ibtn" type="button" aria-label="Theme"></button>
-      <button id="settingsbtn" class="ibtn" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
-      <button id="profilebtn" class="profile" type="button" aria-label="Your profile"><span id="avatar" class="avatar">R</span><span id="pname" class="pname"></span></button>
+      <button id="newchatbtn" class="ibtn" type="button" aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+      <div class="modewrap">
+        <button id="more" class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+        <div id="moremenu" class="mm hidden" role="menu">
+          <button id="profilebtn" class="profile" type="button" aria-label="Your profile"><span id="avatar" class="avatar">R</span><span id="pname" class="pname"></span></button>
+          <hr>
+          <div class="mrow"><span>Theme</span><div class="tseg"><button type="button" data-t="auto" aria-pressed="true">Auto</button><button type="button" data-t="light" aria-pressed="false">Light</button><button type="button" data-t="dark" aria-pressed="false">Dark</button></div></div>
+          <hr>
+          <button id="settingsbtn" class="mi" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Settings</button>
+        </div>
+      </div>
     </div>
   </header>
   <div id="msgs" aria-live="polite"></div>
   <div class="jumpwrap"><button id="jump" class="hidden" type="button" aria-label="Jump to latest message">↓</button></div>
   <div id="note" role="alert"></div>
-  <div id="chip" class="hidden"><span id="chipname"></span><button id="unattach" type="button" aria-label="Remove attachment">Remove</button></div>
+  <div id="chip" class="hidden"><div class="att"><div class="athumb"></div><span class="aname"></span><button id="unattach" type="button" aria-label="Remove attachment" class="ax">✕</button></div></div>
   <form id="f" class="empty">
     <button type="button" id="attach" aria-label="Add to chat" title="Add to chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 4.5v15M4.5 12h15"/></svg></button>
     <textarea id="input" rows="1" placeholder="Ask Rhomeo" aria-label="Message Rhomeo"></textarea>
@@ -623,19 +663,7 @@ input[type=range]{padding:0;border:0;background:none;height:28px;accent-color:va
       <p id="inst-text" class="instp"></p>
       <button id="inst-btn" class="btn hidden" type="button">Install Rhomeo</button>
     </section>
-    <section id="st-voice">
-      <h4>Voice (read aloud)</h4>
-      <div class="seg" id="vgender"><button type="button" data-g="male" aria-pressed="true">Male</button><button type="button" data-g="female" aria-pressed="false">Female</button></div>
-      <div class="chars" id="vchars"></div>
-      <p class="instp" style="margin:10px 0 0;font-size:.8rem">Characters are style presets built from your device’s voices. Gender matching is best effort.</p>
-      <label class="vl" for="vrate">Speed <b id="vratev">1.0×</b></label>
-      <input id="vrate" type="range" min="0.5" max="2" step="0.1" value="1">
-      <label class="vl" for="vsel">Device voice (optional)</label>
-      <select id="vsel" class="sel"></select>
-      <div class="vbtns"><button id="vtest" class="btn" type="button">Preview voice</button><button id="vreset" class="link" type="button">Reset</button></div>
-      <p id="vnote" class="msg" role="status"></p>
-    </section>
-    <section>
+        <section>
       <h4>Account</h4>
       <div class="acct"><span id="st-avatar" class="avatar big">R</span><div class="who2"><b id="st-name"></b><small id="st-email"></small></div></div>
       <button id="logout" class="danger" type="button">Log out</button>
@@ -732,17 +760,21 @@ let user = null, chats = [], cur = null, file = null, ctrl = null, busy = false,
 /* ---------- small helpers ---------- */
 let noteT;
 const NOTE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2l9.4 16.3H2.6z"/><path d="M12 10v4.2M12 17.4v.1"/></svg>';
-function note(t, retryable) { // a small centered card above the message box, gone after a few seconds
-  const n = $('note'); clearTimeout(noteT); n.replaceChildren();
-  if (!t) return;
-  n.insertAdjacentHTML('afterbegin', NOTE_ICON);
-  const s = document.createElement('span'); s.textContent = t; n.appendChild(s);
+let stickyOff = false, noteC;
+function note(t, retryable, sticky) { // floating pill under the header: shrinks in, then shrinks out
+  const n = $('note'); clearTimeout(noteT); clearTimeout(noteC);
+  if (stickyOff && !sticky) return; // the offline message stays until you are back online
+  if (!t) { n.classList.remove('show'); noteC = setTimeout(() => n.replaceChildren(), 320); return; }
+  n.replaceChildren(); n.insertAdjacentHTML('afterbegin', NOTE_ICON);
+  const sp = document.createElement('span'); sp.textContent = t; n.appendChild(sp);
   if (retryable) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'nr'; b.textContent = 'Retry';
     b.onclick = () => { note(''); if (!busy && ($('input').value.trim() || file)) $('f').requestSubmit(); };
     n.appendChild(b);
   }
-  noteT = setTimeout(() => n.replaceChildren(), retryable ? 12000 : 9000);
+  n.onclick = e => { if (!e.target.closest('.nr')) note(''); };
+  requestAnimationFrame(() => n.classList.add('show'));
+  if (!sticky) noteT = setTimeout(() => note(''), retryable ? 8000 : 4000);
 }
 const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
@@ -799,112 +831,32 @@ function setMd(el, t, hl = true) {
     bar.append(lang, b); pre.prepend(bar);
   });
 }
-/*VOICE-START*/
-/* ---------- read aloud: characters, speed and device voice (saved on this device) ---------- */
-const VK = 'rhomeo_voice';
-const CHARS = {
-  male: [
-    { id: 'natural', name: 'Natural', tag: 'clear, everyday voice', rate: 1, pitch: 1, wide: true },
-    { id: 'warrior', name: 'Warrior', tag: 'vibrant · fierce', rate: 1.12, pitch: 0.8 },
-    { id: 'warlord', name: 'Warlord', tag: 'deep · calm', rate: 0.85, pitch: 0.6 },
-    { id: 'hero', name: 'Hero', tag: 'bright · confident', rate: 1.05, pitch: 1 },
-    { id: 'sage', name: 'Sage', tag: 'warm · slow', rate: 0.9, pitch: 0.75 }
-  ],
-  female: [
-    { id: 'natural', name: 'Natural', tag: 'clear, everyday voice', rate: 1, pitch: 1, wide: true },
-    { id: 'valkyrie', name: 'Valkyrie', tag: 'vibrant · strong', rate: 1.1, pitch: 1.1 },
-    { id: 'queen', name: 'Queen', tag: 'calm · commanding', rate: 0.88, pitch: 0.85 },
-    { id: 'guide', name: 'Guide', tag: 'friendly · clear', rate: 1, pitch: 1.25 },
-    { id: 'sorceress', name: 'Sorceress', tag: 'smooth · mysterious', rate: 0.92, pitch: 1 }
-  ]
-};
-const vs = Object.assign({ gender: 'male', char: 'natural', uri: '', rate: 1 }, lsGet(VK) || {});
-if (vs.gender !== 'female') vs.gender = 'male';
-if (!CHARS[vs.gender].some(c => c.id === vs.char)) vs.char = 'natural';
-vs.rate = Math.min(2, Math.max(0.5, +vs.rate || 1));
-const curChar = () => CHARS[vs.gender].find(c => c.id === vs.char) || CHARS[vs.gender][0];
-const MALE = /(\bmale\b|david|mark\b|james|george|daniel|alex\b|fred\b|ralph|guy\b|ryan|matthew|thomas|oliver|arthur|rishi|aaron|eric\b|brian|liam|x-(iol|iom|tpd)\b)/i;
-const FEMALE = /(female|woman|zira|samantha|victoria|karen|moira|tessa|fiona|susan|hazel|aria\b|jenny|sara\b|emma|joanna|salli|kimberly|ivy\b|amy\b|nicole|olivia|libby|sonia|natasha|x-(sfg|tpf|tpc|iob)\b)/i;
-let voices = [], ttsStop = null, ttsBtn = null;
+/* ---------- read aloud: uses the phone's default voice ---------- */
+let ttsStop = null, ttsBtn = null;
 const hasTTS = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
-function pickVoice() { // a specific device voice wins; otherwise the best male or female match in your language
-  if (vs.uri) { const v = voices.find(x => x.voiceURI === vs.uri); if (v) return v; }
-  const lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
-  const want = vs.gender === 'male' ? MALE : FEMALE, not = vs.gender === 'male' ? FEMALE : MALE;
-  const m = voices.filter(v => v.lang.toLowerCase().startsWith(lang) && want.test(v.name + ' ' + v.voiceURI) && !not.test(v.name + ' ' + v.voiceURI));
-  return m.find(v => v.localService) || m[0] || null;
-}
-function speakText(raw, done) { // reads long text in short pieces, because some browsers cut off long utterances
+function speakText(raw, done) { // short pieces, because some browsers cut off long utterances
   const ss = window.speechSynthesis;
   const clean = raw.replace(/```[\s\S]*?```/g, ' code block. ').replace(/`([^`]*)`/g, '$1').replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[#*_>~|]/g, '').replace(/\s+/g, ' ').trim();
   const parts = clean.match(/[^.!?\n]+[.!?]*\s*/g) || [clean], chunks = []; let cur = '';
   parts.forEach(p => { if (cur && (cur + p).length > 200) { chunks.push(cur); cur = p; } else cur += p; });
   if (cur) chunks.push(cur);
-  const v = pickVoice(), c = curChar(), rate = Math.min(2, Math.max(0.3, c.rate * vs.rate));
   let i = 0, dead = false;
   const next = () => {
     if (dead) return; if (i >= chunks.length) { if (done) done(); return; }
-    const u = new SpeechSynthesisUtterance(chunks[i++]);
-    if (v) { u.voice = v; u.lang = v.lang; } else u.lang = navigator.language || 'en-US';
-    u.rate = rate; u.pitch = c.pitch; u.onend = next;
+    const u = new SpeechSynthesisUtterance(chunks[i++]); u.lang = navigator.language || 'en-US'; u.onend = next;
     u.onerror = e => { if (e.error === 'canceled' || e.error === 'interrupted') dead = true; else next(); };
     ss.speak(u);
   };
   ss.cancel(); setTimeout(next, 60);
   return () => { dead = true; ss.cancel(); };
 }
-function stopSpeech() {
-  if (ttsStop) { ttsStop(); ttsStop = null; }
-  if (ttsBtn) { ttsBtn.classList.remove('on'); ttsBtn = null; }
-  const t = $('vtest'); if (t) t.textContent = 'Preview voice';
-}
+function stopSpeech() { if (ttsStop) { ttsStop(); ttsStop = null; } if (ttsBtn) { ttsBtn.classList.remove('on'); ttsBtn = null; } }
 function readAloud(text, btn) {
   if (!hasTTS) return note('Read aloud isn’t supported in this browser.');
   if (ttsBtn === btn) return stopSpeech();
   stopSpeech(); ttsBtn = btn; btn.classList.add('on');
   ttsStop = speakText(text, () => { if (ttsBtn === btn) stopSpeech(); });
 }
-function fillVoices() {
-  if (!hasTTS) return;
-  voices = speechSynthesis.getVoices().slice();
-  const lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
-  voices.sort((a, b) => (b.lang.toLowerCase().startsWith(lang) - a.lang.toLowerCase().startsWith(lang)) || a.name.localeCompare(b.name));
-  const sel = $('vsel'); sel.replaceChildren(new Option('Auto (best match)', ''));
-  voices.forEach(v => sel.add(new Option(v.name + ' · ' + v.lang + (v.localService ? '' : ' (online)'), v.voiceURI)));
-  sel.value = voices.some(v => v.voiceURI === vs.uri) ? vs.uri : '';
-  $('vnote').textContent = voices.length ? '' : 'No voices found yet. Your device may need a text-to-speech engine installed.';
-}
-function renderChars() {
-  const box = $('vchars'); box.replaceChildren();
-  CHARS[vs.gender].forEach(c => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'chr' + (c.wide ? ' wide' : ''); b.setAttribute('aria-pressed', String(c.id === vs.char));
-    const n = document.createElement('b'); n.textContent = c.name; const t = document.createElement('span'); t.textContent = c.tag; b.append(n, t);
-    b.onclick = () => { vs.char = c.id; lsSet(VK, vs); renderChars(); previewVoice(); };
-    box.appendChild(b);
-  });
-  document.querySelectorAll('#vgender [data-g]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.g === vs.gender)));
-}
-function syncVoiceUI() { $('vrate').value = vs.rate; $('vratev').textContent = vs.rate.toFixed(1) + '×'; renderChars(); }
-function previewVoice() {
-  stopSpeech(); $('vtest').textContent = 'Stop';
-  ttsStop = speakText('Hi, I’m Rhomeo. This is how I sound when I read answers aloud.', () => stopSpeech());
-}
-if (!hasTTS) { $('st-voice').classList.add('hidden'); }
-else {
-  fillVoices(); syncVoiceUI();
-  if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', fillVoices);
-  setTimeout(fillVoices, 800); // some browsers load voices late
-  document.querySelectorAll('#vgender [data-g]').forEach(b => b.onclick = () => { // keep the same slot, so Warlord becomes Queen (both calm)
-    const idx = Math.max(0, CHARS[vs.gender].findIndex(c => c.id === vs.char));
-    vs.gender = b.dataset.g; vs.char = CHARS[vs.gender][idx].id; vs.uri = ''; $('vsel').value = ''; lsSet(VK, vs); renderChars(); previewVoice();
-  });
-  $('vsel').onchange = e => { vs.uri = e.target.value; lsSet(VK, vs); previewVoice(); };
-  $('vrate').oninput = e => { vs.rate = +e.target.value; $('vratev').textContent = vs.rate.toFixed(1) + '×'; };
-  $('vrate').onchange = () => lsSet(VK, vs);
-  $('vtest').onclick = () => { if (ttsStop) stopSpeech(); else previewVoice(); };
-  $('vreset').onclick = () => { vs.gender = 'male'; vs.char = 'natural'; vs.uri = ''; vs.rate = 1; lsSet(VK, vs); fillVoices(); syncVoiceUI(); stopSpeech(); };
-}
-/*VOICE-END*/
 const IC = {
   up: '<path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3zM7 11l4-8a2.2 2.2 0 0 1 2.2 2.4L12.7 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7"/>',
   down: '<path d="M17 13V4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3zM17 13l-4 8a2.2 2.2 0 0 1-2.2-2.4l.5-3.6H5a2 2 0 0 1-2-2.3l1.2-7A2 2 0 0 1 6.2 4H17"/>',
@@ -939,7 +891,11 @@ function addMsg(role, text, hl = true) {
   const nm = document.createElement('b'); nm.textContent = user ? 'You' : 'Rhomeo'; who.appendChild(nm);
   const body = document.createElement('div'); body.className = 'body'; d.body = body;
   if (user) d.append(body); else d.append(who, body);
-  if (user) body.textContent = text; else { setMd(body, text, hl); addActs(d, text); }
+  if (user) {
+    const am = /\n?\[Attached: (.+)\]$/.exec(text);
+    if (am) { body.appendChild(attBadge(am[1])); text = text.slice(0, am.index); }
+    if (text) { const tx = document.createElement('div'); tx.textContent = text; body.appendChild(tx); }
+  } else { setMd(body, text, hl); addActs(d, text); }
   const box = $('msgs'); box.appendChild(d); box.scrollTop = box.scrollHeight;
   return d;
 }
@@ -999,7 +955,7 @@ function showEmpty() {
 }
 function renderChat() {
   stopSpeech();
-  $('title').textContent = cur.title;
+  $('title').textContent = cur.title === 'New chat' ? 'Rhomeo' : cur.title;
   $('msgs').innerHTML = '';
   if (!cur.history.length) return showEmpty();
   cur.history.forEach(m => addMsg(m.role, m.parts.map(p => p.text || '').join('\n'), false));
@@ -1009,19 +965,22 @@ function renderChat() {
 /* ---------- reply mode (saved on the account, so it follows you across devices) ---------- */
 let mode = 'fast';
 function renderMode() {
-  $('modelabel').textContent = mode === 'smart' ? 'Smart' : 'Fast';
+  $('modelabel').textContent = mode === 'smart' ? 'Deep' : 'Fast';
   $('mode').dataset.mode = mode;
   $('mode').setAttribute('aria-label', 'Reply mode: ' + mode + '. Open to change.');
   document.querySelectorAll('#modemenu [data-mode]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.mode === mode)));
 }
-function closeMenu() { $('modemenu').classList.add('hidden'); $('mode').setAttribute('aria-expanded', 'false'); }
-$('mode').onclick = e => { e.stopPropagation(); const open = !$('modemenu').classList.toggle('hidden'); $('mode').setAttribute('aria-expanded', String(open)); };
+function closeMenu() { $('modemenu').classList.add('hidden'); $('mode').setAttribute('aria-expanded', 'false'); $('moremenu').classList.add('hidden'); $('more').setAttribute('aria-expanded', 'false'); }
+$('mode').onclick = e => { e.stopPropagation(); $('moremenu').classList.add('hidden'); const open = !$('modemenu').classList.toggle('hidden'); $('mode').setAttribute('aria-expanded', String(open)); };
 document.querySelectorAll('#modemenu [data-mode]').forEach(b => b.onclick = async () => {
   mode = b.dataset.mode; renderMode(); closeMenu();
   const { error } = await sb.auth.updateUser({ data: { mode } });
   if (error) note('Couldn’t save your mode choice: ' + error.message);
 });
 addEventListener('click', closeMenu);
+$('more').onclick = e => { e.stopPropagation(); $('modemenu').classList.add('hidden'); const o = !$('moremenu').classList.toggle('hidden'); $('more').setAttribute('aria-expanded', String(o)); };
+$('moremenu').addEventListener('click', e => e.stopPropagation());
+$('newchatbtn').onclick = () => { $('side').classList.remove('open'); newChat(); };
 renderMode();
 
 /* ---------- auth ---------- */
@@ -1204,7 +1163,7 @@ function onPick(e) {
   const isText = f.type.startsWith('text/') || f.type === 'application/json' || TEXT_EXT.test(f.name);
   if (!isText && !f.type.startsWith('image/') && f.type !== 'application/pdf') { note('Rhomeo can read images, PDFs and code or text files.'); return; }
   if (isText ? f.size > 300 * 1024 : f.size > MAX_FILE) { note(isText ? 'Code and text files can be up to 300 KB.' : 'That file is over 5 MB. Choose a smaller image or PDF.'); return; }
-  const done = (mime, data, text) => { file = { name: f.name, mime, data, text }; $('chipname').textContent = 'Attached: ' + f.name; $('chip').classList.remove('hidden'); note(''); syncSend(); };
+  const done = (mime, data, text) => { file = { name: f.name, mime, data, text }; fillAtt($('chip'), f.name, mime, data); $('chip').classList.remove('hidden'); note(''); syncSend(); };
   const r = new FileReader();
   if (isText) { r.onload = () => done('text/plain', '', String(r.result)); r.readAsText(f); return; }
   r.onload = () => {
@@ -1222,6 +1181,14 @@ function onPick(e) {
   r.readAsDataURL(f);
 }
 ['file', 'fphoto', 'fcam'].forEach(id => $(id).onchange = onPick);
+const shortName = n => n.length > 12 ? n.slice(0, 10) + '…' : n;
+function fillAtt(el, name, mime, data) {
+  const th = el.querySelector('.athumb'); th.replaceChildren(); th.className = 'athumb';
+  if (mime && mime.startsWith('image/') && data) { const im = new Image(); im.alt = ''; im.src = 'data:' + mime + ';base64,' + data; th.appendChild(im); th.classList.add('img'); }
+  const t = document.createElement('i'); t.textContent = (name.includes('.') ? name.split('.').pop() : 'file').slice(0, 4).toUpperCase(); th.appendChild(t);
+  el.querySelector('.aname').textContent = shortName(name);
+}
+function attBadge(name) { const w = document.createElement('div'); w.className = 'att sent'; w.innerHTML = '<div class="athumb"><i></i></div><span class="aname"></span>'; w.querySelector('i').textContent = (name.includes('.') ? name.split('.').pop() : 'file').slice(0, 4).toUpperCase(); w.querySelector('.aname').textContent = shortName(name); return w; }
 function clearFile() { file = null; $('chip').classList.add('hidden'); syncSend(); }
 $('unattach').onclick = clearFile;
 
@@ -1295,7 +1262,7 @@ $('f').onsubmit = async e => {
     if (!out) { // nothing came back: undo the message so you can resend it
       if (box.previousElementSibling) box.previousElementSibling.remove();
       box.remove(); $('input').value = text; autosize();
-      if (sent) { file = sent; $('chipname').textContent = 'Attached: ' + sent.name; $('chip').classList.remove('hidden'); }
+      if (sent) { file = sent; fillAtt($('chip'), sent.name, sent.mime, sent.data); $('chip').classList.remove('hidden'); }
       syncSend();
     }
   }
@@ -1344,18 +1311,16 @@ const TI = {
 const TL = { auto: 'Auto (follows your device)', light: 'Light', dark: 'Dark' };
 const sysLight = matchMedia('(prefers-color-scheme: light)');
 let tmode = 'auto'; try { const sv = localStorage.getItem('rhomeo_tmode'); if (sv === 'light' || sv === 'dark') tmode = sv; } catch {}
-let ttT; function toast(t) { const e = $('tt'); e.textContent = t; e.classList.add('show'); clearTimeout(ttT); ttT = setTimeout(() => e.classList.remove('show'), 1600); }
 function applyTheme(anim) {
   const t = tmode === 'auto' ? (sysLight.matches ? 'light' : 'dark') : tmode;
   if (anim) { root.classList.add('tx'); setTimeout(() => root.classList.remove('tx'), 350); }
   root.dataset.theme = t; document.querySelector('meta[name=theme-color]').content = t === 'light' ? '#ffffff' : '#0D1117';
-  const b = $('themebtn'); b.innerHTML = TI[tmode]; b.title = 'Theme: ' + TL[tmode]; b.setAttribute('aria-label', 'Theme: ' + TL[tmode] + '. Tap to change.');
+  document.querySelectorAll('#moremenu [data-t]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.t === tmode)));
 }
-$('themebtn').onclick = () => {
-  tmode = { auto: 'light', light: 'dark', dark: 'auto' }[tmode];
-  try { tmode === 'auto' ? localStorage.removeItem('rhomeo_tmode') : localStorage.setItem('rhomeo_tmode', tmode); } catch {}
-  applyTheme(true); toast('Theme: ' + TL[tmode]);
-};
+document.querySelectorAll('#moremenu [data-t]').forEach(b => b.onclick = () => {
+  tmode = b.dataset.t; try { tmode === 'auto' ? localStorage.removeItem('rhomeo_tmode') : localStorage.setItem('rhomeo_tmode', tmode); } catch {}
+  applyTheme(true);
+});
 if (sysLight.addEventListener) sysLight.addEventListener('change', () => { if (tmode === 'auto') applyTheme(true); });
 applyTheme(false);
 
@@ -1424,11 +1389,12 @@ async function doInstall() {
 }
 $('install').onclick = doInstall; $('inst-btn').onclick = doInstall;
 addEventListener('pwa-ready', syncInstall); syncInstall();
+let wasOff = false, wasSlow = false;
 function netStatus() {
   const off = !navigator.onLine, slow = !!(cn && (cn.saveData || /(^|-)2g$/.test(cn.effectiveType || '')));
-  const el = $('offline'); el.classList.toggle('hidden', !off && !slow);
-  el.dataset.k = off ? 'off' : 'slow';
-  el.textContent = off ? 'You’re offline. You can read saved chats; sending needs a connection.' : 'Slow connection detected. Rhomeo will keep trying.';
+  if (off) { wasOff = true; stickyOff = false; note('You’re offline. Saved chats still open; sending needs a connection.', false, true); stickyOff = true; }
+  else { if (wasOff) { stickyOff = false; wasOff = false; note(''); } if (slow && !wasSlow) note('Slow connection detected. Rhomeo will keep trying.'); }
+  wasSlow = slow;
 }
 addEventListener('online', () => { netStatus(); if (cur && cur.dirty && user && !busy) saveChat(); });
 addEventListener('offline', netStatus);
