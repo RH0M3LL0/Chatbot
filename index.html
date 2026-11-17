@@ -47,7 +47,25 @@ if('serviceWorker' in navigator){var regSW=function(){navigator.serviceWorker.re
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js">
 <!-- fonts never block the page: system fonts show first, Inter and JetBrains Mono swap in when they arrive -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><style>#boot{display:none}</style></noscript>
+<noscript><style>#boot{display:none}
+.sh-grid{flex-wrap:wrap}
+#rxvc{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:11px 20px;font:600 .85rem var(--sans);box-shadow:var(--shadow)}
+#rxvc.hidden,#rxp.hidden{display:none}
+.rxrun{color:var(--ok)}
+.rxout{margin:-.6em 0 1.1em;border:1px solid var(--line);border-radius:14px;background:var(--code);padding:10px 12px;font-size:.82rem}
+.rxout pre{margin:6px 0 0;border:0;background:none;white-space:pre-wrap;font-family:var(--mono);max-height:240px;overflow:auto}
+.rxtag{display:flex;align-items:center;gap:10px;font-weight:600}.rxtag.ok{color:var(--ok)}.rxtag.bad{color:var(--danger)}
+.rxframe{width:100%;height:260px;border:0;border-radius:10px;background:#fff;margin-top:8px}
+.rxdia{margin:.3em 0 1.1em;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--code);overflow-x:auto;text-align:center}
+.rxdia svg{max-width:100%;height:auto}
+.rxpost{margin:6px 0 0}
+#rxp{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
+.rxbox{width:min(640px,100%);max-height:86vh;overflow:auto;background:var(--sheet);border-radius:28px 28px 0 0;padding:16px 18px calc(22px + env(safe-area-inset-bottom));color:var(--text)}
+.rxh{display:flex;justify-content:space-between;align-items:center}.rxh h3{margin:0;font:700 1.05rem var(--disp)}
+.rxs h4{margin:18px 0 4px;font-size:.9rem}.rxp{margin:2px 0 8px;color:var(--mute);font-size:.82rem}
+.rxrow{display:flex;gap:8px;align-items:center;margin:6px 0}.rxrow span{flex:1;font-size:.88rem;word-break:break-word}
+.rxrow input{flex:1;min-width:0;background:var(--s2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;font-size:.88rem}
+</style></noscript>
 <style>
 :root{
   color-scheme:dark;
@@ -656,6 +674,7 @@ html.rm #modesw,html.rm #modesw .knob,html.rm #modesw .si{transition:none}
   <p class="hint">Rhomeo can make mistakes. Double-check important code.</p>
 </main>
 
+<input id="rxdir" type="file" webkitdirectory multiple hidden>
 <div id="sheet" class="sheet hidden" role="dialog" aria-modal="true" aria-labelledby="sh-title">
   <div class="sheetbox">
     <i class="grab" aria-hidden="true"></i>
@@ -905,6 +924,7 @@ function setMd(el, t, hl = true) {
     bar.append(lang, bts); pre.prepend(bar);
   });
   if (/\$|\\\(|\\\[/.test(t)) mathIn(el);
+  if (typeof rx !== 'undefined' && !(el.parentNode && el.parentNode.classList.contains('streaming'))) rx.enhance(el);
 }
 /* ---------- read aloud: uses the phone's default voice ---------- */
 let ttsStop = null, ttsBtn = null;
@@ -1344,7 +1364,8 @@ $('f').onsubmit = async e => {
   const sched = () => { if (!timer) timer = setTimeout(() => paint(false), Math.max(0, gap - (performance.now() - lastPaint))); };
   try {
     const { data: { session } } = await sb.auth.getSession();
-    const body = JSON.stringify({ mode, contents: cur.history.concat({ role: 'user', parts: live }) });
+    live.push(...await rx.prep(text));
+    const body = JSON.stringify({ mode, contents: rx.pre().concat(cur.history, { role: 'user', parts: live }) });
     let r;
     for (let a = 0; ; a++) { // one automatic retry if the connection fails before any reply arrives
       try {
@@ -1377,6 +1398,7 @@ $('f').onsubmit = async e => {
   clearTimeout(stallT); clearTimeout(timer); th.stop();
   box.classList.remove('wait', 'streaming');
   setBusy(false); ctrl = null;
+  rx.after(box, out);
   if (out) {
     paint(true); clearDraft(); addActs(box, out);
     cur.history.push({ role: 'user', parts: kept }, { role: 'model', parts: [{ text: out }] });
@@ -1508,6 +1530,217 @@ addEventListener('online', () => { netStatus(); if (cur && cur.dirty && user && 
 addEventListener('offline', netStatus);
 if (cn && cn.addEventListener) cn.addEventListener('change', netStatus);
 netStatus();
+
+/* ================= Rhomeo power-ups: memory, project folders, run code, diagrams, voice call, multi-repo, PR review, stack-trace fixer ================= */
+const rx = (() => {
+  const P = {}, GH = 'https://api.github.com';           // loaded projects: name -> [{p,t}]
+  let mem = [], memOk = false, lastPR = null, vc = false, vr = null, speaking = false;
+  const SKIP = /(^|\/)(node_modules|\.git|dist|build|\.next|venv|\.venv|__pycache__|coverage|\.idea|\.vscode)\//;
+  const CODE = /\.(js|jsx|ts|tsx|mjs|py|java|c|h|cpp|cs|go|rs|php|rb|html|css|scss|json|sql|sh|yml|yaml|xml|kt|swift|dart|vue|svelte|toml|md|txt|env\.example)$/i;
+  const ic = d => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  const load = (src) => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+
+  /* ---------- 1. persistent memory (Supabase table "memories") ---------- */
+  async function loadMem() {
+    if (memOk || !user) return;
+    const { data, error } = await sb.from('memories').select('id,text').order('created_at');
+    if (!error) { mem = data || []; memOk = true; }
+  }
+  async function addMem(t) {
+    const { data, error } = await sb.from('memories').insert({ user_id: user.id, text: t.slice(0, 300) }).select('id,text').single();
+    if (error) return note('Couldn’t save to memory: ' + error.message);
+    mem.push(data); note('Saved to memory ✓');
+  }
+
+  /* ---------- 2 + 6. project folders (several at once = multi-repo context) ---------- */
+  async function ingest(name, files) { // files: [{p, f(): Promise<string>}]
+    const out = []; let total = 0;
+    for (const x of files) {
+      if (out.length >= 500 || total > 3e6) break;
+      if (SKIP.test('/' + x.p) || !CODE.test(x.p) || x.size > 150e3) continue;
+      try { const t = await x.read(); total += t.length; out.push({ p: x.p, t }); } catch {}
+    }
+    if (!out.length) return note('No readable code files found in that folder.');
+    P[name] = out; panelRefresh(); note('Loaded ' + name + ': ' + out.length + ' files ✓');
+  }
+  async function pickFolder() {
+    if (window.showDirectoryPicker) {
+      try {
+        const h = await showDirectoryPicker(), files = [];
+        const walk = async (d, pre) => { for await (const [n, e] of d.entries()) {
+          if (e.kind === 'directory') { if (!SKIP.test('/' + pre + n + '/')) await walk(e, pre + n + '/'); }
+          else files.push({ p: pre + n, size: 0, read: async () => (await e.getFile()).text() }); } };
+        note('Reading ' + h.name + '…', false, true, true); await walk(h, ''); return ingest(h.name, files);
+      } catch (e) { if (e.name === 'AbortError') return; }
+    }
+    $('rxdir').click(); // fallback for browsers without the folder API
+  }
+  $('rxdir').onchange = e => {
+    const fs = [...e.target.files]; e.target.value = ''; if (!fs.length) return;
+    const name = (fs[0].webkitRelativePath || '').split('/')[0] || 'project';
+    ingest(name, fs.map(f => ({ p: (f.webkitRelativePath || f.name).split('/').slice(1).join('/') || f.name, size: f.size, read: () => f.text() })));
+  };
+
+  const words = s => [...new Set((s.toLowerCase().match(/[a-z_][a-z0-9_]{2,}/g) || []))].slice(0, 40);
+  function projectCtx(text) { // tree + stack-trace windows + best-matching files, within a size budget
+    const names = Object.keys(P); if (!names.length) return '';
+    let budget = 28000, s = '[Loaded project context. Repos: ' + names.join(', ') + ']\n';
+    names.forEach(n => { s += '\n## ' + n + ' tree\n' + P[n].slice(0, 250).map(f => f.p).join('\n') + '\n'; });
+    const all = names.flatMap(n => P[n].map(f => ({ n, ...f })));
+    const hits = [], seen = new Set();
+    const refs = [...text.matchAll(/(?:File "([^"]+)", line (\d+))|(?:\(?([\w@./\\-]+\.\w{1,5}):(\d+)(?::\d+)?\)?)/g)];
+    refs.forEach(m => {
+      const path = (m[1] || m[3]).replace(/\\/g, '/'), line = +(m[2] || m[4]), base = path.split('/').pop();
+      const f = all.find(x => path.endsWith(x.p) || x.p.endsWith(path)) || all.find(x => x.p.split('/').pop() === base);
+      if (!f || seen.has(f.p + line)) return; seen.add(f.p + line);
+      const L = f.t.split('\n'), a = Math.max(0, line - 16), b = Math.min(L.length, line + 15);
+      hits.push('\n## Trace location ' + f.n + '/' + f.p + ':' + line + '\n' + L.slice(a, b).map((l, i) => (a + i + 1) + (a + i + 1 === line ? ' >> ' : '    ') + l).join('\n'));
+    });
+    hits.forEach(h => { if (budget > 0) { s += h + '\n'; budget -= h.length; } });
+    const w = words(text);
+    const ranked = all.map(f => { const lp = f.p.toLowerCase(); let sc = 0; w.forEach(k => { if (lp.includes(k)) sc += 6; const c = f.t.toLowerCase().split(k).length - 1; sc += Math.min(c, 8); }); return { f, sc }; })
+      .filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, 8);
+    for (const { f } of ranked) { if (budget < 1500) break; const t = f.t.slice(0, Math.min(5000, budget)); s += '\n## ' + f.n + '/' + f.p + '\n```\n' + t + '\n```\n'; budget -= t.length; }
+    return s;
+  }
+
+  /* ---------- 7. GitHub pull-request review ---------- */
+  async function prCtx(text) {
+    const m = /github\.com\/([\w.-]+)\/([\w.-]+)\/pull\/(\d+)/.exec(text); if (!m) { lastPR = null; return ''; }
+    const [, o, r, n] = m, tok = localStorage.getItem('rx_gh');
+    const h = tok ? { Authorization: 'Bearer ' + tok } : {};
+    note('Fetching PR #' + n + '…', false, true, true);
+    try {
+      const [meta, diff] = await Promise.all([
+        fetch(`${GH}/repos/${o}/${r}/pulls/${n}`, { headers: h }).then(x => x.json()),
+        fetch(`${GH}/repos/${o}/${r}/pulls/${n}`, { headers: { ...h, Accept: 'application/vnd.github.v3.diff' } }).then(x => { if (!x.ok) throw 0; return x.text(); })]);
+      lastPR = { o, r, n }; note('');
+      return `[Pull request ${o}/${r}#${n}: "${meta.title || ''}" by ${meta.user ? meta.user.login : '?'}]\n${(meta.body || '').slice(0, 1500)}\n\nReview this diff for bugs, performance problems, security issues and style. For each finding give file:line, the problem, and a fix. End with a short verdict.\n\`\`\`diff\n${diff.slice(0, 60000)}\n\`\`\``;
+    } catch { lastPR = null; note('Couldn’t fetch that PR. Private repo? Add a GitHub token in Memory & tools.'); return ''; }
+  }
+  async function postReview(body) {
+    let tok = localStorage.getItem('rx_gh');
+    if (!tok) { tok = prompt('Paste a GitHub token with pull-request write access. It stays on this device only.'); if (!tok) return; localStorage.setItem('rx_gh', tok.trim()); }
+    if (!confirm('Post this review as a comment on ' + lastPR.o + '/' + lastPR.r + ' #' + lastPR.n + '?')) return;
+    const r = await fetch(`${GH}/repos/${lastPR.o}/${lastPR.r}/pulls/${lastPR.n}/reviews`, { method: 'POST', headers: { Authorization: 'Bearer ' + tok.trim(), 'Content-Type': 'application/json' }, body: JSON.stringify({ body: '**Rhomeo review**\n\n' + body, event: 'COMMENT' }) });
+    note(r.ok ? 'Review posted to GitHub ✓' : 'GitHub refused it (' + r.status + '). Check the token’s permissions.');
+  }
+
+  /* ---------- 3 + 4. run code in a sandbox, draw diagrams ---------- */
+  let pyW = null;
+  function pyRun(code) {
+    return new Promise(res => {
+      if (!pyW) pyW = new Worker(URL.createObjectURL(new Blob([`importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');let py;onmessage=async e=>{try{if(!py){py=await loadPyodide();}let o='';py.setStdout({batched:s=>o+=s+'\\n'});py.setStderr({batched:s=>o+=s+'\\n'});await py.runPythonAsync(e.data);postMessage({o,ok:true});}catch(x){postMessage({o:String(x.message||x),ok:false});}}`], { type: 'text/javascript' })));
+      const t = setTimeout(() => { pyW.terminate(); pyW = null; res({ o: 'Timed out after 20 s (first run downloads Python, ~10 MB).', ok: false }); }, 20000);
+      pyW.onmessage = e => { clearTimeout(t); res(e.data); };
+      pyW.postMessage(code);
+    });
+  }
+  function jsRun(code, html) {
+    return new Promise(res => {
+      const f = document.createElement('iframe'); f.sandbox = 'allow-scripts'; f.style.display = html ? 'block' : 'none';
+      let o = '', done = false;
+      const fin = ok => { if (done) return; done = true; if (!html) f.remove(); res({ o, ok, f: html ? f : null }); removeEventListener('message', h); };
+      const h = e => { if (e.source !== f.contentWindow) return; const d = e.data || {}; if (d.l != null) o += d.l + '\n'; if (d.end) fin(!d.err); if (d.err) { o += d.err + '\n'; fin(false); } };
+      addEventListener('message', h);
+      const boot = '<script>const P=m=>parent.postMessage(m,"*");const S=a=>a.map(x=>typeof x=="object"?(()=>{try{return JSON.stringify(x)}catch{return String(x)}})():String(x)).join(" ");["log","info","warn","error"].forEach(k=>console[k]=(...a)=>P({l:(k=="error"?"[error] ":k=="warn"?"[warn] ":"")+S(a)}));onerror=(m)=>{P({err:String(m)});};onunhandledrejection=e=>P({err:String(e.reason)});<\/script>';
+      f.srcdoc = html ? code + boot.replace('<script>', '<script>setTimeout(()=>P({end:1}),600);') : '<!doctype html>' + boot + '<script>(async()=>{try{\n' + code + '\n}catch(e){P({err:String(e&&e.stack||e)});return}P({end:1})})()<\/script>';
+      document.body.appendChild(f); if (!html) f.style.cssText = 'display:none';
+      setTimeout(() => { if (!done) o += '(stopped after 8 s)\n'; fin(false); }, 8000);
+    });
+  }
+  async function mermaidIn(pre, src) {
+    try {
+      if (!window.mermaid) { await load('https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js'); mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: document.documentElement.dataset.theme === 'light' ? 'default' : 'dark' }); }
+      const { svg } = await mermaid.render('mm' + Math.random().toString(36).slice(2), src);
+      const d = document.createElement('div'); d.className = 'rxdia'; d.innerHTML = svg;
+      const b = document.createElement('button'); b.className = 'cp'; b.type = 'button'; b.textContent = 'Download SVG'; b.onclick = () => saveFile('diagram.svg', svg, 'image/svg+xml');
+      d.appendChild(b); pre.replaceWith(d);
+    } catch {} // bad diagram syntax: leave the code block as is
+  }
+  function enhance(el) {
+    el.querySelectorAll('pre').forEach(pre => {
+      const code = pre.querySelector('code'); if (!code || pre.dataset.rx) return;
+      const lang = ((/language-([\w+#-]+)/.exec(code.className) || [])[1] || '').toLowerCase();
+      if (lang === 'mermaid') { pre.dataset.rx = 1; return mermaidIn(pre, code.textContent); }
+      const kind = { js: 'js', javascript: 'js', mjs: 'js', html: 'html', python: 'py', py: 'py' }[lang]; if (!kind) return;
+      pre.dataset.rx = 1;
+      const b = document.createElement('button'); b.className = 'cp rxrun'; b.type = 'button'; b.textContent = '▶ Run';
+      pre.querySelector('.bts').prepend(b);
+      b.onclick = async () => {
+        const old = pre.nextElementSibling; if (old && old.classList.contains('rxout')) old.remove();
+        const out = document.createElement('div'); out.className = 'rxout'; out.textContent = kind === 'py' ? 'Running Python…' : 'Running…'; pre.after(out); b.disabled = true;
+        const r = kind === 'py' ? await pyRun(code.textContent) : kind === 'js' ? await jsRun(code.textContent) : await jsRun(code.textContent, true);
+        b.disabled = false; out.textContent = '';
+        if (r.f) { r.f.className = 'rxframe'; out.appendChild(r.f); }
+        const pr = document.createElement('pre'); pr.textContent = (r.o || '').trim() || (r.ok ? '(ran with no output)' : ''); if (pr.textContent && !r.f) out.appendChild(pr);
+        const tag = document.createElement('div'); tag.className = 'rxtag ' + (r.ok ? 'ok' : 'bad'); tag.textContent = r.ok ? '✓ Ran without errors' : '✕ Failed'; out.prepend(tag);
+        if (!r.ok) { const fx = document.createElement('button'); fx.className = 'cp'; fx.type = 'button'; fx.textContent = 'Fix with Rhomeo';
+          fx.onclick = () => { $('input').value = 'I ran your code and it failed with this output:\n```\n' + (r.o || '').slice(0, 1500) + '\n```\nPlease fix it.'; autosize(); syncSend(); $('f').requestSubmit(); }; tag.appendChild(fx); }
+      };
+    });
+  }
+
+  /* ---------- 5. hands-free voice call ---------- */
+  const bar = document.createElement('button'); bar.id = 'rxvc'; bar.type = 'button'; bar.className = 'hidden'; document.body.appendChild(bar);
+  function vcState(t) { bar.textContent = t + ' · tap to end call'; }
+  function listen() {
+    if (!vc || busy || speaking) return;
+    if (!SR) { vc = false; bar.classList.add('hidden'); return note('Voice call needs Chrome or Safari.'); }
+    vr = new SR(); vr.lang = navigator.language || 'en-US'; vr.interimResults = false; vr.continuous = false; let got = false;
+    vr.onresult = e => { const t = [...e.results].map(r => r[0].transcript).join(' ').trim(); if (!t) return; got = true; vcState('Thinking'); $('input').value = t; autosize(); syncSend(); $('f').requestSubmit(); };
+    vr.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { vc = false; bar.classList.add('hidden'); note('Microphone access is blocked.'); } };
+    vr.onend = () => { vr = null; if (vc && !got && !busy && !speaking) setTimeout(listen, 250); };
+    try { vr.start(); vcState('Listening'); } catch { setTimeout(listen, 600); }
+  }
+  function startCall() { if (vc) return; vc = true; bar.classList.remove('hidden'); stopSpeech(); listen(); }
+  function endCall() { vc = false; speaking = false; bar.classList.add('hidden'); try { vr && vr.abort(); } catch {} if (hasTTS) speechSynthesis.cancel(); }
+  bar.onclick = endCall;
+
+  /* ---------- panel: memory, loaded projects, GitHub token ---------- */
+  const pan = document.createElement('div'); pan.id = 'rxp'; pan.className = 'hidden'; document.body.appendChild(pan);
+  pan.onclick = e => { if (e.target === pan || e.target.dataset.x) pan.classList.add('hidden'); };
+  function panelRefresh() { if (!pan.classList.contains('hidden')) openPanel(); }
+  async function openPanel() {
+    await loadMem(); pan.classList.remove('hidden'); pan.innerHTML = '<div class="rxbox"><div class="rxh"><h3>Memory &amp; projects</h3><button data-x=1 class="cp">Close</button></div><div class="rxs"></div></div>';
+    const s = pan.querySelector('.rxs'); const add = (h) => { const d = document.createElement('div'); d.innerHTML = h; s.appendChild(d); return d; };
+    add('<h4>Memory</h4><p class="rxp">Rhomeo uses these in every chat. Say “remember that…” in a message to add one.</p>');
+    mem.forEach(m => { const d = add('<div class="rxrow"><span></span><button class="cp">Delete</button></div>'); d.querySelector('span').textContent = m.text;
+      d.querySelector('button').onclick = async () => { const { error } = await sb.from('memories').delete().eq('id', m.id); if (!error) { mem = mem.filter(x => x !== m); openPanel(); } }; });
+    if (!mem.length) add('<p class="rxp">Nothing saved yet.</p>');
+    const a = add('<div class="rxrow"><input placeholder="Add something to remember"><button class="cp">Add</button></div>');
+    a.querySelector('button').onclick = async () => { const v = a.querySelector('input').value.trim(); if (v) { await addMem(v); openPanel(); } };
+    add('<h4>Loaded projects</h4>');
+    Object.keys(P).forEach(n => { const d = add('<div class="rxrow"><span></span><button class="cp">Remove</button></div>'); d.querySelector('span').textContent = n + ' · ' + P[n].length + ' files'; d.querySelector('button').onclick = () => { delete P[n]; openPanel(); }; });
+    if (!Object.keys(P).length) add('<p class="rxp">None. Use “Project folder” in the + menu. Load several for multi-repo context.</p>');
+    const g = add('<h4>GitHub token</h4><p class="rxp">Needed for private repos and for posting PR reviews. Stored only on this device.</p><div class="rxrow"><input type="password" placeholder="ghp_…" value=""><button class="cp">Save</button></div>');
+    g.querySelector('button').onclick = () => { const v = g.querySelector('input').value.trim(); if (v) { localStorage.setItem('rx_gh', v); note('Token saved on this device ✓'); } };
+  }
+
+  /* sheet buttons */
+  const grid = document.querySelector('#sheet .sh-grid');
+  [['folder', 'Project folder', '<path d="M3.5 7A1.5 1.5 0 0 1 5 5.5h4l2 2.5h8A1.5 1.5 0 0 1 20.5 9.500v8A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.500-1.500z"/>'],
+   ['call', 'Voice call', '<path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>'],
+   ['mem', 'Memory', '<path d="M12 3a6 6 0 0 0-3.500 10.900V17h7v-3.100A6 6 0 0 0 12 3zM9.500 20.500h5"/>']].forEach(([k, l, d]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.rx = k; b.innerHTML = '<span class="ico">' + ic(d) + '</span><b>' + l + '</b>'; grid.appendChild(b); });
+  grid.addEventListener('click', e => { const b = e.target.closest('[data-rx]'); if (!b) return; closeSheet(); ({ folder: pickFolder, call: startCall, mem: openPanel })[b.dataset.rx](); });
+
+  /* ---------- send-time hooks ---------- */
+  async function prep(text) {
+    await loadMem();
+    const m = /^\s*(?:please\s+)?remember(?:\s+that|:)?\s+(.{3,})/i.exec(text); if (m && user) addMem(m[1]);
+    const parts = [], pc = await prCtx(text), pj = projectCtx(text);
+    if (pj) parts.push({ text: pj }); if (pc) parts.push({ text: pc });
+    return parts;
+  }
+  const rules = 'You are Rhomeo, a coding assistant. When asked to design or explain an architecture, flow or schema, include a diagram in a ```mermaid block (flowchart, sequenceDiagram or erDiagram). Prefer self-contained JavaScript or Python snippets so the user can press Run. When given a stack trace plus code, name the exact file:line, explain the cause, and give a minimal unified-diff patch. In a voice call keep answers short and spoken-friendly.';
+  const pre = () => [{ role: 'user', parts: [{ text: '[Standing context]\n' + rules + (mem.length ? '\nThings the user asked you to remember:\n- ' + mem.map(x => x.text).join('\n- ') : '') }] }, { role: 'model', parts: [{ text: 'Understood.' }] }];
+  function after(box, out) {
+    if (out && lastPR && !box.querySelector('.rxpost')) { const b = document.createElement('button'); b.className = 'cp rxpost'; b.type = 'button'; b.textContent = 'Post review to GitHub'; b.onclick = () => postReview(out); box.body.after(b); }
+    if (vc) { if (out) { speaking = true; vcState('Speaking'); ttsStop = speakText(out, () => { speaking = false; ttsStop = null; listen(); }); } else listen(); }
+  }
+  return { enhance, prep, pre, after };
+})();
 
 /* start fetching the code highlighter once the app is up, without competing with chat data */
 setTimeout(loadHighlighter, lite ? 2500 : 700);
