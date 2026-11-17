@@ -711,6 +711,56 @@ body.incall header,body.incall #msgs{transform:translateY(-115%);opacity:0;point
 @keyframes rxtr{0%{transform:translateY(-2px)}100%{transform:translateY(6px)}}
 html.rm #rxcall .face svg,html.rm #rxcall .lt,html.rm #rxcall .dots circle{animation:none!important}
 </style>
+<style id="gemini-layout">
+/* ===== Gemini-style layout: same features and animations, new placements ===== */
+/* sidebar */
+aside{background:var(--s1);border-right:0;-webkit-backdrop-filter:none;backdrop-filter:none;padding:12px 12px 10px;gap:6px}
+.brand{gap:10px;padding:4px 6px 12px}
+.brand .sig{padding:0;border:0;gap:0}
+.brand .sig .wm{font-size:1.2rem;align-self:flex-start}
+#new{align-self:flex-start;background:var(--s2);border:0;border-radius:999px;padding:12px 20px 12px 16px;font-weight:500;color:var(--mute);margin-bottom:6px}
+#new:hover{background:color-mix(in srgb,var(--text) 10%,var(--s2))}
+#new svg{color:var(--text)}
+.label{padding:12px 12px 6px;font-size:.84rem;color:var(--text)}
+.row{border-radius:999px;padding-left:16px}
+.row.on{background:color-mix(in srgb,var(--accent) 16%,transparent);box-shadow:none}
+.foot{padding:4px 0 0;gap:2px}
+#sbsettings{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:999px;color:var(--text);font-size:.92rem;text-align:left}
+#sbsettings svg{width:20px;height:20px;color:var(--mute)}
+#sbsettings:hover{background:var(--s2)}
+/* top bar: menu and title on the left, profile on the right */
+header{background:transparent;border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none;padding:10px 12px}
+#title{font-size:1.15rem;font-weight:500}
+#more{padding:0}
+#more .avatar{width:32px;height:32px;font-size:.82rem}
+/* messages: neutral bubble for you, open text for the assistant with its logo on the left */
+.u .body{background:var(--s2);border:0;border-radius:24px;-webkit-backdrop-filter:none;backdrop-filter:none;padding:12px 18px}
+.a{padding-left:42px}
+.a .who{display:flex;position:absolute;left:0;top:3px;margin:0}
+.a .who b{display:none}
+.a .body,html.lite .a .body{background:none;border:0;border-radius:0;padding:2px 0 0;width:100%;-webkit-backdrop-filter:none;backdrop-filter:none}
+/* welcome: greeting top-left, suggestion cards in a row above the composer */
+.hero{margin:0;flex:1;min-height:0;display:flex;flex-direction:column;text-align:left;padding:min(9vh,80px) 0 0}
+.hero .lwrap{width:42px;height:42px;margin:6px 0 20px}
+.hero small{font-family:var(--disp);font-size:clamp(2rem,8.5vw,3rem);font-weight:600;letter-spacing:-.035em;line-height:1.1;margin:0;color:transparent;background:linear-gradient(90deg,var(--accent),var(--ok) 60%,#B39DFF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero h1{font-size:clamp(1.7rem,7.5vw,2.8rem);font-weight:600;letter-spacing:-.035em;color:var(--mute);margin:2px 0 0}
+.hero p{display:none}
+.chips{display:flex;gap:10px;overflow-x:auto;margin:auto 0 0;padding:20px 0 4px;scrollbar-width:none;scroll-snap-type:x proximity}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:0 0 auto;width:152px;min-height:116px;align-items:flex-start;justify-content:flex-start;text-align:left;padding:14px;border:0;border-radius:18px;background:var(--s2);-webkit-backdrop-filter:none;backdrop-filter:none;scroll-snap-align:start}
+.chips button b{font-size:.92rem;line-height:1.3}
+.chips button span{font-size:.72rem;margin-top:2px}
+.chips button i.ci{order:3;align-self:flex-end;margin:auto 0 0}
+/* composer: text on top, "+" on the left and mode / send on the right underneath */
+form#f{display:grid;grid-template-columns:auto 1fr auto auto;grid-template-areas:"inp inp inp inp" "att . mode snd";align-items:center;gap:2px 4px;background:var(--s2);border:0;border-radius:28px;padding:8px 10px;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+[data-theme=dark] form#f{box-shadow:none}
+form#f:focus-within{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--accent) 35%,transparent)}
+#input{grid-area:inp;padding:10px 10px 6px}
+#attach{grid-area:att}
+#modesw{grid-area:mode;margin:0 4px 0 0}
+#send{grid-area:snd}
+@media(max-width:760px){.hero{padding-top:6vh}.chips{margin-right:-16px;padding-right:16px}}
+</style>
 </head>
 <body class="out">
 <noscript><p style="position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:#0A0A0C;color:#E8EBF2;font-family:system-ui;padding:24px;text-align:center">Rhomeo needs JavaScript to run. Please turn it on and reload.</p></noscript>
@@ -767,12 +817,11 @@ html.rm #rxcall .face svg,html.rm #rxcall .lt,html.rm #rxcall .dots circle{anima
   </form>
 </div>
 <aside id="side">
-  <div class="brand"><svg class="logo" aria-hidden="true"><use href="#rm"/></svg></div>
+  <div class="brand"><svg class="logo" aria-hidden="true"><use href="#rm"/></svg><div class="sig"><span class="wm">Rhomeo</span><small class="tg" data-type="Code smarter. Ship faster." data-idle="1">Code smarter. Ship faster.</small></div></div>
   <button id="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>New chat</button>
   <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Recent</span><i></i></div>
   <div id="list"></div>
-  <div class="foot"><button id="install">Install app</button></div>
-  <div class="sig"><span class="wm">Rhomeo</span><small class="tg" data-type="Code smarter. Ship faster." data-idle="1">Code smarter. Ship faster.</small></div>
+  <div class="foot"><button id="install">Install app</button><button id="sbsettings" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button></div>
 </aside>
 <div id="scrim"></div>
 <div id="tt" class="tt" role="status" aria-live="polite"></div>
@@ -783,7 +832,7 @@ html.rm #rxcall .face svg,html.rm #rxcall .lt,html.rm #rxcall .dots circle{anima
     <div class="hright">
       <button id="newchatbtn" class="ibtn" type="button" aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
       <div class="modewrap">
-        <button id="more" class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
+        <button id="more" class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="More"><span id="hav" class="avatar">R</span></button>
         <div id="moremenu" class="mm hidden" role="menu">
           <button id="profilebtn" class="profile" type="button" aria-label="Your profile"><span id="avatar" class="avatar">R</span><span id="pname" class="pname"></span></button>
           <hr>
@@ -901,11 +950,12 @@ function startTypers(d) { if (typersOn) return; typersOn = true; document.queryS
 /* ---------- boot splash and library loading (works on slow and flaky networks) ---------- */
 const boot = $('boot'), bootmsg = $('bootmsg');
 /* ---------- morph transitions: loading screen -> login -> chat ---------- */
-const fancy = () => !lite && !root.classList.contains('rm') && !!Element.prototype.animate;
+const soft = () => !root.classList.contains('rm') && !!Element.prototype.animate; // plain opacity fades: cheap enough for any phone
+const fancy = () => soft() && !lite && !(navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) && !(navigator.deviceMemory && navigator.deviceMemory <= 4);
 const EASE = 'cubic-bezier(.2,.85,.25,1)';
 const inView = r => r.width > 0 && r.left >= 0 && r.right <= innerWidth && r.bottom > 0 && r.top < innerHeight;
 function chatTarget() { // where the logo lands: the sidebar logo on desktop, the menu button when the sidebar is tucked away
-  for (const sel of ['.brand .logo', '#menu svg']) { const el = document.querySelector(sel), r = el && el.getBoundingClientRect(); if (r && inView(r)) return { el, r }; }
+  for (const sel of ['.brand .logo']) { const el = document.querySelector(sel), r = el && el.getBoundingClientRect(); if (r && inView(r)) return { el, r }; }
   return null;
 }
 function ripple(x, y, size, to, dur, delay) {
@@ -923,23 +973,18 @@ function fly(clone, from, to, o) { // glide a copy of one element onto another o
   clone.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')' }], { duration: o.dur, delay: o.delay || 0, easing: o.ease || EASE, fill: 'both' }).finished.then(land, land);
   setTimeout(land, (o.delay || 0) + o.dur + 500);
 }
-function land(t) { // the logo settles into the chat with a little pulse and ripple
-  if (!t) return;
-  t.el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.45)' }, { transform: 'scale(1)' }], { duration: 650, easing: EASE });
-  const r = t.el.getBoundingClientRect(); ripple(r.left + r.width / 2, r.top + r.height / 2, r.width + 8, 3.6, 900);
+function land(t) { // the logo settles into the sidebar with a tiny pulse
+  if (t) t.el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 450, easing: EASE });
 }
 function bootToLogin() { // the logo blooms open into the login card and the wordmark glides into its place
   const card = $('auth-form'), logo = boot.querySelector('.bootlogo'), sig = boot.querySelector('.bootsig'), name = boot.querySelector('.bootname'), dst = card && card.querySelector('.authsig .wm');
   if (!card || !logo || !name || !dst || !card.offsetWidth) return false;
   const cr = card.getBoundingClientRect(), lr = logo.getBoundingClientRect(), lx = lr.left + lr.width / 2, ly = lr.top + lr.height / 2, cx = lx - cr.left, cy = ly - cr.top;
-  card.style.transformOrigin = cx + 'px ' + cy + 'px'; // grows out of the spot where the loading logo was
-  card.animate([{ opacity: 0, transform: 'scale(.82)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 700, easing: EASE }).finished.then(() => { card.style.transformOrigin = ''; }, () => { card.style.transformOrigin = ''; });
+  card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 150, easing: 'ease-out', fill: 'backwards' });
   logo.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.5)', opacity: 0 }], { duration: 520, easing: 'ease-in', fill: 'forwards' });
-  ripple(lx, ly, 112, 6, 900);
   const c = document.createElement('div'); c.className = 'bootname wm';
   c.textContent = name.textContent; sig.style.visibility = 'hidden';
   fly(c, name, dst, { text: 1, dur: 950, delay: 120, onland: () => startTypers(150) });
-  [$('auth-title'), $('auth-sub')].concat([...card.children].slice(1)).forEach((el, i) => el.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: 420 + i * 70, easing: EASE, fill: 'backwards' }));
   return true;
 }
 function bootToChat() { // returning user: the loading logo flies straight into the chat
@@ -948,23 +993,20 @@ function bootToChat() { // returning user: the loading logo flies straight into 
   sig.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(16px)' }], { duration: 380, easing: 'ease-in', fill: 'forwards' });
   logo.querySelectorAll('.glow,.track,.ring').forEach(el => el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.5)' }], { duration: 520, easing: 'ease-out', fill: 'forwards' }));
   if (t) { const c = src.cloneNode(true); src.style.visibility = 'hidden'; fly(c, src, t.el, { dur: 950, delay: 140, onland: () => land(t) }); }
-  else src.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(2.6)', opacity: 0 }], { duration: 650, easing: 'ease-in', fill: 'forwards' }); // no logo on screen to land on: zoom through
+  else src.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: 'ease-out', fill: 'forwards' }); // no sidebar logo on screen (phones): just fade
   return true;
 }
-function loginToChat() { // the card shrinks into the chat's logo
-  const card = $('auth-form'); if (!card || !card.offsetWidth) return false;
-  const body = document.body, t = chatTarget(), cr = card.getBoundingClientRect();
-  const ox = t ? t.r.left + t.r.width / 2 - cr.left : cr.width / 2, oy = t ? t.r.top + t.r.height / 2 - cr.top : cr.height / 2;
-  body.classList.add('enter'); if (t) t.el.style.visibility = 'hidden';
-  card.style.transformOrigin = ox + 'px ' + oy + 'px';
-  const an = card.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: .9, transform: 'scale(.4)', offset: .6 }, { opacity: 0, transform: 'scale(.03)' }], { duration: 620, easing: 'cubic-bezier(.5,0,.75,.4)', fill: 'forwards' });
-  let done = false; const end = () => { if (done) return; done = true; body.classList.remove('enter'); an.cancel(); card.style.transformOrigin = ''; if (t) { t.el.style.visibility = ''; land(t); } };
-  an.finished.then(end, end); setTimeout(end, 1200);
+function loginToChat() { // the card simply fades away to reveal the chat
+  const card = $('auth-form'), body = document.body; if (!card || !card.offsetWidth) return false;
+  body.classList.add('enter');
+  const an = card.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: 'ease-out', fill: 'forwards' });
+  let done = false; const end = () => { if (done) return; done = true; body.classList.remove('enter'); an.cancel(); };
+  an.finished.then(end, end); setTimeout(end, 700);
   return true;
 }
-function bloomCard() { // signing out: the login card settles back in
-  const card = $('auth-form'); if (!fancy() || !card || !card.offsetWidth) return;
-  card.animate([{ opacity: 0, transform: 'scale(.9) translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 480, easing: EASE });
+function bloomCard() { // signing out: the login card fades in
+  const card = $('auth-form'); if (!soft() || !card || !card.offsetWidth) return;
+  card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
 }
 function hideBoot(dest) {
   if (!boot || boot.classList.contains('gone')) return;
@@ -1241,7 +1283,7 @@ function showEmpty() {
   const h = document.createElement('div'); h.className = 'hero';
   const lg = document.createElement('div'); lg.className = 'lwrap';
   lg.innerHTML = '<div class="lfl"><svg class="logo" viewBox="14 5 88 88" aria-hidden="true"><g style="fill:var(--lg)"><path class="p1" fill-rule="evenodd" d="M20 12H60L80 32V48L64 64H38V88H20Z M38 28V48H56L62 42V34L56 28Z"/><path class="p2" d="M48 70H66L84 88H66Z"/><path d="M90 10L96 16L90 22L84 16Z" style="fill:var(--ok)"/></g></svg><i class="glint"></i></div><i class="lshadow"></i>';
-  const s = document.createElement('small'); s.textContent = name ? '> hello, ' + name : '> hello';
+  const s = document.createElement('small'); s.textContent = name ? 'Hello, ' + name : 'Hello';
   const t = document.createElement('h1'); t.textContent = 'What are we building today?';
   const p = document.createElement('p'); p.textContent = 'Write, debug and understand code, faster.';
   const row = document.createElement('div'); row.className = 'chips';
@@ -1388,7 +1430,7 @@ function applySession(session) {
   if (u) {
     body.classList.remove('out'); updateIdentity();
     mode = (u.user_metadata && u.user_metadata.mode) === 'smart' ? 'smart' : 'fast'; renderMode(); setTimeout(loadChats, 0);
-    if (fromBoot) hideBoot('chat'); else if (wasOut && fancy()) { try { loginToChat(); } catch (e) { body.classList.remove('enter'); } }
+    if (fromBoot) hideBoot('chat'); else if (wasOut && soft()) { try { loginToChat(); } catch (e) { body.classList.remove('enter'); } }
   } else {
     chats = []; cur = null; $('list').innerHTML = ''; $('msgs').innerHTML = ''; body.classList.add('out');
     if (fromBoot) hideBoot('login'); else bloomCard();
@@ -1732,7 +1774,7 @@ const displayName = () => ((user && user.user_metadata && user.user_metadata.use
 function updateIdentity() {
   if (!user) return;
   const n = displayName(), ini = n[0].toUpperCase();
-  $('avatar').textContent = ini; $('pname').textContent = n; $('profilebtn').setAttribute('aria-label', 'Your profile: ' + n);
+  $('avatar').textContent = ini; $('hav').textContent = ini; $('pname').textContent = n; $('profilebtn').setAttribute('aria-label', 'Your profile: ' + n);
   $('st-avatar').textContent = ini; $('st-name').textContent = n; $('st-email').textContent = user.email;
   $('pf-avatar').textContent = ini; $('pf-email').textContent = user.email;
 }
@@ -1744,6 +1786,7 @@ function openModal(id) {
 }
 document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-close]')) closeModals(); }));
 $('settingsbtn').onclick = () => openModal('settings');
+$('sbsettings').onclick = () => { $('side').classList.remove('open'); openModal('settings'); };
 $('profilebtn').onclick = () => {
   $('pf-name').value = (user && user.user_metadata && user.user_metadata.username) || '';
   $('pf-pw').value = ''; $('pf-pw2').value = ''; say($('pf-name-msg'), ''); say($('pf-pw-msg'), '');
