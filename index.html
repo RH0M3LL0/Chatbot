@@ -248,7 +248,9 @@ input:focus,textarea:focus{border-color:var(--accent);outline:0;box-shadow:0 0 0
 #auth-form.up #forgot{display:none}
 #auth-form.reset .gbtn,#auth-form.reset .adiv,#auth-form.reset .seg,#auth-form.reset #f-email,#auth-form.reset #forgot{display:none}
 .fly{position:fixed;margin:0;padding:0;z-index:120;pointer-events:none;transform-origin:50% 50%;will-change:transform;white-space:nowrap}
-.ripple{position:fixed;z-index:119;pointer-events:none;border:2px solid var(--accent);border-radius:50%;box-shadow:0 0 24px color-mix(in srgb,var(--accent) 45%,transparent)}
+.ripple{position:fixed;z-index:119;pointer-events:none;border:2px solid var(--accent);border-radius:50%;will-change:transform,opacity}
+.fly.wm{animation:none}
+#boot.gone::before,#boot.gone .bootlogo .logo,#boot.gone .bootlogo .glow,#boot.gone .ring{animation-play-state:paused}
 body.enter #auth{display:flex!important;pointer-events:none}
 .alegal{font-size:.74rem;text-align:center;color:var(--mute);line-height:1.5}
 body.out aside,body.out main{visibility:hidden}
@@ -921,11 +923,6 @@ function fly(clone, from, to, o) { // glide a copy of one element onto another o
   clone.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')' }], { duration: o.dur, delay: o.delay || 0, easing: o.ease || EASE, fill: 'both' }).finished.then(land, land);
   setTimeout(land, (o.delay || 0) + o.dur + 500);
 }
-function chatIn(delay) {
-  const side = $('side'), main = document.querySelector('main');
-  if (main) main.animate([{ opacity: 0, transform: 'translateY(18px) scale(.985)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay, easing: EASE, fill: 'backwards' });
-  if (side) side.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay, easing: 'ease-out', fill: 'backwards' });
-}
 function land(t) { // the logo settles into the chat with a little pulse and ripple
   if (!t) return;
   t.el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.45)' }, { transform: 'scale(1)' }], { duration: 650, easing: EASE });
@@ -935,10 +932,10 @@ function bootToLogin() { // the logo blooms open into the login card and the wor
   const card = $('auth-form'), logo = boot.querySelector('.bootlogo'), sig = boot.querySelector('.bootsig'), name = boot.querySelector('.bootname'), dst = card && card.querySelector('.authsig .wm');
   if (!card || !logo || !name || !dst || !card.offsetWidth) return false;
   const cr = card.getBoundingClientRect(), lr = logo.getBoundingClientRect(), lx = lr.left + lr.width / 2, ly = lr.top + lr.height / 2, cx = lx - cr.left, cy = ly - cr.top;
-  const R = Math.hypot(Math.max(cx, cr.width - cx), Math.max(cy, cr.height - cy)) + 40;
-  card.animate([{ clipPath: 'circle(0px at ' + cx + 'px ' + cy + 'px)' }, { clipPath: 'circle(' + R + 'px at ' + cx + 'px ' + cy + 'px)' }], { duration: 950, easing: EASE });
+  card.style.transformOrigin = cx + 'px ' + cy + 'px'; // grows out of the spot where the loading logo was
+  card.animate([{ opacity: 0, transform: 'scale(.82)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 700, easing: EASE }).finished.then(() => { card.style.transformOrigin = ''; }, () => { card.style.transformOrigin = ''; });
   logo.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.5)', opacity: 0 }], { duration: 520, easing: 'ease-in', fill: 'forwards' });
-  ripple(lx, ly, 112, 10, 1100);
+  ripple(lx, ly, 112, 6, 900);
   const c = document.createElement('div'); c.className = 'bootname wm';
   c.textContent = name.textContent; sig.style.visibility = 'hidden';
   fly(c, name, dst, { text: 1, dur: 950, delay: 120, onland: () => startTypers(150) });
@@ -948,36 +945,26 @@ function bootToLogin() { // the logo blooms open into the login card and the wor
 function bootToChat() { // returning user: the loading logo flies straight into the chat
   const logo = boot.querySelector('.bootlogo'), src = logo && logo.querySelector('.logo'), sig = boot.querySelector('.bootsig'), t = chatTarget();
   if (!src) return false;
-  chatIn(380);
   sig.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(16px)' }], { duration: 380, easing: 'ease-in', fill: 'forwards' });
   logo.querySelectorAll('.glow,.track,.ring').forEach(el => el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.5)' }], { duration: 520, easing: 'ease-out', fill: 'forwards' }));
   if (t) { const c = src.cloneNode(true); src.style.visibility = 'hidden'; fly(c, src, t.el, { dur: 950, delay: 140, onland: () => land(t) }); }
   else src.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(2.6)', opacity: 0 }], { duration: 650, easing: 'ease-in', fill: 'forwards' }); // no logo on screen to land on: zoom through
   return true;
 }
-function loginToChat() { // the card collapses into an accent orb that flies into the chat's logo
+function loginToChat() { // the card shrinks into the chat's logo
   const card = $('auth-form'); if (!card || !card.offsetWidth) return false;
-  const body = document.body, t = chatTarget(), cr = card.getBoundingClientRect(), cs = getComputedStyle(card), acc = getComputedStyle(root).getPropertyValue('--accent').trim() || '#2F6BFF';
-  const D = 56, R0 = Math.hypot(cr.width, cr.height) / 2 + 40;
-  const tx = t ? t.r.left + t.r.width / 2 : innerWidth / 2, ty = t ? t.r.top + t.r.height / 2 : innerHeight / 2;
-  const dx = tx - (cr.left + cr.width / 2), dy = ty - (cr.top + cr.height / 2), sc = (t ? t.r.width : 8) / D;
+  const body = document.body, t = chatTarget(), cr = card.getBoundingClientRect();
+  const ox = t ? t.r.left + t.r.width / 2 - cr.left : cr.width / 2, oy = t ? t.r.top + t.r.height / 2 - cr.top : cr.height / 2;
   body.classList.add('enter'); if (t) t.el.style.visibility = 'hidden';
-  const kids = [...card.children].map(el => el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240, fill: 'forwards' }));
-  const orb = card.animate([
-    { clipPath: 'circle(' + R0 + 'px at 50% 50%)', transform: 'translate(0,0) scale(1)', backgroundColor: cs.backgroundColor, opacity: 1, offset: 0 },
-    { clipPath: 'circle(' + D / 2 + 'px at 50% 50%)', transform: 'translate(0,0) scale(1)', backgroundColor: acc, opacity: 1, offset: .45 },
-    { clipPath: 'circle(' + D / 2 + 'px at 50% 50%)', transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')', backgroundColor: acc, opacity: 1, offset: .93 },
-    { clipPath: 'circle(' + D / 2 + 'px at 50% 50%)', transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')', backgroundColor: acc, opacity: 0, offset: 1 }
-  ], { duration: 1050, easing: 'cubic-bezier(.45,.05,.25,1)', fill: 'forwards' });
-  chatIn(420);
-  let done = false; const end = () => { if (done) return; done = true; body.classList.remove('enter'); orb.cancel(); kids.forEach(k => k.cancel()); if (t) { t.el.style.visibility = ''; land(t); } };
-  orb.finished.then(end, end); setTimeout(end, 1600);
+  card.style.transformOrigin = ox + 'px ' + oy + 'px';
+  const an = card.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: .9, transform: 'scale(.4)', offset: .6 }, { opacity: 0, transform: 'scale(.03)' }], { duration: 620, easing: 'cubic-bezier(.5,0,.75,.4)', fill: 'forwards' });
+  let done = false; const end = () => { if (done) return; done = true; body.classList.remove('enter'); an.cancel(); card.style.transformOrigin = ''; if (t) { t.el.style.visibility = ''; land(t); } };
+  an.finished.then(end, end); setTimeout(end, 1200);
   return true;
 }
-function bloomCard() { // signing out: the login card blooms back from the middle
+function bloomCard() { // signing out: the login card settles back in
   const card = $('auth-form'); if (!fancy() || !card || !card.offsetWidth) return;
-  const R = Math.hypot(card.offsetWidth, card.offsetHeight) / 2 + 40;
-  card.animate([{ clipPath: 'circle(0px at 50% 40%)' }, { clipPath: 'circle(' + R + 'px at 50% 40%)' }], { duration: 750, easing: EASE });
+  card.animate([{ opacity: 0, transform: 'scale(.9) translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 480, easing: EASE });
 }
 function hideBoot(dest) {
   if (!boot || boot.classList.contains('gone')) return;
