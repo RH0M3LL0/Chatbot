@@ -760,6 +760,17 @@ form#f:focus-within{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--accent) 35%,t
 #modesw{grid-area:mode;margin:0 4px 0 0}
 #send{grid-area:snd}
 @media(max-width:760px){.hero{padding-top:6vh}.chips{margin-right:-16px;padding-right:16px}}
+#more{display:none}
+#themebtn{color:var(--text)}
+#themebtn svg{width:24px;height:24px;overflow:visible}
+.ti{transform-origin:12px 12px;opacity:0;transform:rotate(-90deg) scale(.4);transition:transform .45s cubic-bezier(.3,1.4,.5,1),opacity .22s}
+#themebtn[data-t=auto] .ti-auto,#themebtn[data-t=light] .ti-light,#themebtn[data-t=dark] .ti-dark{opacity:1;transform:none}
+#themebtn[data-t=light] .ti-light{color:#F5B301}
+html.rm .ti{transition:none}
+#sbprofile{display:flex;align-items:center;gap:12px;padding:8px 14px;border-radius:999px;color:var(--text);font-size:.92rem;text-align:left}
+#sbprofile .avatar{width:26px;height:26px;font-size:.72rem}
+#sbname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sbprofile:hover{background:var(--s2)}
 </style>
 </head>
 <body class="out">
@@ -821,7 +832,7 @@ form#f:focus-within{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--accent) 35%,t
   <button id="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>New chat</button>
   <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Recent</span><i></i></div>
   <div id="list"></div>
-  <div class="foot"><button id="install">Install app</button><button id="sbsettings" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button></div>
+  <div class="foot"><button id="install">Install app</button><button id="sbprofile" type="button"><span id="sbav" class="avatar">R</span><span id="sbname">Profile</span></button><button id="sbsettings" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button></div>
 </aside>
 <div id="scrim"></div>
 <div id="tt" class="tt" role="status" aria-live="polite"></div>
@@ -832,6 +843,7 @@ form#f:focus-within{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--accent) 35%,t
     <div class="hright">
       <button id="newchatbtn" class="ibtn" type="button" aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
       <div class="modewrap">
+        <button id="themebtn" class="ibtn" type="button" data-t="auto" aria-label="Theme: Auto. Tap to change." title="Theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="ti ti-auto"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></g><g class="ti ti-light"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><g class="ti ti-dark"><path d="M20 14.2A8.2 8.2 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2z"/></g></svg></button>
         <button id="more" class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="More"><span id="hav" class="avatar">R</span></button>
         <div id="moremenu" class="mm hidden" role="menu">
           <button id="profilebtn" class="profile" type="button" aria-label="Your profile"><span id="avatar" class="avatar">R</span><span id="pname" class="pname"></span></button>
@@ -1761,11 +1773,14 @@ function applyTheme(anim) {
   if (anim) { root.classList.add('tx'); setTimeout(() => root.classList.remove('tx'), 350); }
   root.dataset.theme = t; document.querySelector('meta[name=theme-color]').content = t === 'light' ? '#ffffff' : '#0A0A0C';
   document.querySelectorAll('#moremenu [data-t]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.t === tmode)));
+  const tb = $('themebtn'); if (tb) { tb.dataset.t = tmode; tb.setAttribute('aria-label', 'Theme: ' + TL[tmode] + '. Tap to change.'); }
 }
-document.querySelectorAll('#moremenu [data-t]').forEach(b => b.onclick = () => {
-  tmode = b.dataset.t; try { tmode === 'auto' ? localStorage.removeItem('rhomeo_tmode') : localStorage.setItem('rhomeo_tmode', tmode); } catch {}
+function setTheme(m) {
+  tmode = m; try { tmode === 'auto' ? localStorage.removeItem('rhomeo_tmode') : localStorage.setItem('rhomeo_tmode', tmode); } catch {}
   applyTheme(true);
-});
+}
+document.querySelectorAll('#moremenu [data-t]').forEach(b => b.onclick = () => setTheme(b.dataset.t));
+$('themebtn').onclick = e => { e.stopPropagation(); setTheme({ auto: 'light', light: 'dark', dark: 'auto' }[tmode]); note('Theme: ' + TL[tmode], false, false, true); };
 if (sysLight.addEventListener) sysLight.addEventListener('change', () => { if (tmode === 'auto') applyTheme(true); });
 applyTheme(false);
 
@@ -1774,7 +1789,7 @@ const displayName = () => ((user && user.user_metadata && user.user_metadata.use
 function updateIdentity() {
   if (!user) return;
   const n = displayName(), ini = n[0].toUpperCase();
-  $('avatar').textContent = ini; $('hav').textContent = ini; $('pname').textContent = n; $('profilebtn').setAttribute('aria-label', 'Your profile: ' + n);
+  $('avatar').textContent = ini; $('sbav').textContent = ini; $('sbname').textContent = n; $('pname').textContent = n; $('profilebtn').setAttribute('aria-label', 'Your profile: ' + n);
   $('st-avatar').textContent = ini; $('st-name').textContent = n; $('st-email').textContent = user.email;
   $('pf-avatar').textContent = ini; $('pf-email').textContent = user.email;
 }
@@ -1786,6 +1801,7 @@ function openModal(id) {
 }
 document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-close]')) closeModals(); }));
 $('settingsbtn').onclick = () => openModal('settings');
+$('sbprofile').onclick = () => { $('side').classList.remove('open'); $('profilebtn').click(); };
 $('sbsettings').onclick = () => { $('side').classList.remove('open'); openModal('settings'); };
 $('profilebtn').onclick = () => {
   $('pf-name').value = (user && user.user_metadata && user.user_metadata.username) || '';
