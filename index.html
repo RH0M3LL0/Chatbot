@@ -47,78 +47,7 @@ if('serviceWorker' in navigator){var regSW=function(){navigator.serviceWorker.re
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js">
 <!-- fonts never block the page: system fonts show first, Inter and JetBrains Mono swap in when they arrive -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><style>#boot{display:none}
-.sh-grid{flex-wrap:wrap}
-#rxvc{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;border-radius:999px;font:600 .85rem var(--sans);box-shadow:var(--shadow)}
-#rxvc.hidden,#rxp.hidden{display:none}
-.rxrun{color:var(--ok)}
-.rxout{margin:-.6em 0 1.1em;border:1px solid var(--line);border-radius:14px;background:var(--code);padding:10px 12px;font-size:.82rem}
-.rxout pre{margin:6px 0 0;border:0;background:none;white-space:pre-wrap;font-family:var(--mono);max-height:240px;overflow:auto}
-.rxtag{display:flex;align-items:center;gap:10px;font-weight:600}.rxtag.ok{color:var(--ok)}.rxtag.bad{color:var(--danger)}
-.rxframe{width:100%;height:260px;border:0;border-radius:10px;background:#fff;margin-top:8px}
-.rxdia{margin:.3em 0 1.1em;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--code);overflow-x:auto;text-align:center}
-.rxdia svg{max-width:100%;height:auto}
-.rxpost{margin:6px 0 0}
-#rxp{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
-.rxbox{width:min(640px,100%);max-height:86vh;overflow:auto;background:var(--sheet);border-radius:28px 28px 0 0;padding:16px 18px calc(22px + env(safe-area-inset-bottom));color:var(--text)}
-.rxh{display:flex;justify-content:space-between;align-items:center}.rxh h3{margin:0;font:700 1.05rem var(--disp)}
-.rxs h4{margin:18px 0 4px;font-size:.9rem}.rxp{margin:2px 0 8px;color:var(--mute);font-size:.82rem}
-.rxrow{display:flex;gap:8px;align-items:center;margin:6px 0}.rxrow span{flex:1;font-size:.88rem;word-break:break-word}
-.rxrow input{flex:1;min-width:0;background:var(--s2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;font-size:.88rem}
-
-#send::after{content:"";position:absolute;inset:0;border-radius:50%;z-index:0;pointer-events:none;background:linear-gradient(135deg,#4F6BFF 0%,#8B5CF6 55%,#2DD4A7 100%);opacity:0;transform:rotate(0);transition:opacity .35s}
-#send[data-s=mic]::after{opacity:1;animation:rxspin 9s linear infinite}
-#send[data-s=mic]{animation:rxpop .4s cubic-bezier(.3,1.6,.5,1),rxglow 3.2s ease-in-out .4s infinite}
-#send[data-s=send]{animation:rxpop .4s cubic-bezier(.3,1.6,.5,1)}
-.ic-mic .w{stroke-width:2.2;transform-box:fill-box;transform-origin:center;animation:rxwv 1.3s ease-in-out infinite}
-.ic-mic .w:nth-child(2){animation-delay:.15s}.ic-mic .w:nth-child(3){animation-delay:.3s}.ic-mic .w:nth-child(4){animation-delay:.45s}.ic-mic .w:nth-child(5){animation-delay:.6s}
-#send[data-s=rec] .w{animation-duration:.55s}
-#send:not([data-s=mic]):not([data-s=rec]) .w{animation-play-state:paused}
-@keyframes rxwv{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.15)}}
-@keyframes rxpop{0%{transform:scale(.78)}100%{transform:scale(1)}}
-@keyframes rxglow{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.0),0 4px 14px rgba(79,107,255,.28)}50%{box-shadow:0 0 0 6px rgba(139,92,246,.12),0 4px 18px rgba(139,92,246,.4)}}
-@keyframes rxspin{to{transform:rotate(360deg)}}
-html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none}
-#rxvc{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--s1) 88%,transparent);color:var(--text);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:9px 10px 9px 14px}
-#rxvc .orb{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,#4F6BFF,#2DD4A7);animation:rxbr 1.6s ease-in-out infinite}
-#rxvc[data-st=speaking] .orb{background:linear-gradient(135deg,#8B5CF6,#4F6BFF);animation-duration:.6s}
-#rxvc[data-st^=reconnecting] .orb,#rxvc[data-st^=connecting] .orb{background:var(--mute)}
-#rxvc .tm{color:var(--mute);font:500 .78rem var(--mono);min-width:2.4em}
-#rxvc b{background:var(--danger);color:#fff;border-radius:999px;padding:5px 12px;font-size:.78rem}
-@keyframes rxbr{0%,100%{transform:scale(.8);opacity:.7}50%{transform:scale(1.35);opacity:1}}
-
-#rxglow{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .6s;--lv:0;--g1:#4F6BFF;--g2:#2DD4A7;
-  box-shadow:inset 0 0 calc(34px + 70px*var(--lv)) calc(2px + 12px*var(--lv)) var(--g1),inset 0 0 calc(90px + 90px*var(--lv)) 0 var(--g2);animation:rxgl 3.4s ease-in-out infinite}
-#rxglow.on{opacity:.85}
-#rxglow[data-st=speaking]{--g1:#8B5CF6;--g2:#4F6BFF}
-#rxglow[data-st=connecting],#rxglow[data-st^=reconnecting]{--g1:#6b7280;--g2:#374151}
-@keyframes rxgl{0%,100%{filter:brightness(.85)}50%{filter:brightness(1.2)}}
-#rxcall{position:fixed;left:0;right:0;top:0;bottom:var(--ibt,112px);z-index:80;opacity:0;transition:opacity .45s;--lv:0;display:flex;flex-direction:column;align-items:center;background:linear-gradient(rgba(6,8,18,.86),rgba(6,8,18,.93));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff}
-#rxcall.on{opacity:1}#rxcall.hidden{display:none}
-#rxcall .rxtop{display:flex;align-items:center;gap:8px;margin-top:calc(18px + env(safe-area-inset-top));font-size:.85rem;color:rgba(255,255,255,.75)}
-#rxcall .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:rxbr 1.6s ease-in-out infinite}
-#rxcall[data-st=connecting] .dot{background:#9ca3af}
-#rxcall .tm{font:500 .8rem var(--mono);opacity:.7}
-#rxcall .face{position:absolute;left:50%;top:30%;width:min(46vw,190px);aspect-ratio:1;transform:translate(-50%,-50%)}
-#rxcall .face svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 36px rgba(122,108,255,.55));transform:scale(calc(1 + var(--lv)*.07));transition:transform .08s linear;animation:rxbob 4.5s ease-in-out infinite}
-.eye{transform-box:fill-box;transform-origin:center;animation:rxbl 4.2s infinite}
-#rxcall .talk{transform-box:fill-box;transform-origin:center;transform:scaleY(calc(.12 + var(--lv)*.95)) scaleX(calc(.7 + var(--lv)*.35));opacity:0;transition:opacity .2s}
-#rxcall .smile{transition:opacity .2s}
-#rxcall[data-st=speaking] .talk{opacity:1}#rxcall[data-st=speaking] .smile{opacity:0}
-#rxcall.muted .face svg{filter:grayscale(.8) drop-shadow(0 10px 30px rgba(0,0,0,.5))}
-#rxcall .cap{position:absolute;left:0;right:0;top:calc(30% + min(23vw,95px) + 26px);bottom:96px;padding:0 24px;text-align:center;font:600 1.3rem/1.5 var(--disp);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;-webkit-mask-image:linear-gradient(#000 85%,transparent);mask-image:linear-gradient(#000 85%,transparent)}
-#rxcall .cap span{animation:rxin .35s ease-out both}
-#rxcall .you{position:absolute;left:0;right:0;bottom:78px;padding:0 24px;text-align:center;font-size:.85rem;color:rgba(255,255,255,.5);min-height:1.2em}
-#rxcall .ctl{position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:10px}
-#rxcall .ctl button{border-radius:999px;padding:11px 20px;font:600 .88rem var(--sans);background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.16)}
-#rxint{opacity:0;pointer-events:none;transform:scale(.9);transition:opacity .25s,transform .25s;background:var(--accent)!important;border-color:transparent!important}
-#rxcall[data-st=speaking] #rxint{opacity:1;pointer-events:auto;transform:none}
-#rxend{background:var(--danger)!important;border-color:transparent!important}
-@keyframes rxbob{0%,100%{translate:0 -4px}50%{translate:0 5px}}
-@keyframes rxbl{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
-@keyframes rxin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-html.rm #rxglow,html.rm #rxcall .face svg,html.rm .eye{animation:none}
-</style></noscript>
+<noscript><style>#boot{display:none}</style></noscript>
 <style>
 :root{
   color-scheme:dark;
@@ -647,6 +576,111 @@ html.rm #modesw,html.rm #modesw .knob,html.rm #modesw .si{transition:none}
 }
 @media(pointer:coarse){.row .x{padding:12px}.cp{padding:7px 12px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.m,.hero,.row,.chips button,#auth form,#note{animation:none!important}}
+
+.sh-grid{flex-wrap:wrap}
+#rxvc{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;border-radius:999px;font:600 .85rem var(--sans);box-shadow:var(--shadow)}
+#rxvc.hidden,#rxp.hidden{display:none}
+.rxrun{color:var(--ok)}
+.rxout{margin:-.6em 0 1.1em;border:1px solid var(--line);border-radius:14px;background:var(--code);padding:10px 12px;font-size:.82rem}
+.rxout pre{margin:6px 0 0;border:0;background:none;white-space:pre-wrap;font-family:var(--mono);max-height:240px;overflow:auto}
+.rxtag{display:flex;align-items:center;gap:10px;font-weight:600}.rxtag.ok{color:var(--ok)}.rxtag.bad{color:var(--danger)}
+.rxframe{width:100%;height:260px;border:0;border-radius:10px;background:#fff;margin-top:8px}
+.rxdia{margin:.3em 0 1.1em;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--code);overflow-x:auto;text-align:center}
+.rxdia svg{max-width:100%;height:auto}
+.rxpost{margin:6px 0 0}
+#rxp{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
+.rxbox{width:min(640px,100%);max-height:86vh;overflow:auto;background:var(--sheet);border-radius:28px 28px 0 0;padding:16px 18px calc(22px + env(safe-area-inset-bottom));color:var(--text)}
+.rxh{display:flex;justify-content:space-between;align-items:center}.rxh h3{margin:0;font:700 1.05rem var(--disp)}
+.rxs h4{margin:18px 0 4px;font-size:.9rem}.rxp{margin:2px 0 8px;color:var(--mute);font-size:.82rem}
+.rxrow{display:flex;gap:8px;align-items:center;margin:6px 0}.rxrow span{flex:1;font-size:.88rem;word-break:break-word}
+.rxrow input{flex:1;min-width:0;background:var(--s2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;font-size:.88rem}
+
+#send::after{content:"";position:absolute;inset:0;border-radius:50%;z-index:0;pointer-events:none;background:linear-gradient(135deg,#4F6BFF 0%,#8B5CF6 55%,#2DD4A7 100%);opacity:0;transform:rotate(0);transition:opacity .35s}
+#send[data-s=mic]::after{opacity:1;animation:rxspin 9s linear infinite}
+#send[data-s=mic]{animation:rxpop .4s cubic-bezier(.3,1.6,.5,1),rxglow 3.2s ease-in-out .4s infinite}
+#send[data-s=send]{animation:rxpop .4s cubic-bezier(.3,1.6,.5,1)}
+.ic-mic .w{stroke-width:2.2;transform-box:fill-box;transform-origin:center;animation:rxwv 1.3s ease-in-out infinite}
+.ic-mic .w:nth-child(2){animation-delay:.15s}.ic-mic .w:nth-child(3){animation-delay:.3s}.ic-mic .w:nth-child(4){animation-delay:.45s}.ic-mic .w:nth-child(5){animation-delay:.6s}
+#send[data-s=rec] .w{animation-duration:.55s}
+#send:not([data-s=mic]):not([data-s=rec]) .w{animation-play-state:paused}
+@keyframes rxwv{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.15)}}
+@keyframes rxpop{0%{transform:scale(.78)}100%{transform:scale(1)}}
+@keyframes rxglow{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.0),0 4px 14px rgba(79,107,255,.28)}50%{box-shadow:0 0 0 6px rgba(139,92,246,.12),0 4px 18px rgba(139,92,246,.4)}}
+@keyframes rxspin{to{transform:rotate(360deg)}}
+html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none}
+#rxvc{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--s1) 88%,transparent);color:var(--text);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:9px 10px 9px 14px}
+#rxvc .orb{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,#4F6BFF,#2DD4A7);animation:rxbr 1.6s ease-in-out infinite}
+#rxvc[data-st=speaking] .orb{background:linear-gradient(135deg,#8B5CF6,#4F6BFF);animation-duration:.6s}
+#rxvc[data-st^=reconnecting] .orb,#rxvc[data-st^=connecting] .orb{background:var(--mute)}
+#rxvc .tm{color:var(--mute);font:500 .78rem var(--mono);min-width:2.4em}
+#rxvc b{background:var(--danger);color:#fff;border-radius:999px;padding:5px 12px;font-size:.78rem}
+@keyframes rxbr{0%,100%{transform:scale(.8);opacity:.7}50%{transform:scale(1.35);opacity:1}}
+
+#rxglow{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .6s;--lv:0;--g1:#4F6BFF;--g2:#2DD4A7;
+  box-shadow:inset 0 0 calc(34px + 70px*var(--lv)) calc(2px + 12px*var(--lv)) var(--g1),inset 0 0 calc(90px + 90px*var(--lv)) 0 var(--g2);animation:rxgl 3.4s ease-in-out infinite}
+#rxglow.on{opacity:.85}
+#rxglow[data-st=speaking]{--g1:#8B5CF6;--g2:#4F6BFF}
+#rxglow[data-st=connecting],#rxglow[data-st^=reconnecting]{--g1:#6b7280;--g2:#374151}
+@keyframes rxgl{0%,100%{filter:brightness(.85)}50%{filter:brightness(1.2)}}
+#rxcall{position:fixed;left:0;right:0;top:0;bottom:var(--ibt,112px);z-index:80;opacity:0;transition:opacity .45s;--lv:0;display:flex;flex-direction:column;align-items:center;background:radial-gradient(70% 42% at 50% 30%,rgba(110,110,255,.18),transparent 75%);color:var(--text)}
+#rxcall.on{opacity:1}#rxcall.hidden{display:none}
+#rxcall .rxtop{display:flex;align-items:center;gap:8px;margin-top:calc(18px + env(safe-area-inset-top));font-size:.85rem;color:var(--mute)}
+#rxcall .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:rxbr 1.6s ease-in-out infinite}
+#rxcall[data-st=connecting] .dot{background:#9ca3af}
+#rxcall .tm{font:500 .8rem var(--mono);opacity:.7}
+#rxcall .face{position:absolute;left:50%;top:30%;width:min(46vw,190px);aspect-ratio:1;transform:translate(-50%,-50%)}
+#rxcall .face svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 36px rgba(122,108,255,.55));transform:scale(calc(1 + var(--lv)*.07));transition:transform .08s linear;animation:rxbob 4.5s ease-in-out infinite}
+.eye{transform-box:fill-box;transform-origin:center;animation:rxbl 4.2s infinite}
+#rxcall .talk{transform-box:fill-box;transform-origin:center;transform:scaleY(calc(.12 + var(--lv)*.95)) scaleX(calc(.7 + var(--lv)*.35));opacity:0;transition:opacity .2s}
+#rxcall .smile{transition:opacity .2s}
+#rxcall[data-st=speaking] .talk{opacity:1}#rxcall[data-st=speaking] .smile{opacity:0}
+#rxcall.muted .face svg{filter:grayscale(.8) drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+#rxcall .cap{position:absolute;left:0;right:0;top:calc(30% + min(23vw,95px) + 26px);bottom:96px;padding:0 24px;text-align:center;font:600 1.3rem/1.5 var(--disp);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;-webkit-mask-image:linear-gradient(#000 85%,transparent);mask-image:linear-gradient(#000 85%,transparent)}
+#rxcall .cap span{animation:rxin .35s ease-out both}
+#rxcall .you{position:absolute;left:0;right:0;bottom:78px;padding:0 24px;text-align:center;font-size:.85rem;color:var(--mute);min-height:1.2em}
+#rxcall .ctl{position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:10px}
+#rxcall .ctl button{border-radius:999px;padding:11px 20px;font:600 .88rem var(--sans);background:var(--s2);color:var(--text);border:1px solid var(--line)}
+#rxint{opacity:0;pointer-events:none;transform:scale(.9);transition:opacity .25s,transform .25s;background:var(--accent)!important;border-color:transparent!important}
+#rxcall[data-st=speaking] #rxint{opacity:1;pointer-events:auto;transform:none}
+#rxend{background:var(--danger)!important;border-color:transparent!important}
+@keyframes rxbob{0%,100%{translate:0 -4px}50%{translate:0 5px}}
+@keyframes rxbl{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes rxin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+html.rm #rxglow,html.rm #rxcall .face svg,html.rm .eye{animation:none}
+header,#msgs{transition:transform .7s cubic-bezier(.7,0,.25,1),opacity .55s}
+body.incall header,body.incall #msgs{transform:translateY(-115%);opacity:0;pointer-events:none}
+#rxglow[data-st=thinking]{--g1:#F59E0B;--g2:#8B5CF6}
+#rxcall .face svg *{transition:opacity .25s,transform .35s}
+#rxcall .blush,#rxcall .brows,#rxcall .ea,#rxcall .eh,#rxcall .ew,#rxcall .tear,#rxcall .lt,#rxcall .grin,#rxcall .mo,#rxcall .frown,#rxcall .flat,#rxcall .dots{opacity:0}
+#rxcall[data-emo=happy] .ea,#rxcall[data-emo=happy] .grin,#rxcall[data-emo=happy] .blush{opacity:1}
+#rxcall[data-emo=happy] .eo,#rxcall[data-emo=happy] .smile{opacity:0}
+#rxcall[data-emo=laugh] .ea,#rxcall[data-emo=laugh] .grin,#rxcall[data-emo=laugh] .blush,#rxcall[data-emo=laugh] .lt{opacity:1}
+#rxcall[data-emo=laugh] .eo,#rxcall[data-emo=laugh] .smile{opacity:0}
+#rxcall[data-emo=wow] .ew,#rxcall[data-emo=wow] .mo,#rxcall[data-emo=wow] .brows{opacity:1}
+#rxcall[data-emo=wow] .eo,#rxcall[data-emo=wow] .smile{opacity:0}
+#rxcall[data-emo=sad] .frown,#rxcall[data-emo=sad] .brows,#rxcall[data-emo=sad] .tear{opacity:1}
+#rxcall[data-emo=sad] .smile{opacity:0}
+#rxcall[data-emo=think] .flat,#rxcall[data-emo=think] .brows,#rxcall[data-emo=think] .dots{opacity:1}
+#rxcall[data-emo=think] .smile{opacity:0}
+#rxcall[data-emo=curious] .brows{opacity:1}
+#rxcall[data-emo=love] .eh,#rxcall[data-emo=love] .blush,#rxcall[data-emo=love] .grin{opacity:1}
+#rxcall[data-emo=love] .eo,#rxcall[data-emo=love] .smile{opacity:0}
+#rxcall[data-st=speaking] .smile,#rxcall[data-st=speaking] .frown,#rxcall[data-st=speaking] .flat,#rxcall[data-st=speaking] .mo,#rxcall[data-st=speaking]:not([data-emo=laugh]) .grin{opacity:0}
+#rxcall[data-st=speaking][data-emo=laugh] .talk{opacity:0}
+#rxcall .bl,#rxcall .br,#rxcall .eo{transform-box:fill-box;transform-origin:center}
+#rxcall[data-emo=wow] .bl,#rxcall[data-emo=wow] .br{transform:translateY(-8px)}
+#rxcall[data-emo=sad] .bl{transform:rotate(-16deg)}#rxcall[data-emo=sad] .br{transform:rotate(16deg)}
+#rxcall[data-emo=think] .br,#rxcall[data-emo=curious] .br{transform:translateY(-7px) rotate(-8deg)}
+#rxcall[data-emo=sad] .eo{transform:translateY(4px) scaleY(.9)}#rxcall[data-emo=think] .eo{transform:translate(5px,-5px)}
+#rxcall .face svg{rotate:0deg;transition:transform .08s linear,rotate .45s}
+#rxcall[data-emo=curious] .face svg{rotate:-6deg}#rxcall[data-emo=think] .face svg{rotate:5deg}
+#rxcall[data-emo=laugh] .face svg{animation:rxbob 4.5s ease-in-out infinite,rxsh .38s ease-in-out infinite}
+#rxcall[data-emo=think] .dots circle{animation:rxdt 1.2s ease-in-out infinite}#rxcall[data-emo=think] .dots circle:nth-child(2){animation-delay:.2s}#rxcall[data-emo=think] .dots circle:nth-child(3){animation-delay:.4s}
+#rxcall .lt{animation:rxtr 1.1s ease-in infinite}
+@keyframes rxsh{0%,100%{rotate:-3deg}50%{rotate:3deg}}
+@keyframes rxdt{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes rxtr{0%{transform:translateY(-2px)}100%{transform:translateY(6px)}}
+html.rm #rxcall .face svg,html.rm #rxcall .lt,html.rm #rxcall .dots circle{animation:none!important}
 </style>
 </head>
 <body class="out">
@@ -1726,15 +1760,27 @@ const rx = (() => {
   document.body.insertAdjacentHTML('beforeend',
     '<div id="rxglow"></div><div id="rxcall" class="hidden" data-st="connecting"><div class="rxtop"><i class="dot"></i><span class="st">Connecting…</span><span class="tm">0:00</span></div>' +
     '<div class="face"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="fg" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#A9B6FF"/><stop offset=".55" stop-color="#7B7CFF"/><stop offset="1" stop-color="#6A3FE0"/></radialGradient></defs>' +
-    '<circle cx="60" cy="60" r="56" fill="url(#fg)"/><ellipse cx="42" cy="49" rx="6" ry="8.5" fill="#fff" class="eye"/><ellipse cx="78" cy="49" rx="6" ry="8.5" fill="#fff" class="eye"/>' +
-    '<path class="smile" d="M36 74Q60 96 84 74" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><ellipse class="talk" cx="60" cy="80" rx="17" ry="12" fill="#2a1466"/></svg></div>' +
+    '<circle cx="60" cy="60" r="56" fill="url(#fg)"/><g class="blush"><ellipse cx="29" cy="68" rx="8" ry="5" fill="#ff8fb1" opacity=".6"/><ellipse cx="91" cy="68" rx="8" ry="5" fill="#ff8fb1" opacity=".6"/></g>' +
+    '<g class="brows" stroke="#fff" stroke-width="4.5" stroke-linecap="round"><path class="bl" d="M33 35L51 33"/><path class="br" d="M69 33L87 35"/></g>' +
+    '<g class="eo"><ellipse class="eye" cx="42" cy="49" rx="6" ry="8.5" fill="#fff"/><ellipse class="eye" cx="78" cy="49" rx="6" ry="8.5" fill="#fff"/></g>' +
+    '<g class="ea" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"><path d="M34 53Q42 42 50 53"/><path d="M70 53Q78 42 86 53"/></g>' +
+    '<g class="ew"><circle cx="42" cy="48" r="10" fill="#fff"/><circle cx="78" cy="48" r="10" fill="#fff"/><circle cx="42" cy="48" r="4" fill="#2a1466"/><circle cx="78" cy="48" r="4" fill="#2a1466"/></g>' +
+    '<g class="eh" fill="#ff5d8f"><path d="M42 58C30 49 32 40 38 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/><path d="M78 58C66 49 68 40 74 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/></g>' +
+    '<path class="tear" d="M36 61q-4 7 0 9q4-2 0-9z" fill="#9fd8ff"/><g class="lt" fill="#9fd8ff"><path d="M25 56q-5 8 0 10q5-2 0-10z"/><path d="M95 56q-5 8 0 10q5-2 0-10z"/></g>' +
+    '<path class="smile" d="M36 74Q60 96 84 74" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="grin" d="M34 70Q60 108 86 70Z" fill="#2a1466" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
+    '<ellipse class="mo" cx="60" cy="82" rx="7" ry="9" fill="#2a1466"/><path class="frown" d="M40 90Q60 72 80 90" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="flat" d="M46 82H74" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/>' +
+    '<ellipse class="talk" cx="60" cy="80" rx="17" ry="12" fill="#2a1466"/><g class="dots" fill="#fff"><circle cx="98" cy="12" r="3.5"/><circle cx="108" cy="4" r="4.5"/><circle cx="119" cy="-6" r="5.5"/></g></svg></div>' +
     '<div class="cap" aria-live="polite"></div><div class="you"></div>' +
     '<div class="ctl"><button type="button" id="rxmute">Mute</button><button type="button" id="rxint">Interrupt</button><button type="button" id="rxend">End</button></div></div>');
   const ov = $('rxcall'), glow = $('rxglow'), face = ov.querySelector('.face'), capEl = ov.querySelector('.cap'), youEl = ov.querySelector('.you');
   const live = (() => {
     let on = false, ready = false, ever = false, ws = null, mic = null, cIn = null, cOut = null, nextT = 0, srcs = [], handle = null, tries = 0, inTx = '', outTx = '', t0 = 0, tick = 0, buf = [];
-    let muted = false, drop = false, capDone = false, lv = 0, tgt = 0, lvT = 0, ctimer = 0, st = '';
+    let emo = 'think', thinkT = 0, muted = false, drop = false, capDone = false, lv = 0, tgt = 0, lvT = 0, ctimer = 0, st = '';
     const q = s => ov.querySelector(s);
+    const EMO = [[/\b(haha|hehe|lol|funny|joke|hilarious)|😂|🤣/i, 'laugh'], [/\b(sorry|unfortunately|can't|cannot|unable|apologi|sadly|afraid not|failed|error)/i, 'sad'], [/\b(wow|whoa|no way|incredible|amazing|unbelievable)/i, 'wow'], [/\b(love|awesome|great|nice|congrat|perfect|excellent|glad|happy|yay|fantastic|brilliant|thank)/i, 'happy'], [/\b(hmm|let me think|not sure|maybe|perhaps|it depends)/i, 'think'], [/\?\s*$/, 'curious']];
+    const feel = t => { for (const [re, e] of EMO) if (re.test(t)) return e; return /!/.test(t) ? 'happy' : null; };
+    const setEmo = e => { if (e === emo) return; emo = ov.dataset.emo = e; try { face.firstElementChild.animate([{ scale: 1 }, { scale: 1.16 }, { scale: 1 }], { duration: 380, easing: 'ease-out' }); } catch {} };
+    const calm = ms => setTimeout(() => { if (on && st !== 'speaking' && st !== 'thinking') setEmo('listen'); }, ms);
     const status = t => { st = t.toLowerCase().replace(/\W/g, ''); q('.st').textContent = t; ov.dataset.st = glow.dataset.st = st; };
     const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
     const cap = t => { if (capDone) { capEl.replaceChildren(); capDone = false; } const w = document.createElement('span'); w.textContent = t; capEl.appendChild(w); while (capEl.children.length > 60) capEl.firstChild.remove(); };
@@ -1759,18 +1805,23 @@ const rx = (() => {
       const s = cOut.createBufferSource(); s.buffer = ab; s.connect(cOut.destination);
       nextT = Math.max(nextT, cOut.currentTime + 0.04); const at = nextT; s.start(at); nextT += ab.duration; srcs.push(s);
       const lvl = Math.min(1, (pk / n) * 7); setTimeout(() => { if (on && !drop) tgt = Math.max(tgt, lvl); }, Math.max(0, (at - cOut.currentTime) * 1000));
-      s.onended = () => { srcs = srcs.filter(x => x !== s); }; if (st !== 'speaking') status('Speaking');
+      s.onended = () => { srcs = srcs.filter(x => x !== s); }; if (st !== 'speaking') { status('Speaking'); if (emo === 'think') setEmo('listen'); }
     }
     function onMsg(m) {
-      if (m.setupComplete) { ready = ever = true; tries = 0; status('Listening'); }
+      if (m.setupComplete) { ready = ever = true; tries = 0; status('Listening'); setEmo('happy'); calm(1600); }
       if (m.sessionResumptionUpdate && m.sessionResumptionUpdate.newHandle) handle = m.sessionResumptionUpdate.newHandle;
       if (m.goAway) { try { ws.close(); } catch {} }
       const c = m.serverContent; if (!c) return;
-      if (c.inputTranscription && c.inputTranscription.text) { drop = false; inTx += c.inputTranscription.text; youEl.textContent = inTx.trim().slice(-140); }
-      if (c.outputTranscription && c.outputTranscription.text && !drop) { outTx += c.outputTranscription.text; cap(c.outputTranscription.text); youEl.textContent = ''; }
-      if (c.interrupted) { flush(); capDone = true; flushTx(); status('Listening'); }
+      if (c.inputTranscription && c.inputTranscription.text) {
+        drop = false; inTx += c.inputTranscription.text; youEl.textContent = inTx.trim().slice(-140);
+        if (st === 'thinking') { status('Listening'); setEmo('listen'); }
+        const uf = /\b(thank|thanks|love you|good job|well done)/i.test(inTx.slice(-40)) ? 'love' : /\b(haha|lol)/i.test(inTx.slice(-30)) ? 'laugh' : null; if (uf) { setEmo(uf); calm(2200); }
+        clearTimeout(thinkT); thinkT = setTimeout(() => { if (on && st === 'listening' && inTx.trim()) { status('Thinking'); setEmo('think'); } }, 1100);
+      }
+      if (c.outputTranscription && c.outputTranscription.text && !drop) { outTx += c.outputTranscription.text; cap(c.outputTranscription.text); youEl.textContent = ''; const f = feel(outTx.slice(-110)); if (f) setEmo(f); }
+      if (c.interrupted) { flush(); capDone = true; flushTx(); status('Listening'); calm(900); }
       if (c.modelTurn) c.modelTurn.parts.forEach(p => { if (p.inlineData) play(p.inlineData.data); });
-      if (c.turnComplete) { drop = false; capDone = true; flushTx(); setTimeout(() => { if (on && !srcs.length && st === 'speaking') status('Listening'); }, 400); }
+      if (c.turnComplete) { drop = false; capDone = true; flushTx(); setTimeout(() => { if (on && !srcs.length && st === 'speaking') status('Listening'); }, 400); calm(1600); }
     }
     const ctxText = () => rules + ' This is a live voice call: answer in short, natural spoken sentences.' + (cur.history.length ? '\nRecent chat:\n' + cur.history.slice(-8).map(h => (h.role === 'user' ? 'User: ' : 'Rhomeo: ') + h.parts.map(p => p.text || '').join(' ').slice(0, 400)).join('\n') : '');
     async function connect() {
@@ -1787,7 +1838,7 @@ const rx = (() => {
     function retry() { // the link dropped or hit its time limit: reconnect with the saved handle so the conversation carries on
       ready = false; flush();
       if (++tries > 4) { end(); return note('The call dropped. Tap the button to start again.'); }
-      status('Reconnecting…'); setTimeout(() => { if (on) connect().catch(retry); }, 700 * tries);
+      status('Reconnecting…'); setEmo('think'); setTimeout(() => { if (on) connect().catch(retry); }, 700 * tries);
     }
     async function openMic() {
       mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
@@ -1806,14 +1857,14 @@ const rx = (() => {
       };
     }
     function showFace() { // the face rises out of the input bar into the screen
-      document.documentElement.style.setProperty('--ibt', (innerHeight - $('f').getBoundingClientRect().top + 8) + 'px'); ov.classList.remove('hidden'); glow.classList.add('on'); requestAnimationFrame(() => {
+      document.body.classList.add('incall'); document.documentElement.style.setProperty('--ibt', (innerHeight - $('f').getBoundingClientRect().top + 8) + 'px'); ov.classList.remove('hidden'); glow.classList.add('on'); requestAnimationFrame(() => {
         ov.classList.add('on');
         const fr = face.getBoundingClientRect(), dy = $('f').getBoundingClientRect().top - (fr.top + fr.height / 2);
         face.animate([{ transform: 'translate(-50%,-50%) translateY(' + dy + 'px) scale(.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) translateY(0) scale(1)', opacity: 1 }], { duration: 750, easing: 'cubic-bezier(.2,1.25,.3,1)', fill: 'both' });
       });
     }
     function hideFace() {
-      glow.classList.remove('on'); ov.classList.remove('on');
+      glow.classList.remove('on'); ov.classList.remove('on'); document.body.classList.remove('incall');
       const fr = face.getBoundingClientRect(), dy = $('f').getBoundingClientRect().top - (fr.top + fr.height / 2);
       face.animate([{ transform: 'translate(-50%,-50%) translateY(0) scale(1)', opacity: 1 }, { transform: 'translate(-50%,-50%) translateY(' + dy + 'px) scale(.2)', opacity: 0 }], { duration: 420, easing: 'ease-in', fill: 'both' });
       setTimeout(() => { if (!on) { ov.classList.add('hidden'); capEl.replaceChildren(); youEl.textContent = ''; } }, 450);
@@ -1823,7 +1874,7 @@ const rx = (() => {
       if (!navigator.onLine) return note('A live call needs a connection.');
       if (!window.isSecureContext || !navigator.mediaDevices) return note('Live calls need the site to be opened over https.');
       on = true; listening = true; muted = false; drop = false; capDone = false; ever = false; capEl.replaceChildren(); youEl.textContent = ''; $('rxmute').textContent = 'Mute';
-      syncSend(); stopSpeech(); status('Connecting…'); t0 = Date.now(); showFace();
+      syncSend(); stopSpeech(); emo = ov.dataset.emo = 'think'; status('Connecting…'); t0 = Date.now(); showFace();
       tick = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); q('.tm').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }, 500);
       lvT = setInterval(() => { lv += (tgt - lv) * 0.45; tgt *= 0.72; const v = lv.toFixed(3); ov.style.setProperty('--lv', v); glow.style.setProperty('--lv', v); }, 50);
       ctimer = setTimeout(() => { if (on && !ever) { end(); note('The live service didn’t answer. Check the edge function and model name.'); } }, 15000);
@@ -1837,7 +1888,7 @@ const rx = (() => {
       [cIn, cOut].forEach(c => { try { c && c.close(); } catch {} }); cIn = cOut = null; flush(); flushTx(); handle = null; tries = 0; tgt = lv = 0;
       hideFace(); syncSend();
     }
-    function interrupt() { if (!on) return; drop = true; flush(); capDone = true; status('Listening'); }
+    function interrupt() { if (!on) return; drop = true; flush(); capDone = true; status('Listening'); setEmo('wow'); calm(900); }
     $('rxend').onclick = end; $('rxint').onclick = interrupt;
     $('rxmute').onclick = () => { muted = !muted; $('rxmute').textContent = muted ? 'Unmute' : 'Mute'; ov.classList.toggle('muted', muted); };
     return { start, end };
