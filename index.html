@@ -86,6 +86,38 @@ html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none
 #rxvc .tm{color:var(--mute);font:500 .78rem var(--mono);min-width:2.4em}
 #rxvc b{background:var(--danger);color:#fff;border-radius:999px;padding:5px 12px;font-size:.78rem}
 @keyframes rxbr{0%,100%{transform:scale(.8);opacity:.7}50%{transform:scale(1.35);opacity:1}}
+
+#rxglow{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .6s;--lv:0;--g1:#4F6BFF;--g2:#2DD4A7;
+  box-shadow:inset 0 0 calc(34px + 70px*var(--lv)) calc(2px + 12px*var(--lv)) var(--g1),inset 0 0 calc(90px + 90px*var(--lv)) 0 var(--g2);animation:rxgl 3.4s ease-in-out infinite}
+#rxglow.on{opacity:.85}
+#rxglow[data-st=speaking]{--g1:#8B5CF6;--g2:#4F6BFF}
+#rxglow[data-st=connecting],#rxglow[data-st^=reconnecting]{--g1:#6b7280;--g2:#374151}
+@keyframes rxgl{0%,100%{filter:brightness(.85)}50%{filter:brightness(1.2)}}
+#rxcall{position:fixed;left:0;right:0;top:0;bottom:var(--ibt,112px);z-index:80;opacity:0;transition:opacity .45s;--lv:0;display:flex;flex-direction:column;align-items:center;background:linear-gradient(rgba(6,8,18,.86),rgba(6,8,18,.93));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff}
+#rxcall.on{opacity:1}#rxcall.hidden{display:none}
+#rxcall .rxtop{display:flex;align-items:center;gap:8px;margin-top:calc(18px + env(safe-area-inset-top));font-size:.85rem;color:rgba(255,255,255,.75)}
+#rxcall .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:rxbr 1.6s ease-in-out infinite}
+#rxcall[data-st=connecting] .dot{background:#9ca3af}
+#rxcall .tm{font:500 .8rem var(--mono);opacity:.7}
+#rxcall .face{position:absolute;left:50%;top:30%;width:min(46vw,190px);aspect-ratio:1;transform:translate(-50%,-50%)}
+#rxcall .face svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 36px rgba(122,108,255,.55));transform:scale(calc(1 + var(--lv)*.07));transition:transform .08s linear;animation:rxbob 4.5s ease-in-out infinite}
+.eye{transform-box:fill-box;transform-origin:center;animation:rxbl 4.2s infinite}
+#rxcall .talk{transform-box:fill-box;transform-origin:center;transform:scaleY(calc(.12 + var(--lv)*.95)) scaleX(calc(.7 + var(--lv)*.35));opacity:0;transition:opacity .2s}
+#rxcall .smile{transition:opacity .2s}
+#rxcall[data-st=speaking] .talk{opacity:1}#rxcall[data-st=speaking] .smile{opacity:0}
+#rxcall.muted .face svg{filter:grayscale(.8) drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+#rxcall .cap{position:absolute;left:0;right:0;top:calc(30% + min(23vw,95px) + 26px);bottom:96px;padding:0 24px;text-align:center;font:600 1.3rem/1.5 var(--disp);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;-webkit-mask-image:linear-gradient(#000 85%,transparent);mask-image:linear-gradient(#000 85%,transparent)}
+#rxcall .cap span{animation:rxin .35s ease-out both}
+#rxcall .you{position:absolute;left:0;right:0;bottom:78px;padding:0 24px;text-align:center;font-size:.85rem;color:rgba(255,255,255,.5);min-height:1.2em}
+#rxcall .ctl{position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:10px}
+#rxcall .ctl button{border-radius:999px;padding:11px 20px;font:600 .88rem var(--sans);background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.16)}
+#rxint{opacity:0;pointer-events:none;transform:scale(.9);transition:opacity .25s,transform .25s;background:var(--accent)!important;border-color:transparent!important}
+#rxcall[data-st=speaking] #rxint{opacity:1;pointer-events:auto;transform:none}
+#rxend{background:var(--danger)!important;border-color:transparent!important}
+@keyframes rxbob{0%,100%{translate:0 -4px}50%{translate:0 5px}}
+@keyframes rxbl{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes rxin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+html.rm #rxglow,html.rm #rxcall .face svg,html.rm .eye{animation:none}
 </style></noscript>
 <style>
 :root{
@@ -1689,15 +1721,23 @@ const rx = (() => {
     });
   }
 
-  /* ---------- 5. live call: Gemini Live API, audio streams both ways, you can interrupt ---------- */
+  /* ---------- 5. live call: Gemini Live API. Full-screen call with a talking face, glowing edges, interrupt ---------- */
   const LIVE_MODEL = 'gemini-3.1-flash-live-preview', LIVE_VOICE = 'Puck', LIVE_FN = SB_URL + '/functions/v1/live-token';
-  const bar = document.createElement('button'); bar.id = 'rxvc'; bar.type = 'button'; bar.className = 'hidden';
-  bar.innerHTML = '<i class="orb"></i><span class="st"></span><span class="tm"></span><b>End</b>'; document.body.appendChild(bar);
+  document.body.insertAdjacentHTML('beforeend',
+    '<div id="rxglow"></div><div id="rxcall" class="hidden" data-st="connecting"><div class="rxtop"><i class="dot"></i><span class="st">Connecting…</span><span class="tm">0:00</span></div>' +
+    '<div class="face"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="fg" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#A9B6FF"/><stop offset=".55" stop-color="#7B7CFF"/><stop offset="1" stop-color="#6A3FE0"/></radialGradient></defs>' +
+    '<circle cx="60" cy="60" r="56" fill="url(#fg)"/><ellipse cx="42" cy="49" rx="6" ry="8.5" fill="#fff" class="eye"/><ellipse cx="78" cy="49" rx="6" ry="8.5" fill="#fff" class="eye"/>' +
+    '<path class="smile" d="M36 74Q60 96 84 74" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><ellipse class="talk" cx="60" cy="80" rx="17" ry="12" fill="#2a1466"/></svg></div>' +
+    '<div class="cap" aria-live="polite"></div><div class="you"></div>' +
+    '<div class="ctl"><button type="button" id="rxmute">Mute</button><button type="button" id="rxint">Interrupt</button><button type="button" id="rxend">End</button></div></div>');
+  const ov = $('rxcall'), glow = $('rxglow'), face = ov.querySelector('.face'), capEl = ov.querySelector('.cap'), youEl = ov.querySelector('.you');
   const live = (() => {
-    let on = false, ready = false, ws = null, mic = null, cIn = null, cOut = null, nextT = 0, srcs = [], handle = null, tries = 0, inTx = '', outTx = '', t0 = 0, tick = 0, buf = [];
-    const q = s => bar.querySelector(s);
-    const status = t => { q('.st').textContent = t; bar.dataset.st = t.toLowerCase().replace(/\W/g, ''); };
+    let on = false, ready = false, ever = false, ws = null, mic = null, cIn = null, cOut = null, nextT = 0, srcs = [], handle = null, tries = 0, inTx = '', outTx = '', t0 = 0, tick = 0, buf = [];
+    let muted = false, drop = false, capDone = false, lv = 0, tgt = 0, lvT = 0, ctimer = 0, st = '';
+    const q = s => ov.querySelector(s);
+    const status = t => { st = t.toLowerCase().replace(/\W/g, ''); q('.st').textContent = t; ov.dataset.st = glow.dataset.st = st; };
     const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+    const cap = t => { if (capDone) { capEl.replaceChildren(); capDone = false; } const w = document.createElement('span'); w.textContent = t; capEl.appendChild(w); while (capEl.children.length > 60) capEl.firstChild.remove(); };
     async function token() {
       const { data: { session } } = await sb.auth.getSession();
       const r = await fetch(LIVE_FN, { method: 'POST', headers: { Authorization: 'Bearer ' + session.access_token, apikey: SB_KEY } });
@@ -1713,22 +1753,24 @@ const rx = (() => {
     }
     function flush() { srcs.forEach(s => { try { s.stop(); } catch {} }); srcs = []; nextT = 0; }
     function play(d) {
-      const raw = atob(d), n = raw.length >> 1, ab = cOut.createBuffer(1, n, 24000), ch = ab.getChannelData(0);
-      for (let i = 0; i < n; i++) { const v = raw.charCodeAt(2 * i) | (raw.charCodeAt(2 * i + 1) << 8); ch[i] = (v > 32767 ? v - 65536 : v) / 32768; }
+      if (drop) return;
+      const raw = atob(d), n = raw.length >> 1, ab = cOut.createBuffer(1, n, 24000), ch = ab.getChannelData(0); let pk = 0;
+      for (let i = 0; i < n; i++) { const v = raw.charCodeAt(2 * i) | (raw.charCodeAt(2 * i + 1) << 8); ch[i] = (v > 32767 ? v - 65536 : v) / 32768; pk += Math.abs(ch[i]); }
       const s = cOut.createBufferSource(); s.buffer = ab; s.connect(cOut.destination);
-      nextT = Math.max(nextT, cOut.currentTime + 0.04); s.start(nextT); nextT += ab.duration; srcs.push(s);
-      s.onended = () => { srcs = srcs.filter(x => x !== s); }; status('Speaking');
+      nextT = Math.max(nextT, cOut.currentTime + 0.04); const at = nextT; s.start(at); nextT += ab.duration; srcs.push(s);
+      const lvl = Math.min(1, (pk / n) * 7); setTimeout(() => { if (on && !drop) tgt = Math.max(tgt, lvl); }, Math.max(0, (at - cOut.currentTime) * 1000));
+      s.onended = () => { srcs = srcs.filter(x => x !== s); }; if (st !== 'speaking') status('Speaking');
     }
     function onMsg(m) {
-      if (m.setupComplete) { ready = true; tries = 0; status('Listening'); }
+      if (m.setupComplete) { ready = ever = true; tries = 0; status('Listening'); }
       if (m.sessionResumptionUpdate && m.sessionResumptionUpdate.newHandle) handle = m.sessionResumptionUpdate.newHandle;
       if (m.goAway) { try { ws.close(); } catch {} }
       const c = m.serverContent; if (!c) return;
-      if (c.inputTranscription) inTx += c.inputTranscription.text || '';
-      if (c.outputTranscription) outTx += c.outputTranscription.text || '';
-      if (c.interrupted) { flush(); flushTx(); status('Listening'); }
+      if (c.inputTranscription && c.inputTranscription.text) { drop = false; inTx += c.inputTranscription.text; youEl.textContent = inTx.trim().slice(-140); }
+      if (c.outputTranscription && c.outputTranscription.text && !drop) { outTx += c.outputTranscription.text; cap(c.outputTranscription.text); youEl.textContent = ''; }
+      if (c.interrupted) { flush(); capDone = true; flushTx(); status('Listening'); }
       if (c.modelTurn) c.modelTurn.parts.forEach(p => { if (p.inlineData) play(p.inlineData.data); });
-      if (c.turnComplete) { flushTx(); status('Listening'); }
+      if (c.turnComplete) { drop = false; capDone = true; flushTx(); setTimeout(() => { if (on && !srcs.length && st === 'speaking') status('Listening'); }, 400); }
     }
     const ctxText = () => rules + ' This is a live voice call: answer in short, natural spoken sentences.' + (cur.history.length ? '\nRecent chat:\n' + cur.history.slice(-8).map(h => (h.role === 'user' ? 'User: ' : 'Rhomeo: ') + h.parts.map(p => p.text || '').join(' ').slice(0, 400)).join('\n') : '');
     async function connect() {
@@ -1737,7 +1779,10 @@ const rx = (() => {
       w.onopen = () => w.send(JSON.stringify({ setup: { model: 'models/' + LIVE_MODEL, generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: LIVE_VOICE } } } },
         systemInstruction: { parts: [{ text: ctxText() }] }, inputAudioTranscription: {}, outputAudioTranscription: {}, contextWindowCompression: { slidingWindow: {} }, sessionResumption: handle ? { handle } : {} } }));
       w.onmessage = async e => { try { onMsg(JSON.parse(typeof e.data === 'string' ? e.data : await e.data.text())); } catch {} };
-      w.onclose = () => { if (ws === w && on) retry(); };
+      w.onclose = e => {
+        if (ws !== w || !on) return;
+        if (!ever) { end(); note('Couldn’t connect to the live service (code ' + e.code + (e.reason ? ': ' + e.reason.slice(0, 90) : '') + ').'); } else retry();
+      };
     }
     function retry() { // the link dropped or hit its time limit: reconnect with the saved handle so the conversation carries on
       ready = false; flush();
@@ -1752,31 +1797,51 @@ const rx = (() => {
       cIn.createMediaStreamSource(mic).connect(node); node.connect(mute); mute.connect(cIn.destination);
       const ratio = cIn.sampleRate / 16000;
       node.port.onmessage = e => {
-        for (let i = 0; i < e.data.length; i += ratio) buf.push(e.data[Math.floor(i)]);
+        let sq = 0; for (let i = 0; i < e.data.length; i++) sq += e.data[i] * e.data[i];
+        if (st === 'listening' && !muted) tgt = Math.max(tgt, Math.min(1, Math.sqrt(sq / e.data.length) * 9));
+        for (let i = 0; i < e.data.length; i += ratio) buf.push(muted ? 0 : e.data[Math.floor(i)]);
         if (buf.length < 1600) return;
         const pcm = new Int16Array(buf.length); buf.forEach((v, i) => { pcm[i] = Math.max(-1, Math.min(1, v)) * 32767; }); buf = [];
         if (ready && ws && ws.readyState === 1) ws.send(JSON.stringify({ realtimeInput: { audio: { data: b64(new Uint8Array(pcm.buffer)), mimeType: 'audio/pcm;rate=16000' } } }));
       };
     }
+    function showFace() { // the face rises out of the input bar into the screen
+      document.documentElement.style.setProperty('--ibt', (innerHeight - $('f').getBoundingClientRect().top + 8) + 'px'); ov.classList.remove('hidden'); glow.classList.add('on'); requestAnimationFrame(() => {
+        ov.classList.add('on');
+        const fr = face.getBoundingClientRect(), dy = $('f').getBoundingClientRect().top - (fr.top + fr.height / 2);
+        face.animate([{ transform: 'translate(-50%,-50%) translateY(' + dy + 'px) scale(.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) translateY(0) scale(1)', opacity: 1 }], { duration: 750, easing: 'cubic-bezier(.2,1.25,.3,1)', fill: 'both' });
+      });
+    }
+    function hideFace() {
+      glow.classList.remove('on'); ov.classList.remove('on');
+      const fr = face.getBoundingClientRect(), dy = $('f').getBoundingClientRect().top - (fr.top + fr.height / 2);
+      face.animate([{ transform: 'translate(-50%,-50%) translateY(0) scale(1)', opacity: 1 }, { transform: 'translate(-50%,-50%) translateY(' + dy + 'px) scale(.2)', opacity: 0 }], { duration: 420, easing: 'ease-in', fill: 'both' });
+      setTimeout(() => { if (!on) { ov.classList.add('hidden'); capEl.replaceChildren(); youEl.textContent = ''; } }, 450);
+    }
     async function start() {
       if (on) return;
       if (!navigator.onLine) return note('A live call needs a connection.');
       if (!window.isSecureContext || !navigator.mediaDevices) return note('Live calls need the site to be opened over https.');
-      on = true; listening = true; syncSend(); stopSpeech(); bar.classList.remove('hidden'); status('Connecting…'); t0 = Date.now();
+      on = true; listening = true; muted = false; drop = false; capDone = false; ever = false; capEl.replaceChildren(); youEl.textContent = ''; $('rxmute').textContent = 'Mute';
+      syncSend(); stopSpeech(); status('Connecting…'); t0 = Date.now(); showFace();
       tick = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); q('.tm').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }, 500);
+      lvT = setInterval(() => { lv += (tgt - lv) * 0.45; tgt *= 0.72; const v = lv.toFixed(3); ov.style.setProperty('--lv', v); glow.style.setProperty('--lv', v); }, 50);
+      ctimer = setTimeout(() => { if (on && !ever) { end(); note('The live service didn’t answer. Check the edge function and model name.'); } }, 15000);
       try { cOut = new AudioContext({ sampleRate: 24000 }); await openMic(); await connect(); }
-      catch (e) { end(); note(e && e.name === 'NotAllowedError' ? 'Microphone access is blocked. Allow it in your browser’s site settings.' : 'Couldn’t start the call. Check your connection and try again.'); }
+      catch (e) { end(); note(e && e.name === 'NotAllowedError' ? 'Microphone access is blocked. Allow it in your browser’s site settings.' : 'Couldn’t start the call: ' + (e && e.message ? e.message : 'check your connection') + '.'); }
     }
     function end() {
-      if (!on && !ws) return; on = false; ready = false; listening = false; clearInterval(tick); q('.tm').textContent = '';
+      if (!on && !ws) return; on = false; ready = false; listening = false; clearInterval(tick); clearInterval(lvT); clearTimeout(ctimer);
       const w = ws; ws = null; try { w && w.close(); } catch {}
       if (mic) mic.getTracks().forEach(t => t.stop()); mic = null; buf = [];
-      [cIn, cOut].forEach(c => { try { c && c.close(); } catch {} }); cIn = cOut = null; flush(); flushTx(); handle = null; tries = 0;
-      bar.classList.add('hidden'); syncSend();
+      [cIn, cOut].forEach(c => { try { c && c.close(); } catch {} }); cIn = cOut = null; flush(); flushTx(); handle = null; tries = 0; tgt = lv = 0;
+      hideFace(); syncSend();
     }
+    function interrupt() { if (!on) return; drop = true; flush(); capDone = true; status('Listening'); }
+    $('rxend').onclick = end; $('rxint').onclick = interrupt;
+    $('rxmute').onclick = () => { muted = !muted; $('rxmute').textContent = muted ? 'Unmute' : 'Mute'; ov.classList.toggle('muted', muted); };
     return { start, end };
   })();
-  bar.onclick = live.end;
 
   /* sheet buttons */
   const grid = document.querySelector('#sheet .sh-grid');
