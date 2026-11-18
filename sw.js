@@ -1,48 +1,46 @@
-const CACHE = 'rhomeo-v20';
-const CDN = [
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js',
-  'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
-  'https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js'
+/* Rhomeo service worker: offline app shell + safe runtime caching. Bump VERSION to roll out a new shell. */
+const VERSION = 'rhomeo-v1';
+const SHELL = VERSION + '-shell';
+const RUNTIME = VERSION + '-runtime';
+const PRECACHE = [
+  './', 'index.html', 'manifest.json',
+  'icons/favicon.svg', 'icons/favicon-32.png', 'icons/favicon-48.png', 'icons/apple-touch-icon.png',
+  'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-192.png', 'icons/icon-maskable-512.png',
+  'icons/rhomeo-logo.png', 'icons/rhomeo-wordmark.png'
 ];
-const LOCAL = ['./', './index.html', './manifest.json', './icons/favicon.svg', './icons/logo.svg', './icons/favicon-32.png', './icons/apple-touch-icon.png', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-192.png', './icons/icon-maskable-512.png'];
+const LIB_HOSTS = ['cdn.jsdelivr.net', 'unpkg.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => Promise.allSettled([...LOCAL, ...CDN].map(u => c.add(u)))));
-  self.skipWaiting();
+  e.waitUntil(caches.open(SHELL).then(c => Promise.all(PRECACHE.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== CACHE).map(x => caches.delete(x)))));
-  self.clients.claim();
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('rhomeo-') && k !== SHELL && k !== RUNTIME).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
+self.addEventListener('message', e => { if (e.data === 'skipWaiting') self.skipWaiting(); });
 
-const isFont = u => u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com';
+const put = (name, req, res) => { if (res && (res.ok || res.type === 'opaque')) { const copy = res.clone(); caches.open(name).then(c => c.put(req, copy)).catch(() => {}); } return res; };
 
 self.addEventListener('fetch', e => {
-  const r = e.request, u = new URL(r.url);
-  if (r.method !== 'GET' || u.hostname.endsWith('supabase.co')) return; // chat data always goes straight to the network
+  const req = e.request, url = new URL(req.url);
+  if (req.method !== 'GET') return;
+  // never touch the backend: auth, database, edge functions, realtime, uploads, anything with credentials
+  if (/supabase\.(co|in)$/.test(url.hostname) || url.pathname.includes('/functions/v1/') || url.pathname.includes('/auth/v1/') || req.headers.has('range')) return;
 
-  if (r.mode === 'navigate') { // page: fresh copy if the network answers within 2.5s, otherwise the saved copy (fast on bad networks)
-    e.respondWith((async () => {
-      const c = await caches.open(CACHE);
-      try {
-        const res = await Promise.race([fetch(r), new Promise((_, j) => setTimeout(j, 2500))]);
-        if (res && res.ok) c.put('./index.html', res.clone());
-        return res;
-      } catch { return (await c.match('./index.html')) || (await c.match('./')) || Response.error(); }
-    })());
+  // pages: network first (always fresh), fall back to the cached shell when offline
+  if (req.mode === 'navigate') {
+    e.respondWith(fetch(req).then(r => put(SHELL, 'index.html', r)).catch(() => caches.match('index.html').then(r => r || caches.match('./'))));
     return;
   }
-
-  // everything else: instant from cache, refreshed quietly in the background
-  e.respondWith((async () => {
-    const c = await caches.open(CACHE);
-    const hit = await c.match(r);
-    const net = fetch(r).then(res => {
-      // fonts come back "opaque" from other origins; they are safe to keep and make repeat visits instant
-      if (res && (res.ok || (isFont(u) && res.type === 'opaque'))) c.put(r, res.clone());
-      return res;
-    }).catch(() => hit);
-    if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
-    return net;
-  })());
+  // same-origin files (icons, manifest): cache first, refreshed in the background
+  if (url.origin === location.origin) {
+    e.respondWith(caches.match(req).then(hit => {
+      const net = fetch(req).then(r => put(SHELL, req, r)).catch(() => hit);
+      return hit || net;
+    }));
+    return;
+  }
+  // pinned CDN libraries and fonts: cache first (versioned URLs never change)
+  if (LIB_HOSTS.includes(url.hostname)) {
+    e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(r => put(RUNTIME, req, r))));
+  }
 });
