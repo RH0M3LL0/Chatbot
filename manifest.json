@@ -1,5 +1,4 @@
 {
-  "id": "/",
   "name": "Rhomeo",
   "short_name": "Rhomeo",
   "description": "Rhomeo: an AI coding assistant. Write, debug and understand code, faster.",
@@ -7,13 +6,11 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0A0A0C",
-  "theme_color": "#0A0A0C",
-  "categories": ["productivity", "developer", "utilities"],
+  "background_color": "#F3F4F4",
+  "theme_color": "#F3F4F4",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
     { "src": "icons/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]

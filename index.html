@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rhomeo">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0A0A0C">
+<meta name="theme-color" content="#0A0B0C">
 <script>
 /* runs first: applies theme, background and "lite" mode before anything paints (no flash, no wasted work on weak devices) */
 (function(){
@@ -23,7 +23,7 @@
   try{
     var pm=localStorage.getItem('rhomeo_tmode');var t=(pm==='light'||pm==='dark')?pm:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
     d.dataset.theme=t;
-    var m=document.querySelector('meta[name=theme-color]'); if(m) m.content=t==='light'?'#ffffff':'#0A0A0C';
+    var m=document.querySelector('meta[name=theme-color]'); if(m) m.content=t==='light'?'#F3F4F4':'#0A0B0C';
   }catch(e){}
   var weak=(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2);
   var slow=c.saveData||/(^|-)2g$/.test(c.effectiveType||'');
@@ -54,35 +54,42 @@ if('serviceWorker' in navigator){var regSW=function(){navigator.serviceWorker.re
   --tag:"Fira Code","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --msg:1.0625rem;
   --col:800px;
-  --bg:#0A0A0C;--s1:#111114;--s2:#17171B;--line:#222229;
-  --text:#E8EBF2;--mute:#8D93A1;
-  --accent:#E8791B;--link:#FFA24A;--onaccent:#1A0E03;--ok:#FFB45E;--good:#3CCB8F;--danger:#F85149;
-  --code:#07070A;--shadow:0 8px 30px rgba(0,0,0,.6);
-  --comp:#0F0F12;--ubub:#15161B;--sendbg:#B8600F;--sendfg:#FFF3E6;--tile:#131316;--tile2:#1D1E23;--tilehi:#1A1A1F;--sheet:#0E0E11;
-  --glow:radial-gradient(60% 50% at 50% 0%,rgba(247,143,55,.10),transparent 70%);
-  --orb1:rgba(246,135,39,.14);--orb2:rgba(193,105,27,.09);--orb3:rgba(247,149,68,.07);
-  --gridc:rgba(216,161,114,.06);--sweep:rgba(247,143,55,.12);--star:rgba(251,198,154,.8);--ring:rgba(247,143,55,.34);
-  --veil1:rgba(4,4,6,.38);--veil2:rgba(4,4,6,.64);--bub-a:rgba(14,15,19,.58);--bub-ab:rgba(226,171,124,.15);--bub-u:rgba(247,143,55,.20);--bub-ub:rgba(249,176,116,.30);
-  --stream:rgba(247,143,55,.17);--streamhi:#F89E54;--streamglow:rgba(247,143,55,.20);--node:rgba(249,176,116,.62);--nodehi:#FFC47A;
-  --t-kw:#FF7B72;--t-str:#FBCAA9;--t-num:#F9B075;--t-com:#7A8190;--t-fn:#FBCBA1;--t-var:#FFA657;--t-ok:#7EE787;
-  --lg:#E8791B;--logo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23E8791B' fill-rule='evenodd' d='M50 4a46 46 0 1 0 0 92a46 46 0 1 0 0-92ZM50 17.5a32.5 32.5 0 1 1 0 65a32.5 32.5 0 1 1 0-65Z'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23E8791B'/%3E%3C/svg%3E");
-  --pat-code:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240' font-family='monospace' font-size='20' fill='%23F9B175' fill-opacity='.10'%3E%3Ctext x='16' y='44'%3E%26lt;/%26gt;%3C/text%3E%3Ctext x='130' y='90'%3E%7B %7D%3C/text%3E%3Ctext x='52' y='150'%3E=%26gt;%3C/text%3E%3Ctext x='158' y='206'%3E%5B%5D%3C/text%3E%3Ctext x='96' y='226'%3E();%3C/text%3E%3Ctext x='176' y='36'%3E%23%3C/text%3E%3C/svg%3E");
+  /* brand hues, brightened for dark surfaces */
+  --cr:#FF5A5F;--cb:#4DA3FF;--cg:#34D08A;--cy:#FFD23F;
+  --w0:#FF4F55;--w1:#FF7A33;--w2:#FFA033;--w3:#FFB83D;--w4:#FFD670;
+  --bg:#0A0B0C;--s1:#111314;--s2:#1A1D1F;--line:#262A2D;
+  --text:#ECEFF0;--mute:#8F989D;
+  --accent:#4DA3FF;--link:#7DBEFF;--onaccent:#04111F;--ok:#8CC4FF;--good:#34D08A;--danger:#FF5A5F;
+  --code:#070809;--shadow:0 8px 30px rgba(0,0,0,.6);
+  --comp:#0F1112;--ubub:#1A1D1F;--sendbg:#1F5C9E;--sendfg:#EAF4FF;--tile:#131516;--tile2:#1E2123;--tilehi:#1A1D1F;--sheet:#0E1011;
+  --glow:radial-gradient(60% 50% at 50% 0%,rgba(77,163,255,.10),transparent 70%);
+  --orb1:rgba(77,163,255,.13);--orb2:rgba(255,90,95,.08);--orb3:rgba(255,210,63,.06);
+  --gridc:rgba(150,170,190,.06);--sweep:rgba(77,163,255,.12);--star:rgba(160,200,255,.8);--ring:rgba(77,163,255,.34);
+  --veil1:rgba(4,5,6,.38);--veil2:rgba(4,5,6,.64);--bub-a:rgba(14,16,18,.58);--bub-ab:rgba(140,160,180,.15);--bub-u:rgba(77,163,255,.20);--bub-ub:rgba(125,190,255,.30);
+  --stream:rgba(77,163,255,.17);--streamhi:#4DA3FF;--streamglow:rgba(77,163,255,.20);--node:rgba(125,190,255,.62);--nodehi:#A9D2FF;
+  --t-kw:#FF7B72;--t-str:#A5D6FF;--t-num:#6DB6FF;--t-com:#7A8288;--t-fn:#9CCBFF;--t-var:#FFA657;--t-ok:#7EE787;
+  --lg:#4DA3FF;
+  /* login page gradient + subtitle colour */
+  --a0:#3A1C2C;--a1:#5E2540;--a2:#8A2F55;--a3:#6A2A52;--a4:#3A2440;--a5:#1E1B24;--a6:#0C0C0F;--atx:rgba(255,255,255,.62);
+  --logo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 272 295'%3E%3Cpath d='M129.5 0L0 194L129.5 137.5Z M129.5 0L272 89L218.5 171.5Z M0 194L106 194.5L138 294.5Z M106 194.5L218.5 171.5L138 294.5Z'/%3E%3C/svg%3E");
 }
 [data-theme=light]{
   color-scheme:light;
-  --bg:#FFFFFF;--s1:#F6F8FA;--s2:#EAEEF2;--line:#D0D7DE;
-  --text:#1F2328;--mute:#59636E;
-  --accent:#C25E0A;--link:#C25E0A;--onaccent:#fff;--ok:#D9741A;--good:#0F9F7A;--danger:#CF222E;
-  --code:#F6F8FA;--shadow:0 8px 30px rgba(31,35,40,.10);
-  --comp:#FFFFFF;--ubub:#F1EFF0;--sendbg:#FDE5D1;--sendfg:#2F1D0C;--tile:#EDEDEC;--tile2:#E0E0DF;--tilehi:#FFFFFF;--sheet:#F9F8F6;
-  --glow:radial-gradient(60% 50% at 50% 0%,rgba(208,114,34,.08),transparent 70%);
-  --orb1:rgba(208,114,34,.12);--orb2:rgba(208,114,34,.07);--orb3:rgba(247,149,68,.07);
-  --gridc:rgba(31,35,40,.07);--sweep:rgba(208,114,34,.10);--star:rgba(208,114,34,.55);--ring:rgba(208,114,34,.28);
-  --veil1:rgba(58,39,22,.03);--veil2:rgba(58,39,22,.12);--bub-a:rgba(255,255,255,.74);--bub-ab:rgba(31,35,40,.10);--bub-u:rgba(208,114,34,.10);--bub-ub:rgba(208,114,34,.22);
-  --stream:rgba(208,114,34,.16);--streamhi:#E8791B;--streamglow:rgba(208,114,34,.14);--node:rgba(208,114,34,.5);--nodehi:#C25E0A;
-  --t-kw:#CF222E;--t-str:#65340E;--t-num:#A74E0C;--t-com:#6E7781;--t-fn:#8250DF;--t-var:#953800;--t-ok:#116329;
-  --lg:#C9650F;--logo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23C9650F' fill-rule='evenodd' d='M50 4a46 46 0 1 0 0 92a46 46 0 1 0 0-92ZM50 17.5a32.5 32.5 0 1 1 0 65a32.5 32.5 0 1 1 0-65Z'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23C9650F'/%3E%3C/svg%3E");
-  --pat-code:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240' font-family='monospace' font-size='20' fill='%23C25E0A' fill-opacity='.11'%3E%3Ctext x='16' y='44'%3E%26lt;/%26gt;%3C/text%3E%3Ctext x='130' y='90'%3E%7B %7D%3C/text%3E%3Ctext x='52' y='150'%3E=%26gt;%3C/text%3E%3Ctext x='158' y='206'%3E%5B%5D%3C/text%3E%3Ctext x='96' y='226'%3E();%3C/text%3E%3Ctext x='176' y='36'%3E%23%3C/text%3E%3C/svg%3E");
+  --cr:#E21920;--cb:#007ACF;--cg:#0B9D4D;--cy:#FBBF0D;
+  --w0:#E21D22;--w1:#E94A00;--w2:#F08000;--w3:#EF9E20;--w4:#ECBC50;
+  --bg:#F3F4F4;--s1:#FFFFFF;--s2:#E8EBEB;--line:#D3D8D8;
+  --text:#181A1B;--mute:#586064;
+  --accent:#0078D4;--link:#0067B8;--onaccent:#fff;--ok:#2B8CE0;--good:#0B8A44;--danger:#D4151C;
+  --code:#EAEDED;--shadow:0 8px 30px rgba(24,26,27,.12);
+  --comp:#FFFFFF;--ubub:#E8EBEB;--sendbg:#BFDDF7;--sendfg:#06223D;--tile:#E8EAEA;--tile2:#DADFDF;--tilehi:#FFFFFF;--sheet:#F7F8F8;
+  --glow:radial-gradient(60% 50% at 50% 0%,rgba(0,122,207,.07),transparent 70%);
+  --orb1:rgba(0,122,207,.10);--orb2:rgba(226,25,32,.06);--orb3:rgba(251,191,13,.08);
+  --gridc:rgba(24,26,27,.07);--sweep:rgba(0,122,207,.10);--star:rgba(0,122,207,.55);--ring:rgba(0,122,207,.28);
+  --veil1:rgba(20,30,40,.03);--veil2:rgba(20,30,40,.12);--bub-a:rgba(255,255,255,.74);--bub-ab:rgba(24,26,27,.10);--bub-u:rgba(0,122,207,.10);--bub-ub:rgba(0,122,207,.22);
+  --stream:rgba(0,122,207,.16);--streamhi:#007ACF;--streamglow:rgba(0,122,207,.14);--node:rgba(0,122,207,.5);--nodehi:#0078D4;
+  --t-kw:#CF222E;--t-str:#0A3069;--t-num:#0550AE;--t-com:#6E7781;--t-fn:#8250DF;--t-var:#953800;--t-ok:#116329;
+  --lg:#007ACF;
+  --a0:#FFF6EC;--a1:#FFE3D0;--a2:#FFB9B0;--a3:#EE7FA0;--a4:#8A6A88;--a5:#403A48;--a6:#1C1C22;--atx:rgba(70,40,52,.66);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -120,8 +127,8 @@ html.tx *{transition:background-color .3s,border-color .3s,color .3s,fill .3s!im
 @keyframes wmreveal{from{clip-path:inset(-12% 100% -12% 0)}to{clip-path:inset(-12% 0 -12% 0)}}
 @keyframes glint{0%,55%{background-position:150% 0}88%,100%{background-position:-50% 0}}
 @keyframes lshadow{50%{transform:scaleX(.68);opacity:.45}}
-@keyframes pa{50%{transform:translateX(-2.5px)}}
-@keyframes pb{50%{transform:translateX(2.5px)}}
+@keyframes pa{50%{transform:translateX(-10px)}}
+@keyframes pb{50%{transform:translateX(10px)}}
 @keyframes noteup{from{opacity:0;transform:translateY(10px) scale(.96)}}
 @keyframes wavedot{0%,60%,100%{transform:translateY(0) scale(.85);opacity:.5}30%{transform:translateY(-6px) scale(1.15);opacity:1}}
 @keyframes txshine{from{background-position:100% 0}to{background-position:-100% 0}}
@@ -129,11 +136,8 @@ html.tx *{transition:background-color .3s,border-color .3s,color .3s,fill .3s!im
 @keyframes pulsering{0%{transform:scale(.92);opacity:.8}100%{transform:scale(1.55);opacity:0}}
 
 /* ---------- brand: gradient wordmark, typed tagline, floating logo ---------- */
-.wm{display:inline-block;font-family:var(--disp);font-weight:800;letter-spacing:-.035em;background:linear-gradient(105deg,var(--accent) 0%,var(--ok) 32%,color-mix(in srgb,var(--ok) 72%,#fff) 46%,var(--ok) 60%,var(--accent) 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:wmflow 5s ease-in-out infinite alternate}
-.wm.rv{animation:wmreveal 1s steps(6,end) both,wmflow 5s ease-in-out 1s infinite alternate}
 .tg{font-family:var(--tag);color:var(--ok);letter-spacing:.01em}
 .typing::after{content:"";display:inline-block;width:.5em;height:1.05em;margin-left:2px;background:var(--ok);vertical-align:-.18em;border-radius:1px;animation:blink 1s steps(2,start) infinite}
-html.rm .wm,html.rm .wm.rv{animation:none;clip-path:none}
 .logo{width:32px;height:32px;flex-shrink:0;display:block}
 
 /* ---------- background layer ---------- */
@@ -170,36 +174,36 @@ html.paused #bg i,html.paused #bg i::before,html.paused #bg i::after{animation-p
 html.rm .lfl,html.rm .p1,html.rm .p2,html.rm .glint,html.rm .lshadow,html.rm .bootlogo .logo,html.rm .bootlogo .glow,html.rm .brand .logo,html.rm #boot::before,html.rm .ring{animation:none}
 html.lite .glint,html.lite .p1,html.lite .p2,html.lite #boot::before{animation:none}
 
-/* ---------- boot splash ---------- */
-#boot{position:fixed;inset:0;z-index:100;background:var(--glow),var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;overflow:hidden;transition:opacity .4s ease,visibility .4s}
-#boot::before{content:"";position:absolute;inset:-25%;background:radial-gradient(38% 32% at 28% 30%,var(--orb1),transparent 70%),radial-gradient(34% 30% at 74% 70%,var(--orb2),transparent 70%),radial-gradient(30% 26% at 72% 24%,var(--orb3),transparent 70%);animation:bootdrift 14s ease-in-out infinite alternate;will-change:transform}
-#boot>*{position:relative}
+/* ---------- boot splash: the logo tumbles in, then RHOMEO writes itself under it ---------- */
+@keyframes tumble{from{opacity:0;transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(.35)}55%{opacity:1}}
+@keyframes gapglow{0%{opacity:0;transform:scale(.6)}40%{opacity:1;transform:scale(1.05)}100%{opacity:0;transform:scale(1)}}
+@keyframes lpulse{40%{transform:scale(1.045)}}
+@keyframes draw{0%{stroke-dasharray:1;stroke-dashoffset:1;opacity:0}3%{opacity:1}100%{stroke-dasharray:1;stroke-dashoffset:0;opacity:1}}
+#boot{position:fixed;inset:0;z-index:100;background:var(--glow),var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;overflow:hidden;transition:opacity .4s ease,visibility .4s}
 #boot.gone{opacity:0;visibility:hidden;pointer-events:none;z-index:40;transition:opacity .6s ease .05s,visibility 0s linear .7s}
-.bootlogo{position:relative;width:112px;height:112px;display:grid;place-items:center;margin-bottom:6px}
-.bootlogo .glow{position:absolute;inset:-28px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 20%,transparent),color-mix(in srgb,var(--ok) 6%,transparent) 62%,transparent);animation:glowpulse 2.6s ease-in-out infinite}
-.bootlogo .track{position:absolute;inset:0;border-radius:50%;border:2px solid color-mix(in srgb,var(--text) 9%,transparent)}
-.bootlogo .logo{position:relative;width:56px;height:56px;animation:lfloat 3.6s ease-in-out infinite;filter:drop-shadow(0 10px 22px color-mix(in srgb,var(--accent) 50%,transparent))}
-.ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 40%,var(--accent) 78%,var(--ok) 100%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:spin 1.5s linear infinite}
-.bootname{font-size:clamp(1.8rem,8vw,2.4rem);line-height:1.15}
-.bootsig{position:absolute;left:0;right:0;bottom:calc(9vh + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:6px}
-#boot .tg{font-size:.92rem;min-height:1.6em;margin-top:-4px}
-.bootbar{width:168px;height:3px;background:color-mix(in srgb,var(--text) 10%,transparent);border-radius:3px;overflow:hidden;margin-top:6px}
-.bootbar i{display:block;width:30%;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--ok));box-shadow:0 0 12px var(--accent);animation:indet 1.2s ease-in-out infinite}
-#bootmsg{font-size:.82rem;color:var(--mute);min-height:1.3em;max-width:320px}
+.bootstage{--bl:clamp(96px,26vmin,150px);display:flex;flex-direction:column;align-items:center;margin-top:-3vh}
+.bootlogo{display:block;width:var(--bl);height:calc(var(--bl)*1.0845);overflow:visible;transform-origin:50% 55%;animation:lpulse .8s ease-out 1.45s}
+.bootlogo .t{transform-box:fill-box;transform-origin:center;animation:tumble 1.1s cubic-bezier(.22,1.2,.36,1) calc(var(--d)*1s) backwards}
+.bootlogo .gap{transform-box:fill-box;transform-origin:center;opacity:0;animation:gapglow 1.1s ease-out 1.25s}
+.bootwm{display:block;width:calc(var(--bl)*2.06);height:calc(var(--bl)*2.06*.1571);margin-top:calc(var(--bl)*.2);overflow:visible}
+.bootwm .stk{animation:draw .75s cubic-bezier(.5,.1,.3,1) calc(1.55s + var(--i)*.19s + var(--j)*.1s) backwards}
+#bootmsg{font-size:.82rem;color:var(--mute);min-height:1.3em;max-width:320px;margin-top:20px}
+#bootretry{margin-top:14px}
+html.rm .bootlogo,html.rm .bootlogo .t,html.rm .bootlogo .gap,html.rm .bootwm .stk{animation:none}
 
 /* ---------- sign in ---------- */
-#auth{position:fixed;inset:0;display:flex;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));z-index:50;overflow-y:auto}
+@keyframes arise{from{opacity:0;transform:translateY(18px)}}
+#auth{--al:clamp(70px,11.5vh,92px);position:fixed;inset:0;z-index:50;display:flex;overflow-y:auto;overscroll-behavior:contain;color:#fff;background:linear-gradient(180deg,var(--a0) 0%,var(--a1) 15%,var(--a2) 28%,var(--a3) 38%,var(--a4) 47%,var(--a5) 58%,var(--a6) 100%);background-attachment:local}
 body:not(.out) #auth{display:none}
-#auth form{width:100%;max-width:400px;margin:auto;display:flex;flex-direction:column;gap:11px;background:var(--s1);border:1px solid var(--line);border-radius:24px;padding:22px 22px 20px;box-shadow:var(--shadow);animation:up .45s ease-out;position:relative;overflow:hidden}
-#auth form::before{content:"";position:absolute;left:0;right:0;top:0;height:140px;background:var(--glow);pointer-events:none}
-#auth form>*{position:relative}
-.authbrand{display:flex;justify-content:center;margin-bottom:2px}
-.authsig{display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
-.authsig .wm{font-size:2.1rem;line-height:1.15;padding:0 .08em}.authsig small{font-size:.74rem;min-height:1.3em}
-.authbrand .logo{width:60px;height:60px;filter:drop-shadow(0 8px 22px color-mix(in srgb,var(--accent) 50%,transparent))}
-#auth h1{font-family:var(--disp);font-size:1.25rem;margin-top:8px;line-height:1.15;letter-spacing:-.02em;text-align:center}
-.tag{font-size:.8rem;margin-top:6px;min-height:1.4em}
-#auth p{color:var(--mute);font-size:.85rem;line-height:1.45;text-align:center}
+#auth form{width:100%;max-width:400px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:max(34px,calc(env(safe-area-inset-top) + 22px)) 30px max(16px,env(safe-area-inset-bottom))}
+.authhead{display:flex;flex-direction:column;align-items:center;padding-top:clamp(4px,4.5vh,40px)}
+.authlogo{display:block;width:var(--al);height:calc(var(--al)*1.0845)}
+.authwm{display:block;width:calc(var(--al)*2.06);height:calc(var(--al)*2.06*.1571);margin-top:calc(var(--al)*.2)}
+#auth-title{margin-top:18px;font-family:var(--disp);font-size:.68rem;font-weight:600;letter-spacing:.36em;text-transform:uppercase;color:var(--atx);text-align:center}
+.afields{margin-top:auto;padding-top:30px;display:flex;flex-direction:column;gap:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* page-wide form controls (also used by the profile panel) */
 input,textarea{background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 14px;font:inherit;width:100%}
 input:focus,textarea:focus{border-color:var(--accent);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
 ::placeholder{color:var(--mute);opacity:.8}
@@ -207,52 +211,55 @@ input:focus,textarea:focus{border-color:var(--accent);outline:0;box-shadow:0 0 0
 .btn:hover{filter:brightness(1.08)}
 .btn:disabled{opacity:.6}
 .btn.loading{color:transparent;pointer-events:none}
-.btn.loading::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.btn.loading::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:2px solid color-mix(in srgb,var(--onaccent) 35%,transparent);border-top-color:var(--onaccent);border-radius:50%;animation:spin .7s linear infinite}
 .link{color:var(--link);text-align:left;font-size:.92rem}
 .link:hover{text-decoration:underline}
-#auth-err{color:var(--danger);font-size:.86rem;line-height:1.4;text-align:left}
-#auth-err:empty{display:none}
-.authhead{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:2px}
-#auth .authhead p{max-width:30ch}
-.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:46px;padding:9px 18px;border-radius:12px;font-weight:600;font-size:.95rem;position:relative;background:#fff;color:#1f1f1f;border:1px solid #dadce0}
-.gbtn:hover{background:#f7f8f8;box-shadow:0 1px 3px rgba(0,0,0,.18)}
-[data-theme=dark] .gbtn{background:#131314;color:#e3e3e3;border-color:#8e918f}
-[data-theme=dark] .gbtn:hover{background:#1c1d1f;box-shadow:none}
-.gbtn svg{width:20px;height:20px;flex:none}
-.gbtn:disabled{opacity:.65;cursor:default}
-.gbtn.loading span,.gbtn.loading svg{opacity:0}
-.gbtn.loading::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:2px solid color-mix(in srgb,currentColor 25%,transparent);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite}
-.adiv{display:flex;align-items:center;gap:12px;color:var(--mute);font-size:.78rem}
-.adiv::before,.adiv::after{content:"";flex:1;height:1px;background:var(--line)}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:14px}
-.seg button{padding:8px 8px;border-radius:10px;font-size:.9rem;font-weight:600;color:var(--mute)}
-.seg button:hover{color:var(--text)}
-.seg button[aria-selected=true]{background:var(--s2);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.25)}
-.afield{display:flex;flex-direction:column;gap:6px}
-.afield>label{font-size:.8rem;font-weight:600;color:var(--mute);letter-spacing:.01em}
-.aiw{position:relative;display:flex;align-items:center}
-.aiw>svg{position:absolute;left:13px;width:18px;height:18px;color:var(--mute);pointer-events:none;transition:color .15s}
-.aiw:focus-within>svg{color:var(--accent)}
-.aiw input{padding:11px 14px 11px 40px;font-size:16px;border-radius:12px}
-.aiw input#pw{padding-right:46px}
-.peye{position:absolute;right:4px;width:40px;height:40px;display:grid;place-items:center;color:var(--mute);border-radius:10px}
-.peye:hover{color:var(--text)}
+
+/* login fields: borderless, underlined, spaced capitals */
+.aiw{display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.38);transition:border-color .2s}
+.aiw:focus-within{border-bottom-color:#fff}
+.ai{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;color:rgba(255,255,255,.78);transition:background .2s,color .2s}
+.ai svg{width:17px;height:17px}
+.aiw:focus-within .ai{background:rgba(228,219,255,.92);color:#3B2D63}
+#auth input{background:none;border:0;border-radius:0;box-shadow:none!important;padding:14px 0;color:#fff;font-size:16px;letter-spacing:.04em;min-width:0;flex:1}
+#auth input::placeholder{color:rgba(255,255,255,.72);opacity:1;text-transform:uppercase;letter-spacing:.2em;font-size:.74rem;font-weight:600}
+#auth input:-webkit-autofill{-webkit-text-fill-color:#fff;caret-color:#fff;transition:background-color 99999s ease-in-out 0s}
+.peye{width:38px;height:38px;display:grid;place-items:center;flex:none;border-radius:50%;color:rgba(255,255,255,.72)}
+.peye:hover{color:#fff}
 .peye svg{width:19px;height:19px}
 .peye .off{display:none}
 .peye[aria-pressed=true] .on{display:none}.peye[aria-pressed=true] .off{display:inline}
-#auth-go{min-height:46px;border-radius:12px;font-size:.95rem;box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 35%,transparent)}
-#auth-err.ok{color:var(--good)}
-.alabel{display:flex;justify-content:space-between;align-items:baseline}
-.flink{font-size:.8rem;font-weight:600;color:var(--link)}
-.flink:hover{text-decoration:underline}
+#auth-err{font-size:.82rem;line-height:1.45;text-align:center;color:#FFC7C3;margin-top:4px}
+#auth-err:empty{display:none}
+#auth-err.ok{color:#A4F4CC}
+#auth-go{margin-top:12px;min-height:50px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(224,218,238,.94));color:#2B2540;font-weight:700;font-size:.82rem;letter-spacing:.24em;text-transform:uppercase;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+#auth-go:hover{filter:none;background:#fff}
+#auth-go.loading::after{border-color:rgba(43,37,64,.25);border-top-color:#2B2540}
+.flink{align-self:center;font-size:.78rem;letter-spacing:.04em;color:rgba(255,255,255,.74);padding:8px}
+.flink:hover{color:#fff;text-decoration:underline}
+.adiv{display:flex;align-items:center;gap:14px;color:rgba(255,255,255,.6);font-size:.68rem;letter-spacing:.24em;text-transform:uppercase}
+.adiv::before,.adiv::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.26)}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:48px;padding:8px 18px;border-radius:999px;font-weight:600;font-size:.86rem;letter-spacing:.05em;position:relative;color:#fff;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.42);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.gbtn:hover{background:rgba(255,255,255,.26)}
+.gbtn svg{width:24px;height:24px;flex:none;background:#fff;border-radius:50%;padding:3px}
+.gbtn:disabled{opacity:.65;cursor:default}
+.gbtn.loading span,.gbtn.loading svg{opacity:0}
+.gbtn.loading::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.abottom{margin-top:24px;text-align:center;display:flex;flex-direction:column;gap:10px}
+.abottom .sw{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.64)}
+#auth-switch{color:#fff;font-weight:700;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;padding:6px 4px;margin-left:4px}
+#auth-switch:hover{text-decoration:underline}
+.alegal{font-size:.66rem;text-align:center;color:rgba(255,255,255,.42);line-height:1.5}
 #auth-form.up #forgot{display:none}
-#auth-form.reset .gbtn,#auth-form.reset .adiv,#auth-form.reset .seg,#auth-form.reset #f-email,#auth-form.reset #forgot{display:none}
-.fly{position:fixed;margin:0;padding:0;z-index:120;pointer-events:none;transform-origin:50% 50%;will-change:transform;white-space:nowrap}
-.ripple{position:fixed;z-index:119;pointer-events:none;border:2px solid var(--accent);border-radius:50%;will-change:transform,opacity}
-.fly.wm{animation:none}
-#boot.gone::before,#boot.gone .bootlogo .logo,#boot.gone .bootlogo .glow,#boot.gone .ring{animation-play-state:paused}
+#auth-form.fp #f-pw,#auth-form.fp .gbtn,#auth-form.fp .adiv,#auth-form.fp #forgot{display:none}
+#auth-form.reset .gbtn,#auth-form.reset .adiv,#auth-form.reset #f-email,#auth-form.reset #forgot,#auth-form.reset #auth-switchline{display:none}
+/* the fields rise in one by one once the splash has morphed into this page */
+#auth .stag{opacity:0}
+#auth.rise .stag{opacity:1;animation:arise .65s cubic-bezier(.2,.85,.25,1) calc(.4s + var(--i)*.09s) backwards}
+html.rm #auth .stag{opacity:1;animation:none}
+.fly{position:fixed;margin:0!important;padding:0;z-index:120;pointer-events:none;transform-origin:50% 50%;will-change:transform;white-space:nowrap}
+.fly,.fly *{animation:none!important}
 body.enter #auth{display:flex!important;pointer-events:none}
-.alegal{font-size:.74rem;text-align:center;color:var(--mute);line-height:1.5}
 body.out aside,body.out main{visibility:hidden}
 
 /* ---------- sidebar ---------- */
@@ -278,7 +285,6 @@ body.collapsed aside{margin-left:-284px}
 @media(hover:hover){.row .x{opacity:0}.row:hover .x,.row .x:focus-visible{opacity:1}}
 .foot{padding:6px 6px 0;display:flex;flex-direction:column;gap:10px;font-size:.86rem;color:var(--mute)}
 .sig{display:flex;flex-direction:column;gap:3px;padding:12px 8px 2px;border-top:1px solid var(--line)}
-.sig .wm{font-size:1.3rem;align-self:flex-start}
 .sig small{font-size:.62rem;min-height:1.3em;white-space:nowrap}
 .foot:not(:has(button:not(.hidden))){display:none}
 .foot button:hover{color:var(--text);background:var(--s2)}
@@ -322,7 +328,6 @@ header h2{flex:1;min-width:0;text-align:center;font-size:.88rem;font-weight:500;
 .menu button[aria-checked=true] svg{opacity:1}
 button.modebtn{margin:0;display:flex;align-items:center;gap:8px;background:none;border:0;border-radius:12px;padding:8px 10px;font-family:var(--sans);font-size:1.1rem;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
 .modebtn .ml{font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:0;color:var(--mute);background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
-.modebtn .wm{font-size:1.15rem;font-weight:800}
 .modebtn[data-mode=smart] .ml{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
 .modebtn[data-mode=fast] .ml{color:var(--ok)}
 .modebtn>svg{width:16px;height:16px;color:var(--mute)}
@@ -433,7 +438,7 @@ form#f:focus-within{box-shadow:0 12px 38px rgba(155,96,45,.22),0 0 0 1.5px color
 #attach:hover{background:color-mix(in srgb,var(--text) 8%,transparent)}
 #attach svg{width:26px;height:26px}
 #send{background:var(--sendbg);color:var(--sendfg);transition:background-color .3s,color .3s,transform .1s}
-#send[data-s=mic],#send[data-s=rec]{color:#fff}
+#send[data-s=mic]{color:var(--onaccent)}#send[data-s=rec]{color:#fff}
 #send[data-s=rec]{background:var(--danger)}
 #send[data-s=rec]::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--danger);animation:pulsering 1.3s ease-out infinite;pointer-events:none}
 #send .ic{z-index:1;position:absolute;left:50%;top:50%;width:23px;height:23px;margin:-11.5px 0 0 -11.5px;opacity:0;transform:rotate(-70deg) scale(.3);transition:transform .38s cubic-bezier(.3,1.5,.5,1),opacity .22s;pointer-events:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -506,7 +511,7 @@ html.rm #send[data-s=rec]::before{animation:none}
 .tt.show{opacity:1}
 
 
-.chips button i.ci{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+.chips button i.ci{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px;background:color-mix(in srgb,var(--c) 16%,transparent);color:color-mix(in srgb,var(--c) 70%,var(--text))}
 .chips button i.ci svg{width:19px;height:19px}
 html.lite .chips button,html.lite form#f{-webkit-backdrop-filter:none;backdrop-filter:none}
 /* calmer background in the default mix */
@@ -624,7 +629,7 @@ html.rm #modesw,html.rm #modesw .knob,html.rm #modesw .si{transition:none}
 .rxrow{display:flex;gap:8px;align-items:center;margin:6px 0}.rxrow span{flex:1;font-size:.88rem;word-break:break-word}
 .rxrow input{flex:1;min-width:0;background:var(--s2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;font-size:.88rem}
 
-#send::after{content:"";position:absolute;inset:0;border-radius:50%;z-index:0;pointer-events:none;background:linear-gradient(135deg,#D87926 0%,#E8791B 55%,#FFB45E 100%);opacity:0;transform:rotate(0);transition:opacity .35s}
+#send::after{content:"";position:absolute;inset:0;border-radius:50%;z-index:0;pointer-events:none;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 78%,#000) 0%,var(--accent) 55%,color-mix(in srgb,var(--accent) 55%,#fff) 100%);opacity:0;transform:rotate(0);transition:opacity .35s}
 #send[data-s=mic]::after{opacity:1;animation:rxspin 9s linear infinite}
 #send[data-s=mic]{animation:rxpop .4s cubic-bezier(.3,1.6,.5,1),rxglow 3.2s ease-in-out .4s infinite}
 #send[data-s=send]{animation:rxpop .4s cubic-bezier(.3,1.6,.5,1)}
@@ -634,31 +639,31 @@ html.rm #modesw,html.rm #modesw .knob,html.rm #modesw .si{transition:none}
 #send:not([data-s=mic]):not([data-s=rec]) .w{animation-play-state:paused}
 @keyframes rxwv{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.15)}}
 @keyframes rxpop{0%{transform:scale(.78)}100%{transform:scale(1)}}
-@keyframes rxglow{0%,100%{box-shadow:0 0 0 0 rgba(247,143,55,0),0 4px 14px rgba(247,143,55,.30)}50%{box-shadow:0 0 0 6px rgba(247,143,55,.14),0 4px 18px rgba(247,143,55,.45)}}
+@keyframes rxglow{0%,100%{box-shadow:0 0 0 0 transparent,0 4px 14px color-mix(in srgb,var(--accent) 30%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 14%,transparent),0 4px 18px color-mix(in srgb,var(--accent) 45%,transparent)}}
 @keyframes rxspin{to{transform:rotate(360deg)}}
 html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none}
 #rxvc{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--s1) 88%,transparent);color:var(--text);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:9px 10px 9px 14px}
-#rxvc .orb{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,#E8791B,#FFB45E);animation:rxbr 1.6s ease-in-out infinite}
-#rxvc[data-st=speaking] .orb{background:linear-gradient(135deg,#FFB45E,#E8791B);animation-duration:.6s}
+#rxvc .orb{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--ok));animation:rxbr 1.6s ease-in-out infinite}
+#rxvc[data-st=speaking] .orb{background:linear-gradient(135deg,var(--cy),var(--cr));animation-duration:.6s}
 #rxvc[data-st^=reconnecting] .orb,#rxvc[data-st^=connecting] .orb{background:var(--mute)}
 #rxvc .tm{color:var(--mute);font:500 .78rem var(--mono);min-width:2.4em}
 #rxvc b{background:var(--danger);color:#fff;border-radius:999px;padding:5px 12px;font-size:.78rem}
 @keyframes rxbr{0%,100%{transform:scale(.8);opacity:.7}50%{transform:scale(1.35);opacity:1}}
 
-#rxglow{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .6s;--lv:0;--g1:#E8791B;--g2:#7B4516;
+#rxglow{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .6s;--lv:0;--g1:var(--accent);--g2:color-mix(in srgb,var(--accent) 35%,#000);
   box-shadow:inset 0 0 calc(34px + 70px*var(--lv)) calc(2px + 12px*var(--lv)) var(--g1),inset 0 0 calc(90px + 90px*var(--lv)) 0 var(--g2);animation:rxgl 3.4s ease-in-out infinite}
 #rxglow.on{opacity:.85}
-#rxglow[data-st=speaking]{--g1:#FFB45E;--g2:#E8791B}
+#rxglow[data-st=speaking]{--g1:var(--cy);--g2:var(--cr)}
 #rxglow[data-st=connecting],#rxglow[data-st^=reconnecting]{--g1:#6b7280;--g2:#504338}
 @keyframes rxgl{0%,100%{filter:brightness(.85)}50%{filter:brightness(1.2)}}
-#rxcall{position:fixed;left:0;right:0;top:0;bottom:var(--ibt,112px);z-index:80;opacity:0;transition:opacity .45s;--lv:0;display:flex;flex-direction:column;align-items:center;background:radial-gradient(70% 42% at 50% 30%,rgba(247,143,55,.16),transparent 75%);color:var(--text)}
+#rxcall{position:fixed;left:0;right:0;top:0;bottom:var(--ibt,112px);z-index:80;opacity:0;transition:opacity .45s;--lv:0;display:flex;flex-direction:column;align-items:center;background:radial-gradient(70% 42% at 50% 30%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 75%);color:var(--text)}
 #rxcall.on{opacity:1}#rxcall.hidden{display:none}
 #rxcall .rxtop{display:flex;align-items:center;gap:8px;margin-top:calc(18px + env(safe-area-inset-top));font-size:.85rem;color:var(--mute)}
 #rxcall .dot{width:8px;height:8px;border-radius:50%;background:var(--good);animation:rxbr 1.6s ease-in-out infinite}
 #rxcall[data-st=connecting] .dot{background:#9ca3af}
 #rxcall .tm{font:500 .8rem var(--mono);opacity:.7}
 #rxcall .face{position:absolute;left:50%;top:30%;width:min(46vw,190px);aspect-ratio:1;transform:translate(-50%,-50%)}
-#rxcall .face svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 36px rgba(249,186,114,.55));transform:scale(calc(1 + var(--lv)*.07));transition:transform .08s linear;animation:rxbob 4.5s ease-in-out infinite}
+#rxcall .face svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 36px color-mix(in srgb,var(--accent) 55%,transparent));transform:scale(calc(1 + var(--lv)*.07));transition:transform .08s linear;animation:rxbob 4.5s ease-in-out infinite}
 .eye{transform-box:fill-box;transform-origin:center;animation:rxbl 4.2s infinite}
 #rxcall .talk{transform-box:fill-box;transform-origin:center;transform:scaleY(calc(.12 + var(--lv)*.95)) scaleX(calc(.7 + var(--lv)*.35));opacity:0;transition:opacity .2s}
 #rxcall .smile{transition:opacity .2s}
@@ -678,7 +683,7 @@ html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none
 html.rm #rxglow,html.rm #rxcall .face svg,html.rm .eye{animation:none}
 header,#msgs{transition:transform .7s cubic-bezier(.7,0,.25,1),opacity .55s}
 body.incall header,body.incall #msgs{transform:translateY(-115%);opacity:0;pointer-events:none}
-#rxglow[data-st=thinking]{--g1:#F3DCC9;--g2:#E8791B}
+#rxglow[data-st=thinking]{--g1:var(--cg);--g2:var(--accent)}
 #rxcall .face svg *{transition:opacity .25s,transform .35s}
 #rxcall .blush,#rxcall .brows,#rxcall .ea,#rxcall .eh,#rxcall .ew,#rxcall .tear,#rxcall .lt,#rxcall .grin,#rxcall .mo,#rxcall .frown,#rxcall .flat,#rxcall .dots{opacity:0}
 #rxcall[data-emo=happy] .ea,#rxcall[data-emo=happy] .grin,#rxcall[data-emo=happy] .blush{opacity:1}
@@ -711,20 +716,6 @@ body.incall header,body.incall #msgs{transform:translateY(-115%);opacity:0;point
 @keyframes rxtr{0%{transform:translateY(-2px)}100%{transform:translateY(6px)}}
 html.rm #rxcall .face svg,html.rm #rxcall .lt,html.rm #rxcall .dots circle{animation:none!important}
 
-/* loading screen: the Rhomeo logo GIF (black / white matte, blended so it sits on the page glow with no box) */
-.bootlogo{width:min(92vw,480px);height:auto;aspect-ratio:640/336;margin-bottom:0}
-.bootlogo .lg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
-/* the intro is a 60 fps video drawn through WebGL in the logo's own orange; it has real transparency, so it sits on the same glow as the login screen */
-.bootlogo .lg{opacity:0;transition:opacity .3s ease}.bootlogo .lg.on{opacity:1}
-/* the Rhomeo name is the finished frame of the intro video (transparent PNG), not live text */
-.wm.wmimg{display:block;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:inherit;-webkit-text-fill-color:initial;animation:none;padding:0;height:auto;object-fit:contain;user-select:none;-webkit-user-drag:none}
-.authsig .wm.wmimg{width:min(240px,66vw);padding:0}
-.brand .sig .wm.wmimg{width:84px}
-#introvid{position:absolute;width:2px;height:2px;opacity:0;pointer-events:none}
-#boot:not(.nogif) .bootlogo>:is(.glow,.track,.ring){display:none}
-#boot:not(.nogif) .bootlogo>.logo{opacity:0;animation:none}
-#boot:not(.nogif) .bootsig{display:none}
-#boot.nogif .bootlogo{width:112px;height:112px;margin-bottom:6px}#boot.nogif .bootlogo .lg{display:none!important}
 </style>
 <style id="gemini-layout">
 /* ===== Gemini-style layout: same features and animations, new placements ===== */
@@ -732,7 +723,7 @@ html.rm #rxcall .face svg,html.rm #rxcall .lt,html.rm #rxcall .dots circle{anima
 aside{background:var(--s1);border-right:0;-webkit-backdrop-filter:none;backdrop-filter:none;padding:12px 12px 10px;gap:6px}
 .brand{gap:10px;padding:4px 6px 12px}
 .brand .sig{padding:0;border:0;gap:0}
-.brand .sig .wm{font-size:1.2rem;align-self:flex-start}
+.brand .sbwm{display:block;width:118px;height:calc(118px*.1571);margin-top:2px}
 #new{align-self:flex-start;background:var(--s2);border:0;border-radius:999px;padding:12px 20px 12px 16px;font-weight:500;color:var(--mute);margin-bottom:6px}
 #new:hover{background:color-mix(in srgb,var(--text) 10%,var(--s2))}
 #new svg{color:var(--text)}
@@ -757,7 +748,7 @@ header{background:transparent;border-bottom:0;-webkit-backdrop-filter:none;backd
 /* welcome: greeting top-left, suggestion cards in a row above the composer */
 .hero{margin:0;flex:1;min-height:0;display:flex;flex-direction:column;text-align:left;padding:min(9vh,80px) 0 0}
 .hero .lwrap{width:42px;height:42px;margin:6px 0 20px}
-.hero small{font-family:var(--disp);font-size:clamp(2rem,8.5vw,3rem);font-weight:600;letter-spacing:-.035em;line-height:1.1;margin:0;color:transparent;background:linear-gradient(90deg,var(--accent),var(--ok) 60%,#FFD08A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero small{font-family:var(--disp);font-size:clamp(2rem,8.5vw,3rem);font-weight:600;letter-spacing:-.035em;line-height:1.1;margin:0;color:transparent;background:linear-gradient(90deg,var(--w0),var(--w2) 55%,var(--w4));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .hero h1{font-size:clamp(1.7rem,7.5vw,2.8rem);font-weight:600;letter-spacing:-.035em;color:var(--mute);margin:2px 0 0}
 .hero p{display:none}
 .chips{display:flex;gap:10px;overflow-x:auto;margin:auto 0 0;padding:20px 0 4px;scrollbar-width:none;scroll-snap-type:x proximity}
@@ -807,59 +798,58 @@ header{background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 80%,tran
 <noscript><p style="position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:#0A0A0C;color:#E8EBF2;font-family:system-ui;padding:24px;text-align:center">Rhomeo needs JavaScript to run. Please turn it on and reload.</p></noscript>
 <div id="bg" aria-hidden="true"><i class="o o1"></i><i class="o o2"></i></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <defs><linearGradient id="rmg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E29E4C"/><stop offset=".6" stop-color="#E88E34"/><stop offset=".85" stop-color="#F0821E"/><stop offset="1" stop-color="#C0501A"/></linearGradient><linearGradient id="rmd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F38E28"/><stop offset="1" stop-color="#D65C10"/></linearGradient></defs><symbol id="rm" viewBox="0 0 100 100"><path fill="url(#rmg)" fill-rule="evenodd" d="M50 4a46 46 0 1 0 0 92a46 46 0 1 0 0-92ZM50 17.5a32.5 32.5 0 1 1 0 65a32.5 32.5 0 1 1 0-65Z"/><circle cx="50" cy="50" r="20" fill="url(#rmd)"/></symbol>
+  <defs>
+    <linearGradient id="wmg" gradientUnits="userSpaceOnUse" x1="199" y1="0" x2="751" y2="0"><stop offset="0" style="stop-color:var(--w0)"/><stop offset="0.22" style="stop-color:var(--w1)"/><stop offset="0.5" style="stop-color:var(--w2)"/><stop offset="0.75" style="stop-color:var(--w3)"/><stop offset="1" style="stop-color:var(--w4)"/></linearGradient>
+    <radialGradient id="gapg" cx="50%" cy="58%" r="62%"><stop offset="0" style="stop-color:var(--w2);stop-opacity:.95"/><stop offset="1" style="stop-color:var(--w0);stop-opacity:0"/></radialGradient>
+  </defs>
+  <symbol id="rm" viewBox="0 0 272 295"><polygon points="129.5,0 0,194 129.5,137.5" style="fill:var(--cr);stroke:var(--cr)" stroke-width=".7" stroke-linejoin="round"/><polygon points="129.5,0 272,89 218.5,171.5" style="fill:var(--cb);stroke:var(--cb)" stroke-width=".7" stroke-linejoin="round"/><polygon points="0,194 106,194.5 138,294.5" style="fill:var(--cg);stroke:var(--cg)" stroke-width=".7" stroke-linejoin="round"/><polygon points="106,194.5 218.5,171.5 138,294.5" style="fill:var(--cy);stroke:var(--cy)" stroke-width=".7" stroke-linejoin="round"/></symbol>
+  <symbol id="wmk" viewBox="195 427 560 88"><g fill="none" stroke="url(#wmg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><g><path d="M201.5 432.6V509.4"/><path d="M210 433.2H231A20.2 20.2 0 0 1 231 473.6H210"/><path d="M222.3 474.6L247.8 509.4"/></g><g><path d="M284.6 432.6V509.4"/><path d="M294 470.6H334.6"/><path d="M343 432.6V509.4"/></g><g><path d="M417.6 432.6A38.4 38.4 0 1 1 417.6 509.4A38.4 38.4 0 1 1 417.6 432.6"/></g><g><path d="M490 433V509.4"/><path d="M490.4 433.2L525.6 509.4"/><path d="M525.6 509.4L559.6 433.2H643.6"/></g><g><path d="M559.3 451V509.4"/><path d="M597.6 470.6H643.6"/><path d="M597.6 509.4H643.6"/></g><g><path d="M710 432.6A38.4 38.4 0 1 1 710 509.4A38.4 38.4 0 1 1 710 432.6"/></g></g></symbol>
 </svg>
 
 <div id="boot" role="status" aria-live="polite">
-  <div class="bootlogo"><canvas class="lg" id="introcv" width="1280" height="672" role="img" aria-label="Rhomeo"></canvas><video id="introvid" muted playsinline preload="auto" aria-hidden="true" tabindex="-1"></video><i class="glow"></i><i class="track"></i><i class="ring"></i><svg class="logo" aria-hidden="true"><use href="#rm"/></svg></div>
-  <div class="bootsig"><div class="bootname wm rv">Rhomeo</div></div>
+  <div class="bootstage">
+    <svg class="bootlogo" viewBox="0 0 272 295" aria-hidden="true"><polygon class="gap" points="129.5,0 218.5,171.5 106,194.5 0,194 129.5,137.5" fill="url(#gapg)"/><polygon class="t" points="129.5,0 0,194 129.5,137.5" style="--x:-300px;--y:-260px;--r:-420deg;--d:0;fill:var(--cr);stroke:var(--cr)" stroke-width=".7" stroke-linejoin="round"/><polygon class="t" points="129.5,0 272,89 218.5,171.5" style="--x:300px;--y:-230px;--r:380deg;--d:.14;fill:var(--cb);stroke:var(--cb)" stroke-width=".7" stroke-linejoin="round"/><polygon class="t" points="0,194 106,194.5 138,294.5" style="--x:-290px;--y:300px;--r:460deg;--d:.28;fill:var(--cg);stroke:var(--cg)" stroke-width=".7" stroke-linejoin="round"/><polygon class="t" points="106,194.5 218.5,171.5 138,294.5" style="--x:290px;--y:290px;--r:-400deg;--d:.42;fill:var(--cy);stroke:var(--cy)" stroke-width=".7" stroke-linejoin="round"/></svg>
+    <svg class="bootwm" viewBox="195 427 560 88" role="img" aria-label="Rhomeo"><g fill="none" stroke="url(#wmg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><g class="L" style="--i:0"><path class="stk" pathLength="1" style="--j:0" d="M201.5 432.6V509.4"/><path class="stk" pathLength="1" style="--j:1" d="M210 433.2H231A20.2 20.2 0 0 1 231 473.6H210"/><path class="stk" pathLength="1" style="--j:2" d="M222.3 474.6L247.8 509.4"/></g><g class="L" style="--i:1"><path class="stk" pathLength="1" style="--j:0" d="M284.6 432.6V509.4"/><path class="stk" pathLength="1" style="--j:1" d="M294 470.6H334.6"/><path class="stk" pathLength="1" style="--j:2" d="M343 432.6V509.4"/></g><g class="L" style="--i:2"><path class="stk" pathLength="1" style="--j:0" d="M417.6 432.6A38.4 38.4 0 1 1 417.6 509.4A38.4 38.4 0 1 1 417.6 432.6"/></g><g class="L" style="--i:3"><path class="stk" pathLength="1" style="--j:0" d="M490 433V509.4"/><path class="stk" pathLength="1" style="--j:1" d="M490.4 433.2L525.6 509.4"/><path class="stk" pathLength="1" style="--j:2" d="M525.6 509.4L559.6 433.2H643.6"/></g><g class="L" style="--i:4"><path class="stk" pathLength="1" style="--j:0" d="M559.3 451V509.4"/><path class="stk" pathLength="1" style="--j:1" d="M597.6 470.6H643.6"/><path class="stk" pathLength="1" style="--j:2" d="M597.6 509.4H643.6"/></g><g class="L" style="--i:5"><path class="stk" pathLength="1" style="--j:0" d="M710 432.6A38.4 38.4 0 1 1 710 509.4A38.4 38.4 0 1 1 710 432.6"/></g></g></svg>
+  </div>
   <p id="bootmsg"></p>
   <button id="bootretry" class="btn hidden" type="button">Reload</button>
 </div>
 
-
-
 <div id="auth">
   <form id="auth-form" novalidate>
     <div class="authhead">
-      <div class="authsig"><img class="wm wmimg" src="icons/rhomeo-logo.png" alt="Rhomeo" width="240" height="43" decoding="async"><small class="tg" data-type="Code smarter. Ship faster." data-idle="1">Code smarter. Ship faster.</small></div>
+      <svg class="authlogo" aria-hidden="true"><use href="#rm"/></svg>
+      <svg class="authwm" role="img" aria-label="Rhomeo"><use href="#wmk"/></svg>
       <h1 id="auth-title">Welcome back</h1>
-      <p id="auth-sub">Sign in to pick up your chats on any device.</p>
     </div>
-
-    <button class="gbtn" id="auth-google" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button>
-    <div class="adiv" aria-hidden="true">or use email</div>
-
-    <div class="seg" role="tablist" aria-label="Sign in or create an account">
-      <button type="button" role="tab" id="tab-in" aria-selected="true">Sign in</button>
-      <button type="button" role="tab" id="tab-up" aria-selected="false">Create account</button>
-    </div>
-
-    <div class="afield" id="f-email">
-      <label for="email">Email</label>
-      <div class="aiw">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 5.5L20 8"/></svg>
-        <input id="email" type="email" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required>
+    <div class="afields">
+      <div class="afield stag" id="f-email" style="--i:0">
+        <label class="sr" for="email">Email</label>
+        <div class="aiw"><span class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 5.5L20 8"/></svg></span><input id="email" type="email" placeholder="Email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required></div>
       </div>
-    </div>
-    <div class="afield">
-      <div class="alabel"><label for="pw" id="pw-label">Password</label><button class="flink" id="forgot" type="button">Forgot password?</button></div>
-      <div class="aiw">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
-        <input id="pw" type="password" placeholder="6+ characters" autocomplete="current-password" minlength="6" required>
-        <button class="peye" id="pw-eye" type="button" aria-label="Show password" aria-pressed="false">
-          <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
-          <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6a9.7 9.7 0 0 1 1.4-.1c6 0 9.500 6.100 9.500 6.100a16 16 0 0 1-3.100 3.800M6.600 6.900A16 16 0 0 0 2.500 12S6 18.500 12 18.500c1.600 0 3-.4 4.200-1M9.900 9.900a3 3 0 0 0 4.200 4.200"/></svg>
-        </button>
+      <div class="afield stag" id="f-pw" style="--i:1">
+        <label class="sr" for="pw" id="pw-label">Password</label>
+        <div class="aiw"><span class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></span><input id="pw" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
+          <button class="peye" id="pw-eye" type="button" aria-label="Show password" aria-pressed="false">
+            <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6a9.7 9.7 0 0 1 1.4-.1c6 0 9.500 6.100 9.500 6.100a16 16 0 0 1-3.100 3.800M6.600 6.900A16 16 0 0 0 2.500 12S6 18.500 12 18.500c1.600 0 3-.4 4.200-1M9.900 9.900a3 3 0 0 0 4.200 4.200"/></svg>
+          </button>
+        </div>
       </div>
+      <div id="auth-err" role="alert" aria-live="polite"></div>
+      <button class="btn stag" id="auth-go" type="submit" style="--i:2">Login</button>
+      <button class="flink stag" id="forgot" type="button" style="--i:3">Forgot my password</button>
+      <div class="adiv stag" aria-hidden="true" style="--i:4">or</div>
+      <button class="gbtn stag" id="auth-google" type="button" style="--i:5"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button>
     </div>
-
-    <div id="auth-err" role="alert" aria-live="polite"></div>
-    <button class="btn" id="auth-go" type="submit">Sign in</button>
+    <div class="abottom stag" style="--i:6">
+      <p class="sw" id="auth-switchline"><span id="auth-switchq">Not a member?</span><button type="button" id="auth-switch">Register</button></p>
+      <p class="alegal">&copy; 2026 Rhomeo</p>
+    </div>
   </form>
 </div>
 <aside id="side">
-  <div class="brand"><svg class="logo" aria-hidden="true"><use href="#rm"/></svg><div class="sig"><img class="wm wmimg" src="icons/rhomeo-wordmark.png" alt="Rhomeo" width="84" height="23" decoding="async"><small class="tg" data-type="Code smarter. Ship faster." data-idle="1">Code smarter. Ship faster.</small></div></div>
+  <div class="brand"><svg class="logo" aria-hidden="true"><use href="#rm"/></svg><div class="sig"><svg class="sbwm" role="img" aria-label="Rhomeo"><use href="#wmk"/></svg><small class="tg" data-type="Code smarter. Ship faster." data-idle="1">Code smarter. Ship faster.</small></div></div>
   <button id="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>New chat</button>
   <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Recent</span><i></i></div>
   <div id="list"></div>
@@ -992,140 +982,54 @@ function startTypers(d) { if (typersOn) return; typersOn = true; document.queryS
 
 /* ---------- boot splash and library loading (works on slow and flaky networks) ---------- */
 const boot = $('boot'), bootmsg = $('bootmsg');
-/* ---------- intro animation: 60 fps video, drawn through WebGL with real transparency ---------- */
-const INTRO = (() => {
-  const cv = $('introcv'), vid = $('introvid');
-  const api = { cv, vid, ok: false, still: false, box: [29, 118, 608, 218] }; // box: where the finished wordmark sits inside the 640x336 frame
-  const fail = () => { api.ok = false; boot.classList.add('nogif'); };
-  try {
-    const gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, preserveDrawingBuffer: true, antialias: false });
-    if (!gl) throw 0;
-    const sh = (t, c) => { const o = gl.createShader(t); gl.shaderSource(o, c); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw 0; return o; };
-    const pr = gl.createProgram();
-    gl.attachShader(pr, sh(gl.VERTEX_SHADER, 'attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}'));
-    // the video is the logo on a black matte: its brightness gives the shape (alpha), its own colours are kept as they are
-    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, 'precision mediump float;varying vec2 v;uniform sampler2D t;void main(){vec3 c=texture2D(t,v).rgb;float l=dot(c,vec3(.299,.587,.114));float al=max(smoothstep(.03,.24,l),max(c.r,max(c.g,c.b)));gl_FragColor=vec4(c,al);}'));
-    gl.linkProgram(pr); if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw 0;
-    gl.useProgram(pr);
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    const draw = () => { try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, vid); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); cv.classList.add('on'); } catch (e) { fail(); } };
-    const tick = () => { if (vid.readyState >= 2) draw(); if (!vid.ended && !vid.paused) next(); };
-    const next = () => vid.requestVideoFrameCallback ? vid.requestVideoFrameCallback(tick) : requestAnimationFrame(tick); // one draw per decoded frame = 60 fps
-    const mp4 = vid.canPlayType('video/mp4; codecs="avc1.640028"'); // MP4 (H.264) where it plays, WebM elsewhere; both live in icons/
-    vid.muted = true; vid.playsInline = true; vid.onerror = fail; vid.onended = draw;
-    api.still = root.classList.contains('rm') || matchMedia('(prefers-reduced-motion: reduce)').matches; // reduced motion: show the finished wordmark, no animation
-    vid.addEventListener('loadeddata', () => { draw(); if (api.still) vid.currentTime = Math.max(0, vid.duration - .02); });
-    vid.addEventListener('seeked', () => { if (api.still) draw(); });
-    vid.addEventListener('playing', next);
-    vid.src = 'icons/rhomeo-intro-dark-60fps.' + (mp4 ? 'mp4' : 'webm'); // the logo on a black matte; the shader above turns the black into transparency
-    if (!api.still) { const pp = vid.play(); if (pp && pp.catch) pp.catch(fail); }
-    api.ok = true;
-  } catch (e) { fail(); }
-  return api;
-})();
-let bootForce = false;
-const SPLASH_MS = 2500; // video time (ms) when the name is fully drawn; the splash never leaves before that
-let hideTimer = 0;
-/* ---------- morph transitions: loading screen -> login -> chat ---------- */
-const soft = () => !root.classList.contains('rm') && !!Element.prototype.animate; // plain opacity fades: cheap enough for any phone
+/* ---------- the splash morphs into the login page; for a returning user it simply fades out ---------- */
+const soft = () => !root.classList.contains('rm') && !!Element.prototype.animate; // plain fades: cheap enough for any phone
 const fancy = () => soft() && !lite && !(navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) && !(navigator.deviceMemory && navigator.deviceMemory <= 4);
 const EASE = 'cubic-bezier(.2,.85,.25,1)';
-const inView = r => r.width > 0 && r.left >= 0 && r.right <= innerWidth && r.bottom > 0 && r.top < innerHeight;
-function chatTarget() { // where the logo lands: the sidebar logo on desktop, the menu button when the sidebar is tucked away
-  for (const sel of ['.brand .logo']) { const el = document.querySelector(sel), r = el && el.getBoundingClientRect(); if (r && inView(r)) return { el, r }; }
-  return null;
-}
-function ripple(x, y, size, to, dur, delay) {
-  const d = document.createElement('div'); d.className = 'ripple';
-  Object.assign(d.style, { left: (x - size / 2) + 'px', top: (y - size / 2) + 'px', width: size + 'px', height: size + 'px' }); document.body.appendChild(d);
-  d.animate([{ transform: 'scale(.5)', opacity: .75 }, { transform: 'scale(' + to + ')', opacity: 0 }], { duration: dur, delay: delay || 0, easing: 'ease-out', fill: 'both' }).finished.then(() => d.remove(), () => d.remove());
-}
 function fly(clone, from, to, o) { // glide a copy of one element onto another one's spot, then hand over to the real element
-  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect(), cs = getComputedStyle(to);
-  const bw = o.text ? b.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) : b.width;
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
   clone.classList.add('fly'); Object.assign(clone.style, { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px' }); document.body.appendChild(clone);
-  const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2), sc = bw / a.width;
+  const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2), sc = b.width / a.width;
   let done = false; const land = () => { if (done) return; done = true; clone.remove(); to.style.visibility = ''; o.onland && o.onland(); };
   to.style.visibility = 'hidden';
   clone.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')' }], { duration: o.dur, delay: o.delay || 0, easing: o.ease || EASE, fill: 'both' }).finished.then(land, land);
   setTimeout(land, (o.delay || 0) + o.dur + 500);
 }
-function land(t) { // the logo settles into the sidebar with a tiny pulse
-  if (t) t.el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 450, easing: EASE });
-}
-function bootToLogin() {
-  if (INTRO.ok && !boot.classList.contains('nogif')) { // the intro wordmark shrinks and glides onto the login card's own wordmark, then hands over to it
-    const card = $('auth-form'), dst = card && card.querySelector('.authsig .wm');
-    if (!card || !dst || !card.offsetWidth) return false;
-    const r = INTRO.cv.getBoundingClientRect(), k = r.width / 640, q = INTRO.cv.width / 640, [x0, y0, x1, y1] = INTRO.box, w = x1 - x0, h = y1 - y0;
-    const c = document.createElement('canvas'); c.width = w * q; c.height = h * q; c.className = 'fly'; // a still copy of the finished wordmark
-    c.getContext('2d').drawImage(INTRO.cv, x0 * q, y0 * q, w * q, h * q, 0, 0, w * q, h * q);
-    Object.assign(c.style, { left: r.left + x0 * k + 'px', top: r.top + y0 * k + 'px', width: w * k + 'px', height: h * k + 'px' });
-    document.body.appendChild(c); INTRO.cv.style.visibility = 'hidden';
-    const b = dst.getBoundingClientRect(), cs = getComputedStyle(dst), tw = b.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    const sc = tw / (w * k), dx = b.left + b.width / 2 - (r.left + (x0 + x1) / 2 * k), dy = b.top + b.height / 2 - (r.top + (y0 + y1) / 2 * k), tf = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
-    card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 150, easing: 'ease-out', fill: 'backwards' });
-    dst.style.visibility = 'hidden';
-    const D = 1100, L = 120; let done = false;
-    const end = () => { if (done) return; done = true; c.remove(); dst.style.visibility = ''; startTypers(150); };
-    setTimeout(() => { dst.style.visibility = ''; dst.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: 'ease-out' }); }, L + D * .7); // the real wordmark fades in as the copy fades out
-    c.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: tf, opacity: 1, offset: .75 }, { transform: tf, opacity: 0 }], { duration: D, delay: L, easing: EASE, fill: 'both' }).finished.then(end, end);
-    setTimeout(end, L + D + 500);
-    return true;
-  }
-   // the logo blooms open into the login card and the wordmark glides into its place
-  const card = $('auth-form'), logo = boot.querySelector('.bootlogo'), sig = boot.querySelector('.bootsig'), name = boot.querySelector('.bootname'), dst = card && card.querySelector('.authsig .wm');
-  if (!card || !logo || !name || !dst || !card.offsetWidth) return false;
-  const cr = card.getBoundingClientRect(), lr = logo.getBoundingClientRect(), lx = lr.left + lr.width / 2, ly = lr.top + lr.height / 2, cx = lx - cr.left, cy = ly - cr.top;
-  card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 150, easing: 'ease-out', fill: 'backwards' });
-  logo.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.5)', opacity: 0 }], { duration: 520, easing: 'ease-in', fill: 'forwards' });
-  const c = document.createElement('div'); c.className = 'bootname wm';
-  c.textContent = name.textContent; sig.style.visibility = 'hidden';
-  fly(c, name, dst, { text: 1, dur: 950, delay: 120, onland: () => startTypers(150) });
+function bootToLogin() { // the logo and the written-in wordmark glide up into their places on the login page
+  const stage = boot.querySelector('.bootstage'), lg = stage && stage.querySelector('.bootlogo'), wm = stage && stage.querySelector('.bootwm');
+  const tl = document.querySelector('#auth .authlogo'), tw = document.querySelector('#auth .authwm');
+  if (!lg || !wm || !tl || !tw || !tl.getBoundingClientRect().width) return false;
+  const a = lg.cloneNode(true), b = wm.cloneNode(true);
+  stage.style.visibility = 'hidden';
+  fly(a, lg, tl, { dur: 950, delay: 60 }); fly(b, wm, tw, { dur: 950, delay: 140 });
   return true;
 }
-function bootToChat() {
-  if (INTRO.ok && !boot.classList.contains('nogif')) return false; // the intro simply fades out into the chat
-   // returning user: the loading logo flies straight into the chat
-  const logo = boot.querySelector('.bootlogo'), src = logo && logo.querySelector('.logo'), sig = boot.querySelector('.bootsig'), t = chatTarget();
-  if (!src) return false;
-  sig.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(16px)' }], { duration: 380, easing: 'ease-in', fill: 'forwards' });
-  logo.querySelectorAll('.glow,.track,.ring,.lg').forEach(el => el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.5)' }], { duration: 520, easing: 'ease-out', fill: 'forwards' }));
-  if (t) { const c = src.cloneNode(true); src.style.visibility = 'hidden'; fly(c, src, t.el, { dur: 950, delay: 140, onland: () => land(t) }); }
-  else src.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: 'ease-out', fill: 'forwards' }); // no sidebar logo on screen (phones): just fade
-  return true;
-}
-function loginToChat() { // the card simply fades away to reveal the chat
-  const card = $('auth-form'), body = document.body; if (!card || !card.offsetWidth) return false;
+function loginToChat() { // the login page simply fades away to reveal the chat
+  const au = $('auth'), body = document.body; if (!au || !au.offsetWidth) return false;
   body.classList.add('enter');
-  const an = card.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: 'ease-out', fill: 'forwards' });
-  let done = false; const end = () => { if (done) return; done = true; body.classList.remove('enter'); an.cancel(); };
-  an.finished.then(end, end); setTimeout(end, 700);
+  const an = au.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease-out', fill: 'forwards' });
+  let done = false; const end = () => { if (done) return; done = true; body.classList.remove('enter'); an.cancel(); au.classList.remove('rise'); };
+  an.finished.then(end, end); setTimeout(end, 800);
   return true;
 }
-function bloomCard() { // signing out: the login card fades in
-  const card = $('auth-form'); if (!soft() || !card || !card.offsetWidth) return;
-  card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
+function bloomCard() { // signing out: the login page fades in and its fields rise again
+  const au = $('auth'); au.classList.remove('rise'); void au.offsetWidth; au.classList.add('rise');
+  if (soft() && au.offsetWidth) au.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
 }
+const BOOT_MIN = root.classList.contains('rm') ? 0 : 3500; // let the intro play through before anything replaces it
+let bootDest, bootWait = 0;
 function hideBoot(dest) {
   if (!boot || boot.classList.contains('gone')) return;
-  if (INTRO.ok && !INTRO.still && !bootForce && !boot.classList.contains('nogif') && !INTRO.vid.ended) { // app is ready early: let the intro finish drawing the name first
-    const wait = SPLASH_MS - INTRO.vid.currentTime * 1000;
-    if (wait > 0) { clearTimeout(hideTimer); hideTimer = setTimeout(() => hideBoot(dest), Math.min(wait, 5000) + 30); return; }
-  }
-  let ok = false;
-  if (dest && (fancy() || (INTRO.ok && soft()))) { try { ok = dest === 'chat' ? bootToChat() : bootToLogin(); } catch (e) { ok = false; } }
-  boot.classList.add('gone'); if (!(ok && dest === 'login')) startTypers(); setTimeout(() => boot.remove(), 900);
+  if (dest) bootDest = dest;
+  const wait = BOOT_MIN - performance.now();
+  if (wait > 0) { if (!bootWait) bootWait = setTimeout(() => { bootWait = 0; hideBoot(); }, wait); return; }
+  if (bootDest !== 'chat') { $('auth').classList.add('rise'); if (fancy()) { try { bootToLogin(); } catch (e) {} } }
+  boot.classList.add('gone'); startTypers(); setTimeout(() => boot.remove(), 900);
 }
 $('bootretry').onclick = () => location.reload();
 setTimeout(() => { if (boot.isConnected && !boot.classList.contains('gone')) bootmsg.textContent = 'Slow connection. Still loading…'; }, 5000);
 setTimeout(() => { if (boot.isConnected && !boot.classList.contains('gone')) $('bootretry').classList.remove('hidden'); }, 15000);
-setTimeout(() => { bootForce = true; hideBoot(); }, 14000); // never trap anyone behind the splash
+setTimeout(hideBoot, 14000); // never trap anyone behind the splash
 
 const LIBS = [
   [() => window.supabase, ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js', 'https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js']],
@@ -1390,16 +1294,16 @@ function showEmpty() {
   const name = user ? displayName() : '';
   const h = document.createElement('div'); h.className = 'hero';
   const lg = document.createElement('div'); lg.className = 'lwrap';
-  lg.innerHTML = '<div class="lfl"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><path class="p1" fill="url(#rmg)" fill-rule="evenodd" d="M50 4a46 46 0 1 0 0 92a46 46 0 1 0 0-92ZM50 17.5a32.5 32.5 0 1 1 0 65a32.5 32.5 0 1 1 0-65Z"/><circle class="p2" cx="50" cy="50" r="20" fill="url(#rmd)"/></svg><i class="glint"></i></div><i class="lshadow"></i>';
+  lg.innerHTML = '<div class="lfl"><svg class="logo" viewBox="0 0 272 295" aria-hidden="true">' + [['p1','129.5,0 0,194 129.5,137.5','--cr'],['p2','129.5,0 272,89 218.5,171.5','--cb'],['p2','0,194 106,194.5 138,294.5','--cg'],['p1','106,194.5 218.5,171.5 138,294.5','--cy']].map(([c, p, v]) => '<polygon class="' + c + '" points="' + p + '" style="fill:var(' + v + ');stroke:var(' + v + ')" stroke-width=".7" stroke-linejoin="round"/>').join('') + '</svg><i class="glint"></i></div><i class="lshadow"></i>';
   const s = document.createElement('small'); s.textContent = name ? 'Hello, ' + name : 'Hello';
   const t = document.createElement('h1'); t.textContent = 'What are we building today?';
   const p = document.createElement('p'); p.textContent = 'Write, debug and understand code, faster.';
   const row = document.createElement('div'); row.className = 'chips';
   [
-    ['Debug this error', 'paste a stack trace', 'Help me debug this error', '<path d="M8 8a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z"/><path d="M12 8v10M4 13h4M16 13h4M5 7l3 2M19 7l-3 2M5 19l3-2M19 19l-3-2"/>', '#FFA24A'],
-    ['Write a function', 'any language', 'Write a function that', '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>', '#E8791B'],
-    ['Explain this code', 'line by line', 'Explain this code', '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', '#FFC47A'],
-    ['Review and refactor', 'cleaner, faster', 'Review and refactor this code', '<path d="M12 3l2 5.5L19.5 10 14 12l-2 5.5L10 12 4.5 10 10 8.5z"/><path d="M19 17v4M17 19h4"/>', '#F89F55']
+    ['Debug this error', 'paste a stack trace', 'Help me debug this error', '<path d="M8 8a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z"/><path d="M12 8v10M4 13h4M16 13h4M5 7l3 2M19 7l-3 2M5 19l3-2M19 19l-3-2"/>', 'var(--cr)'],
+    ['Write a function', 'any language', 'Write a function that', '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>', 'var(--cb)'],
+    ['Explain this code', 'line by line', 'Explain this code', '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', 'var(--cg)'],
+    ['Review and refactor', 'cleaner, faster', 'Review and refactor this code', '<path d="M12 3l2 5.5L19.5 10 14 12l-2 5.5L10 12 4.5 10 10 8.5z"/><path d="M19 17v4M17 19h4"/>', 'var(--cy)']
   ].forEach(([title, sub, fill, ic, col]) => {
     const b = document.createElement('button'); b.type = 'button';
     const ci = document.createElement('i'); ci.className = 'ci'; ci.style.setProperty('--c', col);
@@ -1441,20 +1345,25 @@ $('newchatbtn').onclick = () => { $('side').classList.remove('open'); newChat();
 renderMode();
 
 /* ---------- auth ---------- */
-let recovering = false;
+let recovering = false, fpMode = false;
 function setMsg(t, ok) { const e = $('auth-err'); e.textContent = t; e.classList.toggle('ok', !!ok); }
 function setMode(s) {
   signup = s;
-  $('auth-go').textContent = s ? 'Create account' : 'Sign in';
-  $('tab-in').setAttribute('aria-selected', String(!s)); $('tab-up').setAttribute('aria-selected', String(s));
+  $('auth-go').textContent = s ? 'Create account' : 'Login';
   $('auth-title').textContent = s ? 'Create your account' : 'Welcome back';
-  $('auth-sub').textContent = s ? 'Save your chats and pick them up on any device.' : 'Sign in to pick up your chats on any device.';
+  $('auth-switchq').textContent = s ? 'Already a member?' : 'Not a member?'; $('auth-switch').textContent = s ? 'Sign in' : 'Register';
   $('pw').autocomplete = s ? 'new-password' : 'current-password';
   $('auth-form').classList.toggle('up', s);
   setMsg('');
 }
-$('tab-in').onclick = () => setMode(false);
-$('tab-up').onclick = () => setMode(true);
+function setFp(on) { // the "forgot password" section: just an email field and a send button
+  fpMode = on; $('auth-form').classList.toggle('fp', on); setMsg('');
+  if (on) {
+    $('auth-title').textContent = 'Reset password'; $('auth-go').textContent = 'Send reset link';
+    $('auth-switchq').textContent = 'Remembered it?'; $('auth-switch').textContent = 'Back to login';
+  } else setMode(false);
+}
+$('auth-switch').onclick = () => fpMode ? setFp(false) : setMode(!signup);
 $('pw-eye').onclick = () => {
   const show = $('pw').type === 'password';
   $('pw').type = show ? 'text' : 'password';
@@ -1468,6 +1377,7 @@ $('auth-form').onsubmit = async e => {
   e.preventDefault();
   setMsg('');
   if (recovering) return savePassword();
+  if (fpMode) return sendReset();
   const creds = { email: $('email').value.trim(), password: $('pw').value };
   if (!/^\S+@\S+\.\S+$/.test(creds.email)) { $('auth-err').textContent = 'Enter a valid email address.'; $('email').focus(); return; }
   if (creds.password.length < 6) { $('auth-err').textContent = 'Your password needs at least 6 characters.'; $('pw').focus(); return; }
@@ -1481,22 +1391,31 @@ $('auth-form').onsubmit = async e => {
   if (!data.session) $('auth-err').textContent = 'Account created. Confirm your email, then sign in.';
 };
 /* Forgot password: Supabase emails a reset LINK (not a code) as long as the "Reset Password" template uses {{ .ConfirmationURL }} */
-$('forgot').onclick = async () => {
+async function sendReset() {
   const email = $('email').value.trim();
-  if (!/^\S+@\S+\.\S+$/.test(email)) { setMsg('Enter your email above, then tap “Forgot password?”.'); $('email').focus(); return; }
+  if (!/^\S+@\S+\.\S+$/.test(email)) { setMsg('Enter a valid email address.'); $('email').focus(); return; }
   if (!navigator.onLine) { setMsg('You’re offline. Check your connection and try again.'); return; }
-  $('forgot').disabled = true; setMsg('Sending…', true);
+  const btn = fpMode ? $('auth-go') : $('forgot');
+  btn.disabled = true; if (fpMode) btn.classList.add('loading'); setMsg('Checking…', true);
+  const done = () => { btn.disabled = false; btn.classList.remove('loading'); };
+  let ex; try { ex = await sb.rpc('email_exists', { p_email: email }); } catch (err) { ex = { error: err }; }
+  if (!ex.error && ex.data === false) { done(); setMsg('No account exists with that email. Check the spelling, or register.'); return; } // if the lookup isn't set up yet, we just send the link
   let res; try { res = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }); } catch (err) { res = { error: err }; }
-  $('forgot').disabled = false;
+  done();
   if (res.error) { setMsg(isNetErr(res.error) ? 'Can’t reach the server. Check your connection and try again.' : /rate limit|seconds/i.test(res.error.message) ? 'Too many requests. Wait a minute and try again.' : res.error.message); return; }
-  setMsg('If an account exists for ' + email + ', a reset link is on its way. Check your inbox and spam folder.', true);
+  setMsg('A reset link is on its way to ' + email + '. Check your inbox and spam folder.', true);
+}
+/* Forgot password: with an email typed it sends the link; with none it opens the reset section */
+$('forgot').onclick = () => {
+  if (!/^\S+@\S+\.\S+$/.test($('email').value.trim())) { setFp(true); $('email').focus(); return; }
+  sendReset();
 };
 /* arriving from the reset link: Supabase fires PASSWORD_RECOVERY, so show a "new password" form instead of dropping them into the app */
 function enterRecovery() {
   recovering = true; document.body.classList.add('out');
   $('auth-form').classList.add('reset');
-  $('auth-title').textContent = 'Set a new password'; $('auth-sub').textContent = 'Choose a new password for your account.';
-  $('pw-label').textContent = 'New password'; $('pw').value = ''; $('pw').autocomplete = 'new-password';
+  $('auth-title').textContent = 'Set a new password';
+  $('pw-label').textContent = 'New password'; $('pw').placeholder = 'New password'; $('pw').value = ''; $('pw').autocomplete = 'new-password';
   $('auth-go').textContent = 'Update password'; setMsg('');
   history.replaceState(null, '', location.pathname);
 }
@@ -1507,7 +1426,7 @@ async function savePassword() {
   let res; try { res = await sb.auth.updateUser({ password: pw }); } catch (err) { res = { error: err }; }
   authBusy(false, 'email');
   if (res.error) { setMsg(isNetErr(res.error) ? 'Can’t reach the server. Check your connection and try again.' : res.error.message); return; }
-  recovering = false; $('auth-form').classList.remove('reset'); $('pw').value = ''; $('pw-label').textContent = 'Password';
+  recovering = false; $('auth-form').classList.remove('reset'); $('pw').value = ''; $('pw-label').textContent = 'Password'; $('pw').placeholder = 'Password';
   setMode(false);
   const { data: { session } } = await sb.auth.getSession();
   applySession(session);
@@ -1876,7 +1795,7 @@ let tmode = 'auto'; try { const sv = localStorage.getItem('rhomeo_tmode'); if (s
 function applyTheme(anim) {
   const t = tmode === 'auto' ? (sysLight.matches ? 'light' : 'dark') : tmode;
   if (anim) { root.classList.add('tx'); setTimeout(() => root.classList.remove('tx'), 350); }
-  root.dataset.theme = t; document.querySelector('meta[name=theme-color]').content = t === 'light' ? '#ffffff' : '#0A0A0C';
+  root.dataset.theme = t; document.querySelector('meta[name=theme-color]').content = t === 'light' ? '#F3F4F4' : '#0A0B0C';
   document.querySelectorAll('#moremenu [data-t]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.t === tmode)));
   const tb = $('themebtn'); if (tb) { tb.dataset.t = tmode; tb.setAttribute('aria-label', 'Theme: ' + TL[tmode] + '. Tap to change.'); }
 }
@@ -2110,17 +2029,17 @@ const rx = (() => {
   const LIVE_MODEL = 'gemini-3.1-flash-live-preview', LIVE_VOICE = 'Puck', LIVE_FN = SB_URL + '/functions/v1/live-token';
   document.body.insertAdjacentHTML('beforeend',
     '<div id="rxglow"></div><div id="rxcall" class="hidden" data-st="connecting"><div class="rxtop"><i class="dot"></i><span class="st">Connecting…</span><span class="tm">0:00</span></div>' +
-    '<div class="face"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="fg" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#FCDABF"/><stop offset=".55" stop-color="#F8A763"/><stop offset="1" stop-color="#B26724"/></radialGradient></defs>' +
+    '<div class="face"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="fg" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#B5DBFF"/><stop offset=".55" stop-color="#3FA0F5"/><stop offset="1" stop-color="#0A5BAA"/></radialGradient></defs>' +
     '<circle cx="60" cy="60" r="56" fill="url(#fg)"/><g class="blush"><ellipse cx="29" cy="68" rx="8" ry="5" fill="#ff8fb1" opacity=".6"/><ellipse cx="91" cy="68" rx="8" ry="5" fill="#ff8fb1" opacity=".6"/></g>' +
     '<g class="brows" stroke="#fff" stroke-width="4.5" stroke-linecap="round"><path class="bl" d="M33 35L51 33"/><path class="br" d="M69 33L87 35"/></g>' +
     '<g class="eo"><ellipse class="eye" cx="42" cy="49" rx="6" ry="8.5" fill="#fff"/><ellipse class="eye" cx="78" cy="49" rx="6" ry="8.5" fill="#fff"/></g>' +
     '<g class="ea" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"><path d="M34 53Q42 42 50 53"/><path d="M70 53Q78 42 86 53"/></g>' +
-    '<g class="ew"><circle cx="42" cy="48" r="10" fill="#fff"/><circle cx="78" cy="48" r="10" fill="#fff"/><circle cx="42" cy="48" r="4" fill="#4A2A0E"/><circle cx="78" cy="48" r="4" fill="#4A2A0E"/></g>' +
+    '<g class="ew"><circle cx="42" cy="48" r="10" fill="#fff"/><circle cx="78" cy="48" r="10" fill="#fff"/><circle cx="42" cy="48" r="4" fill="#0B1A4D"/><circle cx="78" cy="48" r="4" fill="#0B1A4D"/></g>' +
     '<g class="eh" fill="#ff5d8f"><path d="M42 58C30 49 32 40 38 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/><path d="M78 58C66 49 68 40 74 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/></g>' +
-    '<path class="tear" d="M36 61q-4 7 0 9q4-2 0-9z" fill="#FBC6A3"/><g class="lt" fill="#FBC6A3"><path d="M25 56q-5 8 0 10q5-2 0-10z"/><path d="M95 56q-5 8 0 10q5-2 0-10z"/></g>' +
-    '<path class="smile" d="M36 74Q60 96 84 74" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="grin" d="M34 70Q60 108 86 70Z" fill="#4A2A0E" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
-    '<ellipse class="mo" cx="60" cy="82" rx="7" ry="9" fill="#4A2A0E"/><path class="frown" d="M40 90Q60 72 80 90" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="flat" d="M46 82H74" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/>' +
-    '<ellipse class="talk" cx="60" cy="80" rx="17" ry="12" fill="#4A2A0E"/><g class="dots" fill="#fff"><circle cx="98" cy="12" r="3.5"/><circle cx="108" cy="4" r="4.5"/><circle cx="119" cy="-6" r="5.5"/></g></svg></div>' +
+    '<path class="tear" d="M36 61q-4 7 0 9q4-2 0-9z" fill="#9fd8ff"/><g class="lt" fill="#9fd8ff"><path d="M25 56q-5 8 0 10q5-2 0-10z"/><path d="M95 56q-5 8 0 10q5-2 0-10z"/></g>' +
+    '<path class="smile" d="M36 74Q60 96 84 74" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="grin" d="M34 70Q60 108 86 70Z" fill="#0B1A4D" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
+    '<ellipse class="mo" cx="60" cy="82" rx="7" ry="9" fill="#0B1A4D"/><path class="frown" d="M40 90Q60 72 80 90" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="flat" d="M46 82H74" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/>' +
+    '<ellipse class="talk" cx="60" cy="80" rx="17" ry="12" fill="#0B1A4D"/><g class="dots" fill="#fff"><circle cx="98" cy="12" r="3.5"/><circle cx="108" cy="4" r="4.5"/><circle cx="119" cy="-6" r="5.5"/></g></svg></div>' +
     '<div class="cap" aria-live="polite"></div><div class="you"></div>' +
     '<div class="ctl"><button type="button" id="rxmute">Mute</button><button type="button" id="rxint">Interrupt</button><button type="button" id="rxend">End</button></div></div>');
   const ov = $('rxcall'), glow = $('rxglow'), face = ov.querySelector('.face'), capEl = ov.querySelector('.cap'), youEl = ov.querySelector('.you');
