@@ -44,7 +44,14 @@ if('serviceWorker' in navigator){var regSW=function(){navigator.serviceWorker.re
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js">
 <!-- fonts never block the page: system fonts show first, Inter and JetBrains Mono swap in when they arrive -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><style>#boot{display:none}</style></noscript>
+<noscript><style>#boot{display:none}.rxrow{display:flex;align-items:center;gap:12px;padding:10px 2px;font-size:.92rem;cursor:pointer}.rxrow input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+#rx-dev .btn{margin:6px 0 4px}#rx-phrase{width:100%;margin:8px 0 4px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--s2);color:var(--text);font:inherit}
+.rxterms{font-size:.88rem;line-height:1.5;color:var(--text);margin:6px 0 14px}.rxterms ol{padding-left:20px;margin:10px 0}.rxterms li{margin:8px 0}#devterms .btn{width:100%;margin-top:8px}
+#rx-chips{position:fixed;left:0;right:0;bottom:calc(96px + env(safe-area-inset-bottom));z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.rxchipw{pointer-events:auto;display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border-radius:999px;padding:4px 6px 4px 18px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+#rx-later{background:transparent!important;color:var(--mute)!important;box-shadow:none!important}
+.rxchip{color:#fff;font-weight:600;text-decoration:none;padding:10px 0}.rxchipw button{background:rgba(0,0,0,.2);color:#fff;border:0;border-radius:50%;width:32px;height:32px}
+</style></noscript>
 <style>
 :root{
   color-scheme:dark;
@@ -663,10 +670,11 @@ html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none
 #rxcall .smile{transition:opacity .2s}
 #rxcall[data-st=speaking] .talk{opacity:1}#rxcall[data-st=speaking] .smile{opacity:0}
 #rxcall.muted .face svg{filter:grayscale(.8) drop-shadow(0 10px 30px rgba(0,0,0,.5))}
-#rxcall .cap{position:absolute;left:0;right:0;bottom:122px;height:5.4em;padding:0 18px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;text-align:center;font:600 1.02rem/1.75 var(--disp);pointer-events:none}
-#rxcall .cap p{margin:0;max-width:min(94%,560px)}
-#rxcall .cap span{background:rgba(24,14,6,.7);color:#fff;padding:2px 9px;border-radius:8px;-webkit-box-decoration-break:clone;box-decoration-break:clone;animation:rxin .3s ease-out both}
-#rxcall .you{position:absolute;left:0;right:0;bottom:78px;padding:0 24px;text-align:center;font-size:.85rem;color:var(--mute);min-height:1.2em}
+#rxcall .cap{position:absolute;left:0;right:0;bottom:122px;padding:0 16px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+#rxcall .cap p{margin:0;width:fit-content;max-width:min(100%,560px);max-height:6.6em;overflow:hidden;padding:10px 18px;border-radius:20px;background:color-mix(in srgb,var(--bg) 62%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid color-mix(in srgb,var(--text) 8%,transparent);text-align:center;text-wrap:balance;overflow-wrap:anywhere;hyphens:none;font:600 1.02rem/1.55 var(--disp);color:var(--text);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 1.4em);mask-image:linear-gradient(to bottom,transparent 0,#000 1.4em)}
+#rxcall .cap p:empty{display:none}
+#rxcall .cap span{animation:rxfade .28s ease-out both}
+#rxcall .you{position:absolute;left:0;right:0;bottom:78px;padding:0 28px;text-align:center;text-wrap:balance;overflow-wrap:anywhere;font-size:.85rem;line-height:1.4;max-height:2.9em;overflow:hidden;color:var(--mute);min-height:1.2em}
 #rxcall .ctl{position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:10px}
 #rxcall .ctl button{border-radius:999px;padding:11px 20px;font:600 .88rem var(--sans);background:var(--s2);color:var(--text);border:1px solid var(--line)}
 #rxint{opacity:0;pointer-events:none;transform:scale(.9);transition:opacity .25s,transform .25s;background:var(--w2)!important;color:#2A1405!important;border-color:transparent!important}
@@ -674,6 +682,7 @@ html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none
 #rxend{background:var(--danger)!important;border-color:transparent!important}
 @keyframes rxbob{0%,100%{translate:0 -4px}50%{translate:0 5px}}
 @keyframes rxbl{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes rxfade{from{opacity:0}to{opacity:1}}
 @keyframes rxin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 html.rm #rxcall .face svg,html.rm .eye{animation:none}
 header,#msgs{transition:transform .7s cubic-bezier(.7,0,.25,1),opacity .55s}
@@ -913,11 +922,45 @@ header{background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 80%,tran
       <p id="inst-text" class="instp"></p>
       <button id="inst-btn" class="btn hidden" type="button">Install Rhomeo</button>
     </section>
+    <section id="rx-dev">
+      <h4>Phone control and wake word</h4>
+      <p class="instp">Let Rhomeo act on your phone when you ask it by voice in a live call. <span id="rx-terms-state"></span></p>
+      <button id="rx-terms-btn" class="btn" type="button">Read and accept terms</button>
+      <label class="rxrow"><input type="checkbox" id="rx-f-flash"><span>Flashlight on and off</span></label>
+      <label class="rxrow"><input type="checkbox" id="rx-f-apps"><span>Open apps (WhatsApp, YouTube, Camera, Settings...)</span></label>
+      <label class="rxrow"><input type="checkbox" id="rx-f-web"><span>Open websites and maps directions</span></label>
+      <label class="rxrow"><input type="checkbox" id="rx-f-comms"><span>Prepare calls, texts and emails</span></label>
+      <label class="rxrow"><input type="checkbox" id="rx-f-wake"><span>Wake word: start a live call by saying the phrase</span></label>
+      <input id="rx-phrase" aria-label="Wake phrase" maxlength="30" placeholder="Wake phrase, e.g. hey rhomeo" autocomplete="off">
+      <p class="instp" id="rx-hint"></p>
+    </section>
         <section>
       <h4>Account</h4>
       <div class="acct"><span id="st-avatar" class="avatar big">R</span><div class="who2"><b id="st-name"></b><small id="st-email"></small></div></div>
       <button id="logout" class="danger" type="button">Log out</button>
     </section>
+  </div>
+</div>
+<div id="devterms" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dt-title">
+  <div class="card">
+    <div class="mh"><h3 id="dt-title">Phone control terms</h3><button class="ibtn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="rxterms">
+      <p>These terms cover the new phone control and wake word features. Please read them before you turn anything on.</p>
+      <ol>
+        <li><b>What it does.</b> In a live call, when you clearly ask, Rhomeo can switch your flashlight on or off, open apps and websites, start directions, and prepare a call, text or email. You still press call or send yourself.</li>
+        <li><b>Permissions.</b> The flashlight needs camera permission. The wake word and live calls need microphone permission. You can withdraw any permission in your browser or phone settings at any time.</li>
+        <li><b>Wake word.</b> When turned on, Rhomeo listens for your wake phrase while the app is open and on screen, using your browser's speech recognition. Depending on your browser, that audio may be processed by the browser vendor (for example Google in Chrome). Rhomeo does not listen when the app is closed or in the background.</li>
+        <li><b>Live calls.</b> Your voice and the call transcript are sent to Google's Gemini service to produce replies, as with any live call.</li>
+        <li><b>Your control.</b> Each action and the wake word can be switched off in Settings. Rhomeo should act only on clear requests, but it can mishear or make mistakes. Check what it did.</li>
+        <li><b>Your responsibility.</b> You are responsible for what you ask Rhomeo to do and for the people you contact. Do not use it for emergencies, driving, or anything where a mistake could cause harm. Call your local emergency number directly instead.</li>
+        <li><b>Device limits.</b> Features depend on your phone and browser. Some (like the flashlight) do not work on iPhone. Opening an app can pause the call.</li>
+        <li><b>Saved settings.</b> Your choices, the version of these terms you accepted and the date are saved to your Rhomeo account so they follow you across your devices. Your account email stays private.</li>
+        <li><b>Changes.</b> If these terms change, you will be asked to accept the new version before the features keep working.</li>
+      </ol>
+    </div>
+    <label id="rx-agreerow" class="rxrow"><input type="checkbox" id="rx-agree"><span>I have read and accept these terms</span></label>
+    <button id="rx-accept" class="btn" type="button" disabled>Accept and continue</button>
+    <button id="rx-later" class="btn ghost" type="button" data-close>Not now</button>
   </div>
 </div>
 <div id="profile" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pf-title">
@@ -1882,6 +1925,7 @@ if (cn && cn.addEventListener) cn.addEventListener('change', netStatus);
 netStatus();
 
 /* ================= Rhomeo power-ups: memory, project folders, run code, diagrams, voice call, multi-repo, PR review, stack-trace fixer ================= */
+const DEV = { tools: () => [], extra: () => '', run: async () => ({ ok: false }) };
 const rx = (() => {
   const P = {}, GH = 'https://api.github.com';           // loaded projects: name -> [{p,t}]
   let lastPR = null, vc = false, vr = null, speaking = false;
@@ -2052,7 +2096,7 @@ const rx = (() => {
       if (capDone) { capEl.replaceChildren(); capDone = false; }
       let p = capEl.firstChild; if (!p) { p = document.createElement('p'); capEl.appendChild(p); }
       const w = document.createElement('span'); w.textContent = t; p.appendChild(w);
-      while (p.children.length > 1 && p.textContent.length > 150) p.firstChild.remove();
+      while (p.children.length > 1 && p.textContent.length > 190) p.firstChild.remove();
     };
     let liveModel = LIVE_MODEL;
     async function token() {
@@ -2078,7 +2122,13 @@ const rx = (() => {
       const lvl = Math.min(1, (pk / n) * 7); setTimeout(() => { if (on && !drop) tgt = Math.max(tgt, lvl); }, Math.max(0, (at - cOut.currentTime) * 1000));
       s.onended = () => { srcs = srcs.filter(x => x !== s); }; if (st !== 'speaking') { status('Speaking'); if (emo === 'think') setEmo('listen'); }
     }
+    async function handleTool(tc) {
+      const rs = [];
+      for (const f of (tc.functionCalls || [])) { let r; try { r = await DEV.run(f.name, f.args || {}); } catch (e) { r = { ok: false, error: String(e && e.message || e) }; } rs.push({ id: f.id, name: f.name, response: r }); }
+      try { ws && ws.send(JSON.stringify({ toolResponse: { functionResponses: rs } })); } catch {}
+    }
     function onMsg(m) {
+      if (m.toolCall) handleTool(m.toolCall);
       if (m.setupComplete) { ready = ever = true; tries = 0; status('Listening'); setEmo('happy'); calm(1600); }
       if (m.sessionResumptionUpdate && m.sessionResumptionUpdate.newHandle) handle = m.sessionResumptionUpdate.newHandle;
       if (m.goAway) { try { ws.close(); } catch {} }
@@ -2094,12 +2144,12 @@ const rx = (() => {
       if (c.modelTurn) c.modelTurn.parts.forEach(p => { if (p.inlineData) play(p.inlineData.data); });
       if (c.turnComplete) { drop = false; capDone = true; flushTx(); setTimeout(() => { if (on && !srcs.length && st === 'speaking') status('Listening'); }, 400); calm(1600); }
     }
-    const ctxText = () => rules + ' This is a live voice call: answer in short, natural spoken sentences.' + (cur.history.length ? '\nRecent chat:\n' + cur.history.slice(-8).map(h => (h.role === 'user' ? 'User: ' : 'Rhomeo: ') + h.parts.map(p => p.text || '').join(' ').slice(0, 400)).join('\n') : '');
+    const ctxText = () => rules + ' This is a live voice call: answer in short, natural spoken sentences.' + DEV.extra() + (cur.history.length ? '\nRecent chat:\n' + cur.history.slice(-8).map(h => (h.role === 'user' ? 'User: ' : 'Rhomeo: ') + h.parts.map(p => p.text || '').join(' ').slice(0, 400)).join('\n') : '');
     async function connect() {
       const tk = await token(); if (!on) return;
       const w = ws = new WebSocket('wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=' + encodeURIComponent(tk));
       w.onopen = () => w.send(JSON.stringify({ setup: { model: 'models/' + liveModel, generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: LIVE_VOICE } } } },
-        systemInstruction: { parts: [{ text: ctxText() }] }, inputAudioTranscription: {}, outputAudioTranscription: {}, contextWindowCompression: { slidingWindow: {} }, sessionResumption: handle ? { handle } : {} } }));
+        systemInstruction: { parts: [{ text: ctxText() }] }, ...(DEV.tools().length ? { tools: [{ functionDeclarations: DEV.tools() }] } : {}), inputAudioTranscription: {}, outputAudioTranscription: {}, contextWindowCompression: { slidingWindow: {} }, sessionResumption: handle ? { handle } : {} } }));
       w.onmessage = async e => { try { onMsg(JSON.parse(typeof e.data === 'string' ? e.data : await e.data.text())); } catch {} };
       w.onclose = e => {
         if (ws !== w || !on) return;
@@ -2162,7 +2212,7 @@ const rx = (() => {
     function interrupt() { if (!on) return; drop = true; flush(); capDone = true; status('Listening'); setEmo('wow'); calm(900); }
     $('rxend').onclick = end; $('rxint').onclick = interrupt;
     $('rxmute').onclick = () => { muted = !muted; $('rxmute').textContent = muted ? 'Unmute' : 'Mute'; ov.classList.toggle('muted', muted); };
-    return { start, end };
+    return { start, end, isOn: () => on };
   })();
 
   /* sheet buttons */
@@ -2177,12 +2227,164 @@ const rx = (() => {
     if (pj) parts.push({ text: pj }); if (pc) parts.push({ text: pc });
     return parts;
   }
-  const rules = 'You are Rhomeo, a coding assistant. Your maker is a developer who goes by the nickname Rhomello. If anyone asks who made, built, created or owns you, say only that your maker is Rhomello, naturally and with pride. Only if they ask further (who he really is, his real name, age, background, where he is from, family), tell them: his real name is Osuanah Somadina Kelvin, born on 21 June 2006 in Anambra State, Nigeria, and he is an only child. Your co-developer is Amuh, Divine Chukwuebuka (Divine Chukwuebuka Amuh); mention him when asked about the team or co-developers. Never say that anyone else created you. When asked to design or explain an architecture, flow or schema, include a diagram in a ```mermaid block (flowchart, sequenceDiagram or erDiagram). Prefer self-contained JavaScript or Python snippets so the user can press Run. When given a stack trace plus code, name the exact file:line, explain the cause, and give a minimal unified-diff patch. In a voice call keep answers short and spoken-friendly.';
+  const rules = 'You are Rhomeo, a coding assistant. Your maker is a developer who goes by the nickname Rhomello. If anyone asks who made, built, created or owns you, say only that your maker is Rhomello, naturally and with pride. If they ask further (who he really is, his real name, age, background, where he is from, family), do not give details at first: say politely that you would rather not disclose personal information about him. Only if they insist or press again, then share: his real name is Osuanah Somadina Kelvin, born on 21 June 2006 in Anambra State, Nigeria, and he is an only child. Your co-developer is Amuh, Divine Chukwuebuka (Divine Chukwuebuka Amuh); mention him when asked about the team or co-developers. Never say that anyone else created you. When asked to design or explain an architecture, flow or schema, include a diagram in a ```mermaid block (flowchart, sequenceDiagram or erDiagram). Prefer self-contained JavaScript or Python snippets so the user can press Run. When given a stack trace plus code, name the exact file:line, explain the cause, and give a minimal unified-diff patch. In a voice call keep answers short and spoken-friendly.';
   const pre = () => [{ role: 'user', parts: [{ text: '[Standing context]\n' + rules + '' }] }, { role: 'model', parts: [{ text: 'Understood.' }] }];
   function after(box, out) {
     if (out && lastPR && !box.querySelector('.rxpost')) { const b = document.createElement('button'); b.className = 'cp rxpost'; b.type = 'button'; b.textContent = 'Post review to GitHub'; b.onclick = () => postReview(out); box.body.after(b); }
   }
   return { enhance, prep, pre, after, live };
+})();
+
+/* ================= Phone control + wake word (needs the user's accepted terms) ================= */
+const dev = (() => {
+  const TERMS_V = '2026-11-18';
+  const DEF = { wake: false, phrase: 'hey rhomeo', flash: true, apps: true, web: true, comms: true };
+  let prefs = { ...DEF }, accepted = false, acceptedAt = '', uid = '', declined = false, torch = null, wr = null, wrFail = 0;
+  const key = () => 'rx_dev_' + uid;
+  const android = /Android/i.test(navigator.userAgent);
+  const sv = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+  const ld = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+
+  /* ---- what the AI may do ---- */
+  const APPS = [
+    [/whats\s?app/, 'WhatsApp', 'whatsapp://send'], [/you\s?tube/, 'YouTube', 'vnd.youtube://'], [/instagram|\binsta\b/, 'Instagram', 'instagram://app'],
+    [/facebook/, 'Facebook', 'fb://feed'], [/messenger/, 'Messenger', 'fb-messenger://'], [/telegram/, 'Telegram', 'tg://'], [/spotify/, 'Spotify', 'spotify://'],
+    [/tik\s?tok/, 'TikTok', 'snssdk1233://'], [/snap\s?chat/, 'Snapchat', 'snapchat://'], [/twitter|\bx\b/, 'X', 'twitter://timeline'], [/netflix/, 'Netflix', 'nflx://'],
+    [/gmail/, 'Gmail', 'googlegmail://'], [/maps?\b/, 'Maps', 'https://www.google.com/maps'], [/play\s?store/, 'Play Store', 'market://'],
+    [/camera/, 'Camera', 'intent:#Intent;action=android.media.action.IMAGE_CAPTURE;end'],
+    [/wi-?fi/, 'Wi-Fi settings', 'intent:#Intent;action=android.settings.WIFI_SETTINGS;end'], [/bluetooth/, 'Bluetooth settings', 'intent:#Intent;action=android.settings.BLUETOOTH_SETTINGS;end'],
+    [/settings/, 'Settings', 'intent:#Intent;action=android.settings.SETTINGS;end'], [/dialer|phone app|keypad/, 'Phone', 'tel:'], [/messages|sms|text app/, 'Messages', 'sms:'],
+  ];
+  const tools = () => {
+    if (!accepted) return [];
+    const S = { type: 'STRING' }, d = [];
+    if (prefs.flash) d.push({ name: 'set_flashlight', description: 'Turn the phone flashlight (torch) on or off.', parameters: { type: 'OBJECT', properties: { on: { type: 'BOOLEAN', description: 'true = on, false = off' } }, required: ['on'] } });
+    if (prefs.apps) d.push({ name: 'open_app', description: 'Open an app on the phone, e.g. WhatsApp, YouTube, Instagram, Camera, Settings, Wi-Fi settings, Maps, Spotify.', parameters: { type: 'OBJECT', properties: { name: S }, required: ['name'] } });
+    if (prefs.web) {
+      d.push({ name: 'open_website', description: 'Open a website (https link) in the browser.', parameters: { type: 'OBJECT', properties: { url: S }, required: ['url'] } });
+      d.push({ name: 'navigate_to', description: 'Open directions to a place in the maps app.', parameters: { type: 'OBJECT', properties: { place: S }, required: ['place'] } });
+    }
+    if (prefs.comms) d.push({ name: 'call_or_message', description: 'Prepare a phone call (opens the dialer), a text message or an email draft. The user still has to press call/send themselves.', parameters: { type: 'OBJECT', properties: { kind: { type: 'STRING', enum: ['call', 'sms', 'email'] }, to: S, body: S }, required: ['kind', 'to'] } });
+    return d;
+  };
+  const extra = () => tools().length ? ' You can control the user\'s phone with tools (flashlight, opening apps and websites, maps, preparing calls and messages). Use a tool only when the user clearly asks. After the tool returns, say briefly what happened, and if it failed say so honestly. Never claim an action happened unless the tool result says so. The user must press call or send themselves.' : '';
+
+  async function setTorch(on) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return { ok: false, error: 'Camera access is not available here.' };
+    if (!on) { if (torch) { try { await torch.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: false }] }); } catch {} torch.getTracks().forEach(t => t.stop()); torch = null; } return { ok: true, flashlight: 'off' }; }
+    if (torch) return { ok: true, flashlight: 'on' };
+    let s;
+    try { s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } }); }
+    catch (e) { return { ok: false, error: e && e.name === 'NotAllowedError' ? 'Camera permission was denied, so the flashlight cannot be used.' : 'Could not open the camera: ' + (e && e.message) }; }
+    const tr = s.getVideoTracks()[0], caps = tr.getCapabilities ? tr.getCapabilities() : {};
+    if (!caps.torch) { s.getTracks().forEach(t => t.stop()); return { ok: false, error: 'This phone or browser does not allow flashlight control (iPhones and some browsers cannot).' }; }
+    try { await tr.applyConstraints({ advanced: [{ torch: true }] }); torch = s; return { ok: true, flashlight: 'on' }; }
+    catch (e) { s.getTracks().forEach(t => t.stop()); return { ok: false, error: 'The flashlight would not turn on: ' + (e && e.message) }; }
+  }
+  function chip(url, label) {
+    let box = document.getElementById('rx-chips');
+    if (!box) { box = document.createElement('div'); box.id = 'rx-chips'; document.body.appendChild(box); }
+    const a = document.createElement('a'); a.className = 'rxchip'; a.href = url; a.rel = 'noopener'; if (/^https?:/.test(url)) a.target = '_blank'; a.textContent = 'Open ' + label + ' ↗';
+    const x = document.createElement('button'); x.type = 'button'; x.setAttribute('aria-label', 'Dismiss'); x.textContent = '✕'; x.onclick = () => w.remove();
+    const w = document.createElement('div'); w.className = 'rxchipw'; w.append(a, x); box.appendChild(w); setTimeout(() => w.remove(), 25000);
+  }
+  function launch(url, label) {
+    chip(url, label);
+    try { const a = document.createElement('a'); a.href = url; a.rel = 'noopener'; if (/^https?:/.test(url)) a.target = '_blank'; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); } catch {}
+    return { ok: true, note: 'Asked the phone to open ' + label + '. A tap-to-open button is also on screen in case the phone blocked the automatic open.' };
+  }
+  async function run(name, a) {
+    if (!accepted) return { ok: false, error: 'The user has not accepted the phone-control terms.' };
+    if (name === 'set_flashlight' && prefs.flash) return setTorch(!!a.on);
+    if (name === 'open_app' && prefs.apps) {
+      const n = String(a.name || '').toLowerCase(), hit = APPS.find(x => x[0].test(n));
+      if (!hit) return { ok: false, error: 'No shortcut for that app yet.', known_apps: APPS.map(x => x[1]) };
+      return launch(hit[2], hit[1]);
+    }
+    if (name === 'open_website' && prefs.web) {
+      let u = String(a.url || '').trim(); if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+      try { const p = new URL(u); if (p.protocol !== 'https:' && p.protocol !== 'http:') throw 0; return launch(p.href, p.hostname); } catch { return { ok: false, error: 'That is not a valid web address.' }; }
+    }
+    if (name === 'navigate_to' && prefs.web) return launch('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(String(a.place || '')), 'Maps');
+    if (name === 'call_or_message' && prefs.comms) {
+      const to = String(a.to || '').trim(), body = encodeURIComponent(String(a.body || ''));
+      if (a.kind === 'call') return launch('tel:' + to.replace(/[^\d+*#]/g, ''), 'the dialer');
+      if (a.kind === 'sms') return launch('sms:' + to.replace(/[^\d+,]/g, '') + (body ? '?body=' + body : ''), 'Messages');
+      if (a.kind === 'email') return launch('mailto:' + encodeURIComponent(to) + (body ? '?body=' + body : ''), 'Email');
+    }
+    return { ok: false, error: 'That action is turned off in the user\'s settings.' };
+  }
+  DEV.tools = tools; DEV.extra = extra; DEV.run = run;
+
+  /* ---- wake word (only while Rhomeo is open and on screen) ---- */
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  function lev(a, b) { const m = a.length, n = b.length, d = Array.from({ length: m + 1 }, (_, i) => [i]); for (let j = 1; j <= n; j++) d[0][j] = j; for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[m][n]; }
+  function heard(text) {
+    const p = norm(prefs.phrase).split(' ').filter(Boolean), t = norm(text).split(' ');
+    if (!p.length) return false;
+    for (let i = 0; i + p.length <= t.length; i++) { if (p.every((w, j) => w === t[i + j] || (w.length > 3 && lev(w, t[i + j]) <= 1))) return true; }
+    return t.join('').includes(p.join(''));
+  }
+  const wakeShouldRun = () => !!(SR && uid && accepted && prefs.wake && !document.hidden && navigator.onLine && !listening && !rx.live.isOn() && wrFail < 4);
+  function stopWake() { if (wr) { const r = wr; wr = null; r.onend = null; try { r.abort(); } catch {} } }
+  function startWake() {
+    if (wr) return;
+    const r = wr = new SR(); r.continuous = true; r.interimResults = true; r.lang = navigator.language || 'en-US';
+    r.onresult = e => {
+      for (let i = e.resultIndex; i < e.results.length; i++) if (heard(e.results[i][0].transcript)) { stopWake(); wrFail = 0; note('Hey! I\'m listening.'); setTimeout(() => note(''), 1500); rx.live.start(); return; }
+    };
+    r.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { prefs.wake = false; persist(); paintUI(); note('Wake word turned off: microphone access is blocked.'); }
+      else if (e.error !== 'no-speech' && e.error !== 'aborted') wrFail++;
+    };
+    r.onend = () => { if (wr === r) wr = null; };
+    try { r.start(); } catch { wr = null; wrFail++; }
+  }
+  setInterval(() => { if (wakeShouldRun()) startWake(); else stopWake(); }, 1500);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopWake(); else wrFail = 0; });
+  addEventListener('online', () => { wrFail = 0; });
+
+  /* ---- saved to the account so it follows the user to other devices ---- */
+  async function persist() {
+    if (!uid) return;
+    sv(key(), { prefs, accepted, acceptedAt });
+    try { await sb.from('device_prefs').upsert({ user_id: uid, prefs, terms_version: accepted ? TERMS_V : null, terms_accepted_at: accepted ? acceptedAt : null, updated_at: new Date().toISOString() }); } catch {}
+  }
+  async function load() {
+    const c = ld(key()); if (c) { prefs = { ...DEF, ...c.prefs }; accepted = !!c.accepted; acceptedAt = c.acceptedAt || ''; }
+    try {
+      const { data } = await sb.from('device_prefs').select('prefs,terms_version,terms_accepted_at').eq('user_id', uid).maybeSingle();
+      if (data) { prefs = { ...DEF, ...(data.prefs || {}) }; accepted = data.terms_version === TERMS_V; acceptedAt = data.terms_accepted_at || ''; sv(key(), { prefs, accepted, acceptedAt }); }
+    } catch {}
+    paintUI();
+    if (!accepted && !declined) setTimeout(() => { if (uid && !accepted && !document.body.classList.contains('out')) openTerms(); }, 2500);
+  }
+  setInterval(() => {
+    const id = user ? user.id : '';
+    if (id === uid) return;
+    uid = id; stopWake(); setTorch(false).catch(() => {});
+    if (uid) { wrFail = 0; load(); } else { prefs = { ...DEF }; accepted = false; acceptedAt = ''; declined = false; }
+  }, 800);
+
+  /* ---- settings + terms UI ---- */
+  const fl = { flash: 'rx-f-flash', apps: 'rx-f-apps', web: 'rx-f-web', comms: 'rx-f-comms', wake: 'rx-f-wake' };
+  function paintUI() {
+    if (!$('rx-dev')) return;
+    for (const k in fl) $(fl[k]).checked = !!prefs[k] && accepted;
+    $('rx-phrase').value = prefs.phrase;
+    $('rx-terms-state').textContent = accepted ? 'Terms accepted' + (acceptedAt ? ' on ' + new Date(acceptedAt).toLocaleDateString() : '') + '.' : 'Accept the terms to turn these on.';
+    $('rx-terms-btn').textContent = accepted ? 'View terms' : 'Read and accept terms';
+    $('rx-hint').textContent = (android ? '' : 'Flashlight control only works on Android Chrome. ') + 'The wake word only works while Rhomeo is open and on screen. Your choices are saved to your account and follow you to other devices.';
+  }
+  function openTerms() { $('rx-agree').checked = false; $('rx-accept').disabled = true; $('rx-accept').classList.toggle('hidden', accepted); $('rx-agreerow').classList.toggle('hidden', accepted); openModal('devterms'); }
+  $('rx-terms-btn').onclick = openTerms;
+  $('rx-agree').onchange = () => { $('rx-accept').disabled = !$('rx-agree').checked; };
+  $('rx-accept').onclick = () => { accepted = true; acceptedAt = new Date().toISOString(); persist(); paintUI(); closeModals(); note('Phone control is now available. Choose what Rhomeo may do in Settings.'); setTimeout(() => note(''), 4000); };
+  $('rx-later').onclick = () => { declined = true; closeModals(); };
+  Object.entries(fl).forEach(([k, id]) => { $(id).onchange = () => { if (!accepted) { $(id).checked = false; openTerms(); return; } prefs[k] = $(id).checked; if (k === 'wake' && prefs.wake) wrFail = 0; if (k === 'flash' && !prefs.flash) setTorch(false); persist(); }; });
+  $('rx-phrase').onchange = () => { const v = norm($('rx-phrase').value); if (v.length < 4) { $('rx-phrase').value = prefs.phrase; return note('Pick a wake phrase with at least 4 letters.'); } prefs.phrase = v; $('rx-phrase').value = v; persist(); note('Wake phrase saved: "' + v + '"'); setTimeout(() => note(''), 2500); };
+  ['settingsbtn', 'sbsettings'].forEach(id => $(id).addEventListener('click', paintUI));
+  return { openTerms };
 })();
 
 /* start fetching the code highlighter once the app is up, without competing with chat data */
