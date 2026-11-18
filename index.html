@@ -643,47 +643,41 @@ html.rm #modesw,html.rm #modesw .knob,html.rm #modesw .si{transition:none}
 @keyframes rxspin{to{transform:rotate(360deg)}}
 html.rm .ic-mic .w,html.rm #send::after,html.rm #send[data-s=mic]{animation:none}
 #rxvc{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--s1) 88%,transparent);color:var(--text);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:9px 10px 9px 14px}
-#rxvc .orb{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--ok));animation:rxbr 1.6s ease-in-out infinite}
+#rxvc .orb{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--w3),var(--w1));animation:rxbr 1.6s ease-in-out infinite}
 #rxvc[data-st=speaking] .orb{background:linear-gradient(135deg,var(--cy),var(--cr));animation-duration:.6s}
 #rxvc[data-st^=reconnecting] .orb,#rxvc[data-st^=connecting] .orb{background:var(--mute)}
 #rxvc .tm{color:var(--mute);font:500 .78rem var(--mono);min-width:2.4em}
 #rxvc b{background:var(--danger);color:#fff;border-radius:999px;padding:5px 12px;font-size:.78rem}
 @keyframes rxbr{0%,100%{transform:scale(.8);opacity:.7}50%{transform:scale(1.35);opacity:1}}
 
-#rxglow{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .6s;--lv:0;--g1:var(--accent);--g2:color-mix(in srgb,var(--accent) 35%,#000);
-  box-shadow:inset 0 0 calc(34px + 70px*var(--lv)) calc(2px + 12px*var(--lv)) var(--g1),inset 0 0 calc(90px + 90px*var(--lv)) 0 var(--g2);animation:rxgl 3.4s ease-in-out infinite}
-#rxglow.on{opacity:.85}
-#rxglow[data-st=speaking]{--g1:var(--cy);--g2:var(--cr)}
-#rxglow[data-st=connecting],#rxglow[data-st^=reconnecting]{--g1:#6b7280;--g2:#504338}
-@keyframes rxgl{0%,100%{filter:brightness(.85)}50%{filter:brightness(1.2)}}
-#rxcall{position:fixed;left:0;right:0;top:0;bottom:var(--ibt,112px);z-index:80;opacity:0;transition:opacity .45s;--lv:0;display:flex;flex-direction:column;align-items:center;background:radial-gradient(70% 42% at 50% 30%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 75%);color:var(--text)}
+#rxcall{position:fixed;left:0;right:0;top:0;bottom:var(--ibt,112px);z-index:80;opacity:0;transition:opacity .45s;--lv:0;display:flex;flex-direction:column;align-items:center;background:radial-gradient(70% 42% at 50% 30%,color-mix(in srgb,var(--w2) 24%,transparent),transparent 78%),var(--bg);color:var(--text)}
 #rxcall.on{opacity:1}#rxcall.hidden{display:none}
 #rxcall .rxtop{display:flex;align-items:center;gap:8px;margin-top:calc(18px + env(safe-area-inset-top));font-size:.85rem;color:var(--mute)}
-#rxcall .dot{width:8px;height:8px;border-radius:50%;background:var(--good);animation:rxbr 1.6s ease-in-out infinite}
+#rxcall .dot{width:8px;height:8px;border-radius:50%;background:var(--w2);animation:rxbr 1.6s ease-in-out infinite}
 #rxcall[data-st=connecting] .dot{background:#9ca3af}
 #rxcall .tm{font:500 .8rem var(--mono);opacity:.7}
 #rxcall .face{position:absolute;left:50%;top:30%;width:min(46vw,190px);aspect-ratio:1;transform:translate(-50%,-50%)}
-#rxcall .face svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 36px color-mix(in srgb,var(--accent) 55%,transparent));transform:scale(calc(1 + var(--lv)*.07));transition:transform .08s linear;animation:rxbob 4.5s ease-in-out infinite}
+#rxcall .face svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 12px 30px color-mix(in srgb,var(--w1) 45%,transparent));transform:scale(calc(1 + var(--lv)*.07));transition:transform .08s linear;animation:rxbob 4.5s ease-in-out infinite}
 .eye{transform-box:fill-box;transform-origin:center;animation:rxbl 4.2s infinite}
 #rxcall .talk{transform-box:fill-box;transform-origin:center;transform:scaleY(calc(.12 + var(--lv)*.95)) scaleX(calc(.7 + var(--lv)*.35));opacity:0;transition:opacity .2s}
 #rxcall .smile{transition:opacity .2s}
 #rxcall[data-st=speaking] .talk{opacity:1}#rxcall[data-st=speaking] .smile{opacity:0}
 #rxcall.muted .face svg{filter:grayscale(.8) drop-shadow(0 10px 30px rgba(0,0,0,.5))}
-#rxcall .cap{position:absolute;left:0;right:0;top:calc(30% + min(23vw,95px) + 26px);bottom:96px;padding:0 24px;text-align:center;font:600 1.3rem/1.5 var(--disp);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;-webkit-mask-image:linear-gradient(#000 85%,transparent);mask-image:linear-gradient(#000 85%,transparent)}
-#rxcall .cap span{animation:rxin .35s ease-out both}
+#rxcall .cap{position:absolute;left:0;right:0;bottom:122px;height:5.4em;padding:0 18px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;text-align:center;font:600 1.02rem/1.75 var(--disp);pointer-events:none}
+#rxcall .cap p{margin:0;max-width:min(94%,560px)}
+#rxcall .cap span{background:rgba(24,14,6,.7);color:#fff;padding:2px 9px;border-radius:8px;-webkit-box-decoration-break:clone;box-decoration-break:clone;animation:rxin .3s ease-out both}
 #rxcall .you{position:absolute;left:0;right:0;bottom:78px;padding:0 24px;text-align:center;font-size:.85rem;color:var(--mute);min-height:1.2em}
 #rxcall .ctl{position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:10px}
 #rxcall .ctl button{border-radius:999px;padding:11px 20px;font:600 .88rem var(--sans);background:var(--s2);color:var(--text);border:1px solid var(--line)}
-#rxint{opacity:0;pointer-events:none;transform:scale(.9);transition:opacity .25s,transform .25s;background:var(--accent)!important;border-color:transparent!important}
+#rxint{opacity:0;pointer-events:none;transform:scale(.9);transition:opacity .25s,transform .25s;background:var(--w2)!important;color:#2A1405!important;border-color:transparent!important}
 #rxcall[data-st=speaking] #rxint{opacity:1;pointer-events:auto;transform:none}
 #rxend{background:var(--danger)!important;border-color:transparent!important}
 @keyframes rxbob{0%,100%{translate:0 -4px}50%{translate:0 5px}}
 @keyframes rxbl{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
 @keyframes rxin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-html.rm #rxglow,html.rm #rxcall .face svg,html.rm .eye{animation:none}
+html.rm #rxcall .face svg,html.rm .eye{animation:none}
 header,#msgs{transition:transform .7s cubic-bezier(.7,0,.25,1),opacity .55s}
 body.incall header,body.incall #msgs{transform:translateY(-115%);opacity:0;pointer-events:none}
-#rxglow[data-st=thinking]{--g1:var(--cg);--g2:var(--accent)}
 #rxcall .face svg *{transition:opacity .25s,transform .35s}
 #rxcall .blush,#rxcall .brows,#rxcall .ea,#rxcall .eh,#rxcall .ew,#rxcall .tear,#rxcall .lt,#rxcall .grin,#rxcall .mo,#rxcall .frown,#rxcall .flat,#rxcall .dots{opacity:0}
 #rxcall[data-emo=happy] .ea,#rxcall[data-emo=happy] .grin,#rxcall[data-emo=happy] .blush{opacity:1}
@@ -2028,21 +2022,22 @@ const rx = (() => {
   /* ---------- 5. live call: Gemini Live API. Full-screen call with a talking face, glowing edges, interrupt ---------- */
   const LIVE_MODEL = 'gemini-3.1-flash-live-preview', LIVE_VOICE = 'Puck', LIVE_FN = SB_URL + '/functions/v1/live-token';
   document.body.insertAdjacentHTML('beforeend',
-    '<div id="rxglow"></div><div id="rxcall" class="hidden" data-st="connecting"><div class="rxtop"><i class="dot"></i><span class="st">Connecting…</span><span class="tm">0:00</span></div>' +
-    '<div class="face"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="fg" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#B5DBFF"/><stop offset=".55" stop-color="#3FA0F5"/><stop offset="1" stop-color="#0A5BAA"/></radialGradient></defs>' +
-    '<circle cx="60" cy="60" r="56" fill="url(#fg)"/><g class="blush"><ellipse cx="29" cy="68" rx="8" ry="5" fill="#ff8fb1" opacity=".6"/><ellipse cx="91" cy="68" rx="8" ry="5" fill="#ff8fb1" opacity=".6"/></g>' +
-    '<g class="brows" stroke="#fff" stroke-width="4.5" stroke-linecap="round"><path class="bl" d="M33 35L51 33"/><path class="br" d="M69 33L87 35"/></g>' +
-    '<g class="eo"><ellipse class="eye" cx="42" cy="49" rx="6" ry="8.5" fill="#fff"/><ellipse class="eye" cx="78" cy="49" rx="6" ry="8.5" fill="#fff"/></g>' +
-    '<g class="ea" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"><path d="M34 53Q42 42 50 53"/><path d="M70 53Q78 42 86 53"/></g>' +
-    '<g class="ew"><circle cx="42" cy="48" r="10" fill="#fff"/><circle cx="78" cy="48" r="10" fill="#fff"/><circle cx="42" cy="48" r="4" fill="#0B1A4D"/><circle cx="78" cy="48" r="4" fill="#0B1A4D"/></g>' +
-    '<g class="eh" fill="#ff5d8f"><path d="M42 58C30 49 32 40 38 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/><path d="M78 58C66 49 68 40 74 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/></g>' +
-    '<path class="tear" d="M36 61q-4 7 0 9q4-2 0-9z" fill="#9fd8ff"/><g class="lt" fill="#9fd8ff"><path d="M25 56q-5 8 0 10q5-2 0-10z"/><path d="M95 56q-5 8 0 10q5-2 0-10z"/></g>' +
-    '<path class="smile" d="M36 74Q60 96 84 74" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="grin" d="M34 70Q60 108 86 70Z" fill="#0B1A4D" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>' +
-    '<ellipse class="mo" cx="60" cy="82" rx="7" ry="9" fill="#0B1A4D"/><path class="frown" d="M40 90Q60 72 80 90" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/><path class="flat" d="M46 82H74" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/>' +
-    '<ellipse class="talk" cx="60" cy="80" rx="17" ry="12" fill="#0B1A4D"/><g class="dots" fill="#fff"><circle cx="98" cy="12" r="3.5"/><circle cx="108" cy="4" r="4.5"/><circle cx="119" cy="-6" r="5.5"/></g></svg></div>' +
+    '<div id="rxcall" class="hidden" data-st="connecting"><div class="rxtop"><i class="dot"></i><span class="st">Connecting…</span><span class="tm">0:00</span></div>' +
+    '<div class="face"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="fg" cx="38%" cy="28%" r="85%"><stop offset="0" stop-color="#FFE48F"/><stop offset=".5" stop-color="#FFB23E"/><stop offset="1" stop-color="#EE7410"/></radialGradient><clipPath id="gc"><path d="M34 70Q60 108 86 70Z"/></clipPath></defs>' +
+    '<circle cx="60" cy="60" r="56" fill="url(#fg)"/><ellipse cx="42" cy="24" rx="28" ry="13" fill="#fff" opacity=".2" transform="rotate(-18 42 24)"/><g class="blush"><ellipse cx="28" cy="68" rx="8" ry="5" fill="#FF6F7D" opacity=".55"/><ellipse cx="92" cy="68" rx="8" ry="5" fill="#FF6F7D" opacity=".55"/></g>' +
+    '<g class="brows" stroke="#3B1D0C" stroke-width="4.5" stroke-linecap="round"><path class="bl" d="M33 35L51 33"/><path class="br" d="M69 33L87 35"/></g>' +
+    '<g class="eo"><ellipse class="eye" cx="42" cy="49" rx="6" ry="8.5" fill="#3B1D0C"/><ellipse class="eye" cx="78" cy="49" rx="6" ry="8.5" fill="#3B1D0C"/><circle cx="44" cy="45" r="2.1" fill="#fff"/><circle cx="80" cy="45" r="2.1" fill="#fff"/></g>' +
+    '<g class="ea" fill="none" stroke="#3B1D0C" stroke-width="5.5" stroke-linecap="round"><path d="M34 53Q42 42 50 53"/><path d="M70 53Q78 42 86 53"/></g>' +
+    '<g class="ew"><circle cx="42" cy="48" r="10" fill="#fff"/><circle cx="78" cy="48" r="10" fill="#fff"/><circle cx="42" cy="48" r="4.5" fill="#3B1D0C"/><circle cx="78" cy="48" r="4.5" fill="#3B1D0C"/></g>' +
+    '<g class="eh" fill="#FF3D6E"><path d="M42 58C30 49 32 40 38 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/><path d="M78 58C66 49 68 40 74 40c3 0 4 3 4 3s1-3 4-3c6 0 8 9-4 18z"/></g>' +
+    '<path class="tear" d="M36 61q-4 7 0 9q4-2 0-9z" fill="#8FD3FF"/><g class="lt" fill="#8FD3FF"><path d="M25 56q-5 8 0 10q5-2 0-10z"/><path d="M95 56q-5 8 0 10q5-2 0-10z"/></g>' +
+    '<path class="smile" d="M36 74Q60 96 84 74" fill="none" stroke="#3B1D0C" stroke-width="5.5" stroke-linecap="round"/>' +
+    '<g class="grin"><path d="M34 70Q60 108 86 70Z" fill="#3B1D0C"/><g clip-path="url(#gc)"><rect x="30" y="68" width="60" height="9" fill="#fff"/><ellipse cx="60" cy="98" rx="15" ry="9" fill="#FF6F7D"/></g></g>' +
+    '<ellipse class="mo" cx="60" cy="82" rx="7" ry="9" fill="#3B1D0C"/><path class="frown" d="M40 90Q60 72 80 90" fill="none" stroke="#3B1D0C" stroke-width="5.5" stroke-linecap="round"/><path class="flat" d="M46 82H74" stroke="#3B1D0C" stroke-width="5.5" stroke-linecap="round"/>' +
+    '<g class="talk"><ellipse cx="60" cy="80" rx="17" ry="12" fill="#3B1D0C"/><ellipse cx="60" cy="87" rx="9" ry="5" fill="#FF6F7D"/></g><g class="dots" fill="#F07A12"><circle cx="98" cy="12" r="3.5"/><circle cx="108" cy="4" r="4.5"/><circle cx="119" cy="-6" r="5.5"/></g></svg></div>' +
     '<div class="cap" aria-live="polite"></div><div class="you"></div>' +
     '<div class="ctl"><button type="button" id="rxmute">Mute</button><button type="button" id="rxint">Interrupt</button><button type="button" id="rxend">End</button></div></div>');
-  const ov = $('rxcall'), glow = $('rxglow'), face = ov.querySelector('.face'), capEl = ov.querySelector('.cap'), youEl = ov.querySelector('.you');
+  const ov = $('rxcall'), face = ov.querySelector('.face'), capEl = ov.querySelector('.cap'), youEl = ov.querySelector('.you');
   const live = (() => {
     let on = false, ready = false, ever = false, ws = null, mic = null, cIn = null, cOut = null, nextT = 0, srcs = [], handle = null, tries = 0, inTx = '', outTx = '', t0 = 0, tick = 0, buf = [];
     let emo = 'think', thinkT = 0, muted = false, drop = false, capDone = false, lv = 0, tgt = 0, lvT = 0, ctimer = 0, st = '';
@@ -2051,9 +2046,14 @@ const rx = (() => {
     const feel = t => { for (const [re, e] of EMO) if (re.test(t)) return e; return /!/.test(t) ? 'happy' : null; };
     const setEmo = e => { if (e === emo) return; emo = ov.dataset.emo = e; try { face.firstElementChild.animate([{ scale: 1 }, { scale: 1.16 }, { scale: 1 }], { duration: 380, easing: 'ease-out' }); } catch {} };
     const calm = ms => setTimeout(() => { if (on && st !== 'speaking' && st !== 'thinking') setEmo('listen'); }, ms);
-    const status = t => { st = t.toLowerCase().replace(/\W/g, ''); q('.st').textContent = t; ov.dataset.st = glow.dataset.st = st; };
+    const status = t => { st = t.toLowerCase().replace(/\W/g, ''); q('.st').textContent = t; ov.dataset.st = st; };
     const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
-    const cap = t => { if (capDone) { capEl.replaceChildren(); capDone = false; } const w = document.createElement('span'); w.textContent = t; capEl.appendChild(w); while (capEl.children.length > 60) capEl.firstChild.remove(); };
+    const cap = t => { // subtitles: words flow on in one block; the oldest scroll off the top, a new turn starts a fresh block
+      if (capDone) { capEl.replaceChildren(); capDone = false; }
+      let p = capEl.firstChild; if (!p) { p = document.createElement('p'); capEl.appendChild(p); }
+      const w = document.createElement('span'); w.textContent = t; p.appendChild(w);
+      while (p.children.length > 1 && p.textContent.length > 150) p.firstChild.remove();
+    };
     async function token() {
       const { data: { session } } = await sb.auth.getSession();
       const r = await fetch(LIVE_FN, { method: 'POST', headers: { Authorization: 'Bearer ' + session.access_token, apikey: SB_KEY } });
@@ -2127,14 +2127,14 @@ const rx = (() => {
       };
     }
     function showFace() { // the face rises out of the input bar into the screen
-      document.body.classList.add('incall'); document.documentElement.style.setProperty('--ibt', (innerHeight - $('f').getBoundingClientRect().top + 8) + 'px'); ov.classList.remove('hidden'); glow.classList.add('on'); requestAnimationFrame(() => {
+      document.body.classList.add('incall'); document.documentElement.style.setProperty('--ibt', (innerHeight - $('f').getBoundingClientRect().top + 8) + 'px'); ov.classList.remove('hidden'); requestAnimationFrame(() => {
         ov.classList.add('on');
         const fr = face.getBoundingClientRect(), dy = $('f').getBoundingClientRect().top - (fr.top + fr.height / 2);
         face.animate([{ transform: 'translate(-50%,-50%) translateY(' + dy + 'px) scale(.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) translateY(0) scale(1)', opacity: 1 }], { duration: 750, easing: 'cubic-bezier(.2,1.25,.3,1)', fill: 'both' });
       });
     }
     function hideFace() {
-      glow.classList.remove('on'); ov.classList.remove('on'); document.body.classList.remove('incall');
+      ov.classList.remove('on'); document.body.classList.remove('incall');
       const fr = face.getBoundingClientRect(), dy = $('f').getBoundingClientRect().top - (fr.top + fr.height / 2);
       face.animate([{ transform: 'translate(-50%,-50%) translateY(0) scale(1)', opacity: 1 }, { transform: 'translate(-50%,-50%) translateY(' + dy + 'px) scale(.2)', opacity: 0 }], { duration: 420, easing: 'ease-in', fill: 'both' });
       setTimeout(() => { if (!on) { ov.classList.add('hidden'); capEl.replaceChildren(); youEl.textContent = ''; } }, 450);
@@ -2146,7 +2146,7 @@ const rx = (() => {
       on = true; listening = true; muted = false; drop = false; capDone = false; ever = false; capEl.replaceChildren(); youEl.textContent = ''; $('rxmute').textContent = 'Mute';
       syncSend(); stopSpeech(); emo = ov.dataset.emo = 'think'; status('Connecting…'); t0 = Date.now(); showFace();
       tick = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); q('.tm').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }, 500);
-      lvT = setInterval(() => { lv += (tgt - lv) * 0.45; tgt *= 0.72; const v = lv.toFixed(3); ov.style.setProperty('--lv', v); glow.style.setProperty('--lv', v); }, 50);
+      lvT = setInterval(() => { lv += (tgt - lv) * 0.45; tgt *= 0.72; const v = lv.toFixed(3); ov.style.setProperty('--lv', v); }, 50);
       ctimer = setTimeout(() => { if (on && !ever) { end(); note('The live service didn’t answer. Check the edge function and model name.'); } }, 15000);
       try { cOut = new AudioContext({ sampleRate: 24000 }); await openMic(); await connect(); }
       catch (e) { end(); note(e && e.name === 'NotAllowedError' ? 'Microphone access is blocked. Allow it in your browser’s site settings.' : 'Couldn’t start the call: ' + (e && e.message ? e.message : 'check your connection') + '.'); }
