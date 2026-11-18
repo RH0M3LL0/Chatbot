@@ -2054,10 +2054,11 @@ const rx = (() => {
       const w = document.createElement('span'); w.textContent = t; p.appendChild(w);
       while (p.children.length > 1 && p.textContent.length > 150) p.firstChild.remove();
     };
+    let liveModel = LIVE_MODEL;
     async function token() {
       const { data: { session } } = await sb.auth.getSession();
       const r = await fetch(LIVE_FN, { method: 'POST', headers: { Authorization: 'Bearer ' + session.access_token, apikey: SB_KEY } });
-      if (!r.ok) throw new Error('token ' + r.status); return (await r.json()).token;
+      if (!r.ok) throw new Error('token ' + r.status); const d = await r.json(); if (d.model) liveModel = d.model; return d.token;
     }
     function flushTx() {
       const u = inTx.trim(), m = outTx.trim(); inTx = outTx = ''; if (!u && !m) return;
@@ -2097,7 +2098,7 @@ const rx = (() => {
     async function connect() {
       const tk = await token(); if (!on) return;
       const w = ws = new WebSocket('wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=' + encodeURIComponent(tk));
-      w.onopen = () => w.send(JSON.stringify({ setup: { model: 'models/' + LIVE_MODEL, generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: LIVE_VOICE } } } },
+      w.onopen = () => w.send(JSON.stringify({ setup: { model: 'models/' + liveModel, generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: LIVE_VOICE } } } },
         systemInstruction: { parts: [{ text: ctxText() }] }, inputAudioTranscription: {}, outputAudioTranscription: {}, contextWindowCompression: { slidingWindow: {} }, sessionResumption: handle ? { handle } : {} } }));
       w.onmessage = async e => { try { onMsg(JSON.parse(typeof e.data === 'string' ? e.data : await e.data.text())); } catch {} };
       w.onclose = e => {
