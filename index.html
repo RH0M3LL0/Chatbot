@@ -44,14 +44,7 @@ if('serviceWorker' in navigator){var regSW=function(){navigator.serviceWorker.re
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js">
 <!-- fonts never block the page: system fonts show first, Inter and JetBrains Mono swap in when they arrive -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><style>#boot{display:none}.rxrow{display:flex;align-items:center;gap:12px;padding:10px 2px;font-size:.92rem;cursor:pointer}.rxrow input{width:20px;height:20px;accent-color:var(--accent);flex:none}
-#rx-dev .btn{margin:6px 0 4px}#rx-phrase{width:100%;margin:8px 0 4px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--s2);color:var(--text);font:inherit}
-.rxterms{font-size:.88rem;line-height:1.5;color:var(--text);margin:6px 0 14px}.rxterms ol{padding-left:20px;margin:10px 0}.rxterms li{margin:8px 0}#devterms .btn{width:100%;margin-top:8px}
-#rx-chips{position:fixed;left:0;right:0;bottom:calc(96px + env(safe-area-inset-bottom));z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
-.rxchipw{pointer-events:auto;display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border-radius:999px;padding:4px 6px 4px 18px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
-#rx-later{background:transparent!important;color:var(--mute)!important;box-shadow:none!important}
-.rxchip{color:#fff;font-weight:600;text-decoration:none;padding:10px 0}.rxchipw button{background:rgba(0,0,0,.2);color:#fff;border:0;border-radius:50%;width:32px;height:32px}
-</style></noscript>
+<noscript><style>#boot{display:none}</style></noscript>
 <style>
 :root{
   color-scheme:dark;
@@ -719,6 +712,23 @@ body.incall header,body.incall #msgs{transform:translateY(-115%);opacity:0;point
 @keyframes rxtr{0%{transform:translateY(-2px)}100%{transform:translateY(6px)}}
 html.rm #rxcall .face svg,html.rm #rxcall .lt,html.rm #rxcall .dots circle{animation:none!important}
 
+/* ---------- phone control + terms ---------- */
+.dvrow{display:flex;align-items:center;gap:12px;padding:10px 2px;font-size:.92rem;cursor:pointer}.dvrow input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+#rx-dev .btn{margin:6px 0 4px}#rx-phrase{width:100%;margin:8px 0 4px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--s2);color:var(--text);font:inherit}
+#devterms .card{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+#devterms .mh{flex:none}
+.rxterms{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:0 -8px;padding:2px 8px 14px;font-size:.86rem;line-height:1.55;color:var(--text);-webkit-overflow-scrolling:touch}
+.rxterms>p{margin:0 0 14px;color:var(--mute)}
+.rxterms ol{list-style:none;counter-reset:t;margin:0;padding:0;display:grid;gap:10px}
+.rxterms li{counter-increment:t;position:relative;padding:12px 14px 12px 46px;border-radius:16px;background:var(--s2);border:1px solid var(--line)}
+.rxterms li::before{content:counter(t);position:absolute;left:12px;top:12px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 .75rem var(--sans);background:var(--accent);color:var(--onaccent)}
+.rxterms li b{display:block;margin-bottom:2px;font-size:.9rem}
+.rxfoot{flex:none;padding:12px 0 calc(18px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--s1);display:grid;gap:8px}
+.rxfoot .btn{width:100%;margin:0}.rxfoot .dvrow{padding:4px 2px}
+#rx-chips{position:fixed;left:0;right:0;bottom:calc(96px + env(safe-area-inset-bottom));z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.rxchipw{pointer-events:auto;display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border-radius:999px;padding:4px 6px 4px 18px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+#rx-later{background:transparent!important;color:var(--mute)!important;box-shadow:none!important}
+.rxchip{color:#fff;font-weight:600;text-decoration:none;padding:10px 0}.rxchipw button{background:rgba(0,0,0,.2);color:#fff;border:0;border-radius:50%;width:32px;height:32px}
 </style>
 <style id="gemini-layout">
 /* ===== Gemini-style layout: same features and animations, new placements ===== */
@@ -926,12 +936,14 @@ header{background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 80%,tran
       <h4>Phone control and wake word</h4>
       <p class="instp">Let Rhomeo act on your phone when you ask it by voice in a live call. <span id="rx-terms-state"></span></p>
       <button id="rx-terms-btn" class="btn" type="button">Read and accept terms</button>
-      <label class="rxrow"><input type="checkbox" id="rx-f-flash"><span>Flashlight on and off</span></label>
-      <label class="rxrow"><input type="checkbox" id="rx-f-apps"><span>Open apps (WhatsApp, YouTube, Camera, Settings...)</span></label>
-      <label class="rxrow"><input type="checkbox" id="rx-f-web"><span>Open websites and maps directions</span></label>
-      <label class="rxrow"><input type="checkbox" id="rx-f-comms"><span>Prepare calls, texts and emails</span></label>
-      <label class="rxrow"><input type="checkbox" id="rx-f-wake"><span>Wake word: start a live call by saying the phrase</span></label>
+      <label class="dvrow"><input type="checkbox" id="rx-f-flash"><span>Flashlight on and off</span></label>
+      <label class="dvrow"><input type="checkbox" id="rx-f-apps"><span>Open apps (WhatsApp, YouTube, Camera, Settings...)</span></label>
+      <label class="dvrow"><input type="checkbox" id="rx-f-web"><span>Open websites and maps directions</span></label>
+      <label class="dvrow"><input type="checkbox" id="rx-f-comms"><span>Prepare calls, texts and emails</span></label>
+      <label class="dvrow"><input type="checkbox" id="rx-f-wake"><span>Wake word: start a live call by saying the phrase</span></label>
       <input id="rx-phrase" aria-label="Wake phrase" maxlength="30" placeholder="Wake phrase, e.g. hey rhomeo" autocomplete="off">
+      <a id="rx-app-btn" class="btn hidden" href="/rhomeo.apk" download style="display:block;text-align:center;text-decoration:none">Get the Rhomeo Android app</a>
+      <button id="rx-overlay-btn" class="btn hidden" type="button">Let Rhomeo open itself when it hears you</button>
       <p class="instp" id="rx-hint"></p>
     </section>
         <section>
@@ -947,20 +959,22 @@ header{background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 80%,tran
     <div class="rxterms">
       <p>These terms cover the new phone control and wake word features. Please read them before you turn anything on.</p>
       <ol>
-        <li><b>What it does.</b> In a live call, when you clearly ask, Rhomeo can switch your flashlight on or off, open apps and websites, start directions, and prepare a call, text or email. You still press call or send yourself.</li>
-        <li><b>Permissions.</b> The flashlight needs camera permission. The wake word and live calls need microphone permission. You can withdraw any permission in your browser or phone settings at any time.</li>
-        <li><b>Wake word.</b> When turned on, Rhomeo listens for your wake phrase while the app is open and on screen, using your browser's speech recognition. Depending on your browser, that audio may be processed by the browser vendor (for example Google in Chrome). Rhomeo does not listen when the app is closed or in the background.</li>
-        <li><b>Live calls.</b> Your voice and the call transcript are sent to Google's Gemini service to produce replies, as with any live call.</li>
-        <li><b>Your control.</b> Each action and the wake word can be switched off in Settings. Rhomeo should act only on clear requests, but it can mishear or make mistakes. Check what it did.</li>
-        <li><b>Your responsibility.</b> You are responsible for what you ask Rhomeo to do and for the people you contact. Do not use it for emergencies, driving, or anything where a mistake could cause harm. Call your local emergency number directly instead.</li>
-        <li><b>Device limits.</b> Features depend on your phone and browser. Some (like the flashlight) do not work on iPhone. Opening an app can pause the call.</li>
-        <li><b>Saved settings.</b> Your choices, the version of these terms you accepted and the date are saved to your Rhomeo account so they follow you across your devices. Your account email stays private.</li>
-        <li><b>Changes.</b> If these terms change, you will be asked to accept the new version before the features keep working.</li>
+        <li><b>What it does</b>In a live call or in chat, when you clearly ask, Rhomeo can switch your flashlight on or off, open apps and websites, start directions, and prepare a call, text or email. You still press call or send yourself.</li>
+        <li><b>Permissions</b>In the browser the flashlight needs camera permission; in the Android app it does not. The wake word and live calls need microphone permission. The Android app may also ask for notifications and, optionally, "display over other apps". You can withdraw any permission in your browser or phone settings at any time.</li>
+        <li><b>Wake word</b>When turned on, Rhomeo listens for your wake phrase using your device's speech recognition, which may send audio to its vendor (for example Google) to turn it into text. In a browser this only happens while Rhomeo is open and on screen. In the Rhomeo Android app it keeps listening in the background, shows a notification while it does, and stops as soon as you turn the wake word off. Rhomeo only acts on what you say after the wake phrase.</li>
+        <li><b>Live calls</b>Your voice and the call transcript are sent to Google's Gemini service to produce replies, as with any live call.</li>
+        <li><b>Your control</b>Each action and the wake word can be switched off in Settings. Rhomeo should act only on clear requests, but it can mishear or make mistakes. Check what it did.</li>
+        <li><b>Your responsibility</b>You are responsible for what you ask Rhomeo to do and for the people you contact. Do not use it for emergencies, driving, or anything where a mistake could cause harm. Call your local emergency number directly instead.</li>
+        <li><b>Device limits</b>Features depend on your phone and browser. Some (like the flashlight) do not work on iPhone. Opening an app can pause the call.</li>
+        <li><b>Saved settings</b>Your choices, the version of these terms you accepted and the date are saved to your Rhomeo account so they follow you across your devices. Your account email stays private.</li>
+        <li><b>Changes</b>If these terms change, you will be asked to accept the new version before the features keep working.</li>
       </ol>
     </div>
-    <label id="rx-agreerow" class="rxrow"><input type="checkbox" id="rx-agree"><span>I have read and accept these terms</span></label>
-    <button id="rx-accept" class="btn" type="button" disabled>Accept and continue</button>
-    <button id="rx-later" class="btn ghost" type="button" data-close>Not now</button>
+    <div class="rxfoot">
+      <label id="rx-agreerow" class="dvrow"><input type="checkbox" id="rx-agree"><span>I have read and accept these terms</span></label>
+      <button id="rx-accept" class="btn" type="button" disabled>Accept and continue</button>
+      <button id="rx-later" class="btn ghost" type="button" data-close>Not now</button>
+    </div>
   </div>
 </div>
 <div id="profile" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pf-title">
@@ -1474,10 +1488,30 @@ $('auth-google').onclick = async () => {
   if (!navigator.onLine) { $('auth-err').textContent = 'You’re offline. Check your connection and try again.'; return; }
   authBusy(true, 'google');
   let res;
-  try { res = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: 'select_account' } } }); }
+  const inApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  try {
+    if (inApp) { // Google refuses sign-in inside embedded browsers, so open the phone's real browser and come back through a link
+      res = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: APP_AUTH_URL, skipBrowserRedirect: true, queryParams: { prompt: 'select_account' } } });
+      if (!res.error) { await window.Capacitor.registerPlugin('RhomeoDevice').openUrl({ url: res.data.url }); setTimeout(() => authBusy(false, 'google'), 1500); }
+    } else res = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: 'select_account' } } });
+  }
   catch (err) { res = { error: err }; }
   if (res.error) { authBusy(false, 'google'); $('auth-err').textContent = isNetErr(res.error) ? 'Can’t reach the server. Check your connection and try again.' : 'Google sign-in failed: ' + res.error.message; }
 };
+const APP_AUTH_URL = 'app.rhomeo.chat://auth';
+if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+  window.Capacitor.registerPlugin('App').addListener('appUrlOpen', async ev => { // the browser sends the sign-in result back here
+    const url = String(ev.url || ''); if (url.indexOf(APP_AUTH_URL) !== 0) return;
+    const hp = new URLSearchParams(url.split('#')[1] || ''), qp = new URLSearchParams((url.split('?')[1] || '').split('#')[0]);
+    const get = k => hp.get(k) || qp.get(k);
+    authBusy(false, 'google');
+    try {
+      if (get('error_description')) { $('auth-err').textContent = 'Google sign-in failed: ' + get('error_description').replace(/\+/g, ' '); return; }
+      if (get('access_token') && get('refresh_token')) { const r = await sb.auth.setSession({ access_token: get('access_token'), refresh_token: get('refresh_token') }); if (r.error) throw r.error; }
+      else if (get('code')) { const r = await sb.auth.exchangeCodeForSession(get('code')); if (r.error) throw r.error; }
+    } catch (err) { $('auth-err').textContent = 'Google sign-in failed: ' + (err && err.message ? err.message : 'try again'); }
+  });
+}
 addEventListener('pageshow', e => { if (e.persisted) authBusy(false, 'google'); }); // back button after the Google redirect
 /* the user cancelled or Google/Supabase refused: the error comes back in the URL */
 (function () {
@@ -1751,25 +1785,48 @@ $('f').onsubmit = async e => {
   try {
     const { data: { session } } = await sb.auth.getSession();
     live.push(...await rx.prep(text));
-    const body = JSON.stringify({ mode, contents: rx.pre().concat(cur.history, { role: 'user', parts: live }) });
-    let r;
-    for (let a = 0; ; a++) { // one automatic retry if the connection fails before any reply arrives
-      try {
-        r = await fetch(FN_URL, { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token, apikey: SB_KEY }, body });
-        break;
-      } catch (err) {
-        if (err.name === 'AbortError' || a >= 1 || !navigator.onLine) throw err;
-        th.set('Connection hiccup, retrying…'); await sleep(1500);
-      }
-    }
-    if (!r.ok) throw new Error(r.status === 429 ? 'Rhomeo is a little busy, or today’s message limit is reached. Try again in a moment.' : 'Rhomeo couldn’t reply (error ' + r.status + ').');
-    const rd = r.body.getReader(), dec = new TextDecoder();
+    const msgs = rx.pre().concat(cur.history, { role: 'user', parts: live });
     let first = true;
-    for (;;) {
-      const { done, value } = await rd.read(); if (done) break;
-      arm(30000);
-      if (first) { first = false; th.stop(); box.classList.remove('wait'); box.classList.add('streaming'); }
-      out += dec.decode(value, { stream: true }); sched();
+    for (let hop = 0; hop < 3; hop++) { // a reply may ask to act on the phone; do it, hand back the result, and let it finish its answer
+      const body = JSON.stringify({ mode, contents: msgs, tools: dev.toolNames() });
+      let r;
+      for (let a = 0; ; a++) { // one automatic retry if the connection fails before any reply arrives
+        try {
+          r = await fetch(FN_URL, { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token, apikey: SB_KEY }, body });
+          break;
+        } catch (err) {
+          if (err.name === 'AbortError' || a >= 1 || !navigator.onLine) throw err;
+          th.set('Connection hiccup, retrying…'); await sleep(1500);
+        }
+      }
+      if (!r.ok) throw new Error(r.status === 429 ? 'Rhomeo is a little busy, or today’s message limit is reached. Try again in a moment.' : 'Rhomeo couldn’t reply (error ' + r.status + ').');
+      const rd = r.body.getReader(), dec = new TextDecoder(), calls = []; let pend = '';
+      const take = chunk => { // text streams through; a phone action arrives as \u0001{json}\u0002
+        pend += chunk;
+        for (;;) {
+          const i = pend.indexOf('\u0001');
+          if (i < 0) { out += pend; pend = ''; break; }
+          out += pend.slice(0, i);
+          const j = pend.indexOf('\u0002', i);
+          if (j < 0) { pend = pend.slice(i); break; }
+          try { calls.push(JSON.parse(pend.slice(i + 1, j))); } catch {}
+          pend = pend.slice(j + 1);
+        }
+      };
+      for (;;) {
+        const { done, value } = await rd.read(); if (done) break;
+        arm(30000);
+        if (first) { first = false; th.stop(); box.classList.remove('wait'); box.classList.add('streaming'); }
+        take(dec.decode(value, { stream: true })); sched();
+      }
+      if (!calls.length) break;
+      const resp = [];
+      for (const c of calls) {
+        let res; try { res = await DEV.run(c.functionCall.name, c.functionCall.args || {}); } catch (e) { res = { ok: false, error: String((e && e.message) || e) }; }
+        resp.push({ functionResponse: { name: c.functionCall.name, response: res } });
+      }
+      msgs.push({ role: 'model', parts: calls }, { role: 'user', parts: resp });
+      out += out && !/\s$/.test(out) ? '\n\n' : '';
     }
   } catch (err) {
     if (stalled) note(out ? 'The connection dropped mid-reply. Kept what arrived. Ask me to continue.' : 'This is taking too long. Check your connection and try again.', !out);
@@ -2092,8 +2149,22 @@ const rx = (() => {
     const calm = ms => setTimeout(() => { if (on && st !== 'speaking' && st !== 'thinking') setEmo('listen'); }, ms);
     const status = t => { st = t.toLowerCase().replace(/\W/g, ''); q('.st').textContent = t; ov.dataset.st = st; };
     const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
-    const cap = t => { // subtitles: words flow on in one block; the oldest scroll off the top, a new turn starts a fresh block
-      if (capDone) { capEl.replaceChildren(); capDone = false; }
+    /* subtitles are revealed word by word in step with the voice: the transcript arrives faster than the audio plays, so each word waits for its moment */
+    const freshCq = () => ({ text: '', shown: 0, finished: false, fin: 0, t0: 0, aud: 0, play: null });
+    let cq = freshCq(), capTimer = 0;
+    const newTurn = () => { if (capDone || (cq.finished && performance.now() - cq.fin > 1200)) { cq = freshCq(); capEl.replaceChildren(); capDone = false; } };
+    const capIn = t => { newTurn(); if (!cq.t0) cq.t0 = performance.now(); cq.text += t; };
+    const capTick = () => {
+      const q = cq; if (!on || drop || !q.text) return;
+      const words = q.text.split(/\s+/).filter(Boolean);
+      const whole = (q.finished || /\s$/.test(q.text)) ? words.length : Math.max(0, words.length - 1);
+      const el = q.play != null && cOut ? Math.max(0, cOut.currentTime - q.play) : Math.max(0, (performance.now() - q.t0) / 1000 - 0.5);
+      const wps = words.length >= 4 && q.aud > 0.6 ? Math.min(5, Math.max(1.6, words.length / q.aud)) : 2.7;
+      let allow = Math.min(whole, Math.floor(el * wps) + 1);
+      if (q.finished && q.play != null && !srcs.length) allow = whole; // the voice has finished: show the rest
+      while (q.shown < allow) { cap(words[q.shown] + ' '); q.shown++; }
+    };
+    const cap = t => { // words flow on in one block; the oldest fade off the top
       let p = capEl.firstChild; if (!p) { p = document.createElement('p'); capEl.appendChild(p); }
       const w = document.createElement('span'); w.textContent = t; p.appendChild(w);
       while (p.children.length > 1 && p.textContent.length > 190) p.firstChild.remove();
@@ -2119,6 +2190,7 @@ const rx = (() => {
       for (let i = 0; i < n; i++) { const v = raw.charCodeAt(2 * i) | (raw.charCodeAt(2 * i + 1) << 8); ch[i] = (v > 32767 ? v - 65536 : v) / 32768; pk += Math.abs(ch[i]); }
       const s = cOut.createBufferSource(); s.buffer = ab; s.connect(cOut.destination);
       nextT = Math.max(nextT, cOut.currentTime + 0.04); const at = nextT; s.start(at); nextT += ab.duration; srcs.push(s);
+      newTurn(); if (cq.play == null) cq.play = at; cq.aud += ab.duration;
       const lvl = Math.min(1, (pk / n) * 7); setTimeout(() => { if (on && !drop) tgt = Math.max(tgt, lvl); }, Math.max(0, (at - cOut.currentTime) * 1000));
       s.onended = () => { srcs = srcs.filter(x => x !== s); }; if (st !== 'speaking') { status('Speaking'); if (emo === 'think') setEmo('listen'); }
     }
@@ -2139,10 +2211,10 @@ const rx = (() => {
         const uf = /\b(thank|thanks|love you|good job|well done)/i.test(inTx.slice(-40)) ? 'love' : /\b(haha|lol)/i.test(inTx.slice(-30)) ? 'laugh' : null; if (uf) { setEmo(uf); calm(2200); }
         clearTimeout(thinkT); thinkT = setTimeout(() => { if (on && st === 'listening' && inTx.trim()) { status('Thinking'); setEmo('think'); } }, 1100);
       }
-      if (c.outputTranscription && c.outputTranscription.text && !drop) { outTx += c.outputTranscription.text; cap(c.outputTranscription.text); youEl.textContent = ''; const f = feel(outTx.slice(-110)); if (f) setEmo(f); }
+      if (c.outputTranscription && c.outputTranscription.text && !drop) { outTx += c.outputTranscription.text; capIn(c.outputTranscription.text); youEl.textContent = ''; const f = feel(outTx.slice(-110)); if (f) setEmo(f); }
       if (c.interrupted) { flush(); capDone = true; flushTx(); status('Listening'); calm(900); }
       if (c.modelTurn) c.modelTurn.parts.forEach(p => { if (p.inlineData) play(p.inlineData.data); });
-      if (c.turnComplete) { drop = false; capDone = true; flushTx(); setTimeout(() => { if (on && !srcs.length && st === 'speaking') status('Listening'); }, 400); calm(1600); }
+      if (c.turnComplete) { drop = false; cq.finished = true; cq.fin = performance.now(); flushTx(); setTimeout(() => { if (on && !srcs.length && st === 'speaking') status('Listening'); }, 400); calm(1600); }
     }
     const ctxText = () => rules + ' This is a live voice call: answer in short, natural spoken sentences.' + DEV.extra() + (cur.history.length ? '\nRecent chat:\n' + cur.history.slice(-8).map(h => (h.role === 'user' ? 'User: ' : 'Rhomeo: ') + h.parts.map(p => p.text || '').join(' ').slice(0, 400)).join('\n') : '');
     async function connect() {
@@ -2194,16 +2266,17 @@ const rx = (() => {
       if (on) return;
       if (!navigator.onLine) return note('A live call needs a connection.');
       if (!window.isSecureContext || !navigator.mediaDevices) return note('Live calls need the site to be opened over https.');
-      on = true; listening = true; muted = false; drop = false; capDone = false; ever = false; capEl.replaceChildren(); youEl.textContent = ''; $('rxmute').textContent = 'Mute';
+      on = true; listening = true; muted = false; drop = false; capDone = false; ever = false; capEl.replaceChildren(); cq = freshCq(); youEl.textContent = ''; $('rxmute').textContent = 'Mute';
       syncSend(); stopSpeech(); emo = ov.dataset.emo = 'think'; status('Connecting…'); t0 = Date.now(); showFace();
       tick = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); q('.tm').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }, 500);
+      capTimer = setInterval(capTick, 60);
       lvT = setInterval(() => { lv += (tgt - lv) * 0.45; tgt *= 0.72; const v = lv.toFixed(3); ov.style.setProperty('--lv', v); }, 50);
       ctimer = setTimeout(() => { if (on && !ever) { end(); note('The live service didn’t answer. Check the edge function and model name.'); } }, 15000);
       try { cOut = new AudioContext({ sampleRate: 24000 }); await openMic(); await connect(); }
       catch (e) { end(); note(e && e.name === 'NotAllowedError' ? 'Microphone access is blocked. Allow it in your browser’s site settings.' : 'Couldn’t start the call: ' + (e && e.message ? e.message : 'check your connection') + '.'); }
     }
     function end() {
-      if (!on && !ws) return; on = false; ready = false; listening = false; clearInterval(tick); clearInterval(lvT); clearTimeout(ctimer);
+      if (!on && !ws) return; on = false; ready = false; listening = false; clearInterval(tick); clearInterval(lvT); clearInterval(capTimer); clearTimeout(ctimer);
       const w = ws; ws = null; try { w && w.close(); } catch {}
       if (mic) mic.getTracks().forEach(t => t.stop()); mic = null; buf = [];
       [cIn, cOut].forEach(c => { try { c && c.close(); } catch {} }); cIn = cOut = null; flush(); flushTx(); handle = null; tries = 0; tgt = lv = 0;
@@ -2237,11 +2310,15 @@ const rx = (() => {
 
 /* ================= Phone control + wake word (needs the user's accepted terms) ================= */
 const dev = (() => {
-  const TERMS_V = '2026-11-18';
+  const TERMS_V = '2026-11-19';
   const DEF = { wake: false, phrase: 'hey rhomeo', flash: true, apps: true, web: true, comms: true };
   let prefs = { ...DEF }, accepted = false, acceptedAt = '', uid = '', declined = false, torch = null, wr = null, wrFail = 0;
   const key = () => 'rx_dev_' + uid;
   const android = /Android/i.test(navigator.userAgent);
+  /* inside the Android app, the native plugin does the real work (flashlight, any app, settings, volume, background wake word) */
+  const APP_APK_URL = '/rhomeo.apk'; // where you host the built Android app; set to '' to hide the download button
+  const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  const NP = NATIVE ? window.Capacitor.registerPlugin('RhomeoDevice') : null;
   const sv = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
   const ld = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 
@@ -2259,7 +2336,11 @@ const dev = (() => {
     if (!accepted) return [];
     const S = { type: 'STRING' }, d = [];
     if (prefs.flash) d.push({ name: 'set_flashlight', description: 'Turn the phone flashlight (torch) on or off.', parameters: { type: 'OBJECT', properties: { on: { type: 'BOOLEAN', description: 'true = on, false = off' } }, required: ['on'] } });
-    if (prefs.apps) d.push({ name: 'open_app', description: 'Open an app on the phone, e.g. WhatsApp, YouTube, Instagram, Camera, Settings, Wi-Fi settings, Maps, Spotify.', parameters: { type: 'OBJECT', properties: { name: S }, required: ['name'] } });
+    if (prefs.apps) d.push({ name: 'open_app', description: NATIVE ? 'Open any app installed on the phone by its name, e.g. WhatsApp, YouTube, Camera, Calculator, Spotify.' : 'Open an app on the phone, e.g. WhatsApp, YouTube, Instagram, Camera, Settings, Wi-Fi settings, Maps, Spotify.', parameters: { type: 'OBJECT', properties: { name: S }, required: ['name'] } });
+    if (NATIVE && prefs.apps) {
+      d.push({ name: 'open_settings', description: 'Open a phone settings screen: wifi, bluetooth, airplane mode, display, sound, location, battery, mobile data, notifications, or general settings.', parameters: { type: 'OBJECT', properties: { panel: S }, required: ['panel'] } });
+      d.push({ name: 'set_volume', description: 'Set the phone media volume from 0 to 100 percent.', parameters: { type: 'OBJECT', properties: { percent: { type: 'INTEGER' } }, required: ['percent'] } });
+    }
     if (prefs.web) {
       d.push({ name: 'open_website', description: 'Open a website (https link) in the browser.', parameters: { type: 'OBJECT', properties: { url: S }, required: ['url'] } });
       d.push({ name: 'navigate_to', description: 'Open directions to a place in the maps app.', parameters: { type: 'OBJECT', properties: { place: S }, required: ['place'] } });
@@ -2295,6 +2376,14 @@ const dev = (() => {
   }
   async function run(name, a) {
     if (!accepted) return { ok: false, error: 'The user has not accepted the phone-control terms.' };
+    if (NATIVE) {
+      try {
+        if (name === 'set_flashlight' && prefs.flash) { const r = await NP.flashlight({ on: !!a.on }); return { ok: true, flashlight: r.on ? 'on' : 'off' }; }
+        if (name === 'open_app' && prefs.apps) { const r = await NP.openApp({ name: String(a.name || '') }); return { ok: true, opened: r.opened }; }
+        if (name === 'open_settings' && prefs.apps) { await NP.openSettings({ panel: String(a.panel || '') }); return { ok: true }; }
+        if (name === 'set_volume' && prefs.apps) { const r = await NP.setVolume({ percent: Number(a.percent) }); return { ok: true, volume_percent: r.percent }; }
+      } catch (e) { return { ok: false, error: String((e && e.message) || e) }; }
+    }
     if (name === 'set_flashlight' && prefs.flash) return setTorch(!!a.on);
     if (name === 'open_app' && prefs.apps) {
       const n = String(a.name || '').toLowerCase(), hit = APPS.find(x => x[0].test(n));
@@ -2325,6 +2414,15 @@ const dev = (() => {
     for (let i = 0; i + p.length <= t.length; i++) { if (p.every((w, j) => w === t[i + j] || (w.length > 3 && lev(w, t[i + j]) <= 1))) return true; }
     return t.join('').includes(p.join(''));
   }
+  let nWake = '', nPaused = false;
+  async function nativeWakeSync() {
+    const want = !!(uid && accepted && prefs.wake) ? prefs.phrase : '';
+    try {
+      if (want !== nWake) { if (want) await NP.startWake({ phrase: want }); else await NP.stopWake(); nWake = want; nPaused = false; }
+      if (nWake) { const busy = rx.live.isOn() || listening; if (busy !== nPaused) { nPaused = busy; busy ? await NP.wakePause() : await NP.wakeResume(); } }
+    } catch (e) { if (want) { prefs.wake = false; nWake = ''; persist(); paintUI(); note('Wake word could not start: ' + ((e && e.message) || 'permission needed')); } }
+  }
+  if (NATIVE) NP.addListener('wake', () => { if (!rx.live.isOn()) rx.live.start(); });
   const wakeShouldRun = () => !!(SR && uid && accepted && prefs.wake && !document.hidden && navigator.onLine && !listening && !rx.live.isOn() && wrFail < 4);
   function stopWake() { if (wr) { const r = wr; wr = null; r.onend = null; try { r.abort(); } catch {} } }
   function startWake() {
@@ -2340,7 +2438,7 @@ const dev = (() => {
     r.onend = () => { if (wr === r) wr = null; };
     try { r.start(); } catch { wr = null; wrFail++; }
   }
-  setInterval(() => { if (wakeShouldRun()) startWake(); else stopWake(); }, 1500);
+  setInterval(() => { if (NATIVE) nativeWakeSync(); else if (wakeShouldRun()) startWake(); else stopWake(); }, 1500);
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopWake(); else wrFail = 0; });
   addEventListener('online', () => { wrFail = 0; });
 
@@ -2374,17 +2472,21 @@ const dev = (() => {
     $('rx-phrase').value = prefs.phrase;
     $('rx-terms-state').textContent = accepted ? 'Terms accepted' + (acceptedAt ? ' on ' + new Date(acceptedAt).toLocaleDateString() : '') + '.' : 'Accept the terms to turn these on.';
     $('rx-terms-btn').textContent = accepted ? 'View terms' : 'Read and accept terms';
-    $('rx-hint').textContent = (android ? '' : 'Flashlight control only works on Android Chrome. ') + 'The wake word only works while Rhomeo is open and on screen. Your choices are saved to your account and follow you to other devices.';
+    $('rx-hint').textContent = (NATIVE ? 'In the Rhomeo app the wake word keeps listening in the background (you will see a notification while it does). ' : (android ? '' : 'Flashlight control only works on Android Chrome. ') + 'In the browser the wake word only works while Rhomeo is open and on screen. Get the Rhomeo Android app for background listening. ') + 'Your choices are saved to your account and follow you to other devices.';
+    $('rx-overlay-btn').classList.toggle('hidden', !NATIVE);
+    $('rx-app-btn').classList.toggle('hidden', NATIVE || !android || !APP_APK_URL);
   }
   function openTerms() { $('rx-agree').checked = false; $('rx-accept').disabled = true; $('rx-accept').classList.toggle('hidden', accepted); $('rx-agreerow').classList.toggle('hidden', accepted); openModal('devterms'); }
+  $('rx-app-btn').href = APP_APK_URL || '#';
   $('rx-terms-btn').onclick = openTerms;
+  $('rx-overlay-btn').onclick = () => { if (NP) NP.openOverlaySettings().catch(() => {}); };
   $('rx-agree').onchange = () => { $('rx-accept').disabled = !$('rx-agree').checked; };
   $('rx-accept').onclick = () => { accepted = true; acceptedAt = new Date().toISOString(); persist(); paintUI(); closeModals(); note('Phone control is now available. Choose what Rhomeo may do in Settings.'); setTimeout(() => note(''), 4000); };
   $('rx-later').onclick = () => { declined = true; closeModals(); };
   Object.entries(fl).forEach(([k, id]) => { $(id).onchange = () => { if (!accepted) { $(id).checked = false; openTerms(); return; } prefs[k] = $(id).checked; if (k === 'wake' && prefs.wake) wrFail = 0; if (k === 'flash' && !prefs.flash) setTorch(false); persist(); }; });
   $('rx-phrase').onchange = () => { const v = norm($('rx-phrase').value); if (v.length < 4) { $('rx-phrase').value = prefs.phrase; return note('Pick a wake phrase with at least 4 letters.'); } prefs.phrase = v; $('rx-phrase').value = v; persist(); note('Wake phrase saved: "' + v + '"'); setTimeout(() => note(''), 2500); };
   ['settingsbtn', 'sbsettings'].forEach(id => $(id).addEventListener('click', paintUI));
-  return { openTerms };
+  return { openTerms, toolNames: () => tools().map(t => t.name) };
 })();
 
 /* start fetching the code highlighter once the app is up, without competing with chat data */
